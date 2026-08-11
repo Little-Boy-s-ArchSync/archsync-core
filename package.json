@@ -28,7 +28,6 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "prepare": "pnpm build",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --noEmit --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
