@@ -1,0 +1,17 @@
+version: "0.1"
+metadata:
+  name: minimal-service
+  description: Smallest valid ArchLoop model.
+components:
+  api:
+    name: Public API
+    type: service
+    layer: application
+  database:
+    name: Primary Database
+    type: database
+    layer: data
+relationships:
+  - from: api
+    to: database
+    type: data

@@ -1,0 +1,41 @@
+{
+  "name": "@archloop/core",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "packageManager": "pnpm@11.16.0",
+  "description": "Architecture model, validation and graph primitives for ArchLoop.",
+  "files": [
+    "dist",
+    "specs",
+    "README.md"
+  ],
+  "bin": {
+    "archloop": "dist/bin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --noEmit --pretty false",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "arch:model": "tsx src/bin.ts",
+    "validate:fixtures": "tsx src/bin.ts validate-dir test/fixtures",
+    "phase1:verify": "pnpm typecheck && pnpm test && pnpm validate:fixtures && pnpm build"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "yaml": "^2.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

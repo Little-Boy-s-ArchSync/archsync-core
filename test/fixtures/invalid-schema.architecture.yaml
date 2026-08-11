@@ -1,0 +1,9 @@
+version: "1.0"
+metadata:
+  name: invalid-schema
+components:
+  Bad_Component_ID:
+    type: unknown-type
+    layer: nowhere
+relationships: not-an-array
+

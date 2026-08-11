@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archloop.dev/schemas/architecture-v0.1.json",
+  "title": "ArchLoop Architecture Model",
+  "description": "Machine-readable contract for the intended software architecture.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "metadata", "components", "relationships"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^0\\.1(?:\\.[0-9]+)?$"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "owners": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/componentId" },
+      "additionalProperties": { "$ref": "#/$defs/component" }
+    },
+    "relationships": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationship" }
+    },
+    "rules": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/rule" },
+      "default": []
+    },
+    "quality_goals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/qualityGoal" },
+      "default": []
+    }
+  },
+  "$defs": {
+    "componentId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "selector": {
+      "type": "string",
+      "pattern": "^(?:\\*|[a-z*][a-z0-9*-]*)$"
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "layer"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": {
+          "enum": ["frontend", "gateway", "service", "worker", "database", "cache", "queue", "external", "library", "other"]
+        },
+        "layer": {
+          "enum": ["experience", "edge", "application", "domain", "data", "integration", "external"]
+        },
+        "description": { "type": "string" },
+        "technology": { "type": "string" },
+        "owner": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type"],
+      "properties": {
+        "id": { "$ref": "#/$defs/componentId" },
+        "from": { "$ref": "#/$defs/componentId" },
+        "to": { "$ref": "#/$defs/componentId" },
+        "type": {
+          "enum": ["http", "async", "data", "dependency", "event", "deployment", "other"]
+        },
+        "description": { "type": "string" },
+        "criticality": { "enum": ["low", "medium", "high", "critical"] }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "from", "to", "severity"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9-]*$"
+        },
+        "type": { "enum": ["deny", "require"] },
+        "from": { "$ref": "#/$defs/selector" },
+        "to": { "$ref": "#/$defs/selector" },
+        "relationship_type": {
+          "enum": ["http", "async", "data", "dependency", "event", "deployment", "other"]
+        },
+        "severity": { "enum": ["info", "warning", "error", "critical"] },
+        "rationale": { "type": "string", "minLength": 1 }
+      }
+    },
+    "qualityGoal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "attribute", "metric", "operator", "target", "priority"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9-]*$"
+        },
+        "attribute": {
+          "enum": ["performance", "availability", "security", "cost", "scalability", "reliability", "complexity", "maintainability"]
+        },
+        "scope": { "$ref": "#/$defs/selector" },
+        "metric": { "type": "string", "minLength": 1 },
+        "operator": { "enum": ["<", "<=", "=", ">=", ">", "contains", "not_contains"] },
+        "target": {
+          "anyOf": [
+            { "type": "number" },
+            { "type": "string" },
+            { "type": "boolean" }
+          ]
+        },
+        "unit": { "type": "string" },
+        "priority": { "enum": ["low", "medium", "high", "critical"] },
+        "description": { "type": "string" }
+      }
+    }
+  }
+}
