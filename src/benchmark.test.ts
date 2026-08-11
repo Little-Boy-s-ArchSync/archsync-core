@@ -178,6 +178,63 @@ describe("Phase 1 benchmark ground truth", () => {
 
     expect(result.valid).toBe(true);
     expect(result.summary).toEqual({ "no-impact": 1, violation: 1, evolution: 1 });
+    expect(result.evaluatedCases).toBe(3);
+    expect(result.totalCases).toBe(3);
+  });
+
+  it("rejects a ground-truth classification that disagrees with the conformance engine", async () => {
+    const value = groundTruth();
+    value.cases[2]!.category = "no-impact";
+    value.cases[2]!.expected.classification = "no-impact";
+    value.cases[2]!.expected.findings = [];
+    value.cases[2]!.delta = {
+      relationships_added: [{ from: "service", to: "database", type: "http" }],
+    };
+    value.benchmark.expected_distribution = { "no-impact": 2, violation: 1, evolution: 0 };
+
+    const result = await validateBenchmark(await writeBenchmark(value));
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(/conformance engine classified 'evolution', expected 'no-impact'/);
+  });
+
+  it("rejects expected violation rule ids that disagree with engine findings", async () => {
+    const value = groundTruth();
+    value.cases[1]!.expected.findings[0]!.id = "ARCH-002";
+    const architecture = `
+version: "0.1"
+metadata:
+  name: benchmark-test
+components:
+  service:
+    type: service
+    layer: domain
+  database:
+    type: database
+    layer: data
+relationships:
+  - from: service
+    to: database
+    type: data
+rules:
+  - id: ARCH-001
+    type: require
+    from: service
+    to: database
+    relationship_type: data
+    severity: error
+  - id: ARCH-002
+    type: require
+    from: service
+    to: database
+    relationship_type: data
+    severity: error
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(/conformance engine rule findings \[ARCH-001, ARCH-002\] differ from expected \[ARCH-002\]/);
   });
 
   const rejectedCases: Array<{

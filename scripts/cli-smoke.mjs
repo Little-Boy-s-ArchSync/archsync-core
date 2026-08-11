@@ -52,6 +52,48 @@ try {
   assert.deepEqual(diffJson.addedEdges.map((edge) => edge.key), ["api|data|redis"]);
   pass("graph diff JSON");
 
+  const cleanCheck = run([
+    "check",
+    fixture("order-platform.architecture.yaml"),
+    fixture("order-platform.architecture.yaml"),
+  ]);
+  assert.equal(cleanCheck.status, 0, cleanCheck.stderr);
+  assert.match(cleanCheck.stdout, /^NO-IMPACT \(0 violations, 0 architecture changes\)/);
+  pass("clean conformance exit code");
+
+  const violationCheck = run([
+    "check",
+    fixture("order-platform.architecture.yaml"),
+    fixture("order-platform.violation.architecture.yaml"),
+  ]);
+  assert.equal(violationCheck.status, 1);
+  assert.match(violationCheck.stdout, /\[ARCH-001\].+frontend\|http\|payment-service/);
+  assert.match(violationCheck.stdout, /\[ARCH-004\].+is missing/);
+  pass("violation conformance exit code");
+
+  const violationJson = run([
+    "check-json",
+    fixture("order-platform.architecture.yaml"),
+    fixture("order-platform.violation.architecture.yaml"),
+  ]);
+  assert.equal(violationJson.status, 1);
+  const violationResult = JSON.parse(violationJson.stdout);
+  assert.equal(violationResult.classification, "violation");
+  assert.deepEqual(
+    violationResult.findings.filter((finding) => finding.kind !== "architecture-evolution").map((finding) => finding.id),
+    ["ARCH-001", "ARCH-004"],
+  );
+  pass("machine-readable conformance JSON");
+
+  const evolutionCheck = run([
+    "check",
+    fixture("order-platform.architecture.yaml"),
+    fixture("order-platform.evolution.architecture.yaml"),
+  ]);
+  assert.equal(evolutionCheck.status, 3);
+  assert.match(evolutionCheck.stdout, /^EVOLUTION \(0 violations, 2 architecture changes\)/);
+  pass("evolution approval exit code");
+
   for (const format of ["mermaid", "drawio"]) {
     const extension = format === "mermaid" ? "mmd" : "drawio";
     const first = join(temporaryDirectory, `first.${extension}`);
@@ -73,6 +115,28 @@ try {
       assert.match(firstOutput, /^flowchart LR$/m);
     }
     pass(`${format} deterministic output`);
+  }
+
+  for (const extension of ["mmd", "drawio"]) {
+    const first = join(temporaryDirectory, `report-first.${extension}`);
+    const second = join(temporaryDirectory, `report-second.${extension}`);
+    const args = [
+      "report",
+      fixture("order-platform.architecture.yaml"),
+      fixture("order-platform.violation.architecture.yaml"),
+    ];
+    const firstRun = run([...args, first]);
+    const secondRun = run([...args, second]);
+    assert.equal(firstRun.status, 0, firstRun.stderr);
+    assert.equal(secondRun.status, 0, secondRun.stderr);
+    const [firstOutput, secondOutput] = await Promise.all([
+      readFile(first, "utf8"),
+      readFile(second, "utf8"),
+    ]);
+    assert.equal(firstOutput, secondOutput);
+    assert.match(firstOutput, /ARCH-001/);
+    assert.match(firstOutput, /ARCH-004/);
+    pass(`annotated ${extension} conformance report`);
   }
 
   const usage = run([]);

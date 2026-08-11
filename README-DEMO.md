@@ -10,8 +10,9 @@ Mục tiêu của demo là chứng minh ArchSync có thể:
 4. Sinh sơ đồ Mermaid và draw.io tự động.
 5. Kiểm tra bộ benchmark có ground truth và patch hợp lệ.
 6. Chạy toàn bộ cổng kiểm tra Phase 1.
+7. Phân biệt model sai schema với kiến trúc đúng schema nhưng vi phạm rule.
 
-> **Phạm vi hiện tại:** Phase 1 xây dựng Expected Architecture Model. Việc phân tích source code, so sánh Expected với Actual và chặn pull request thuộc các phase tiếp theo.
+> **Phạm vi hiện tại:** Phase 1 xây dựng Expected Architecture Model và kiểm chứng rule engine bằng Observed Architecture fixture. Việc tự động phân tích source code để tạo Actual/Observed Graph và chặn pull request thuộc các phase tiếp theo.
 
 ## 1. Chuẩn bị
 
@@ -100,6 +101,58 @@ Giải thích:
 > Relationship đang trỏ đến `missing-database`, nhưng component này không tồn tại. ArchSync chỉ rõ vị trí `/relationships/0/to` và trả exit code 1 để CI/CD có thể chặn thay đổi.
 
 `ELIFECYCLE` trong trường hợp này là kết quả mong đợi, không phải lỗi của buổi demo.
+
+## 4A. Demo lỗi kiến trúc thực sự
+
+Fixture tiếp theo **đúng schema** và có đầy đủ component hợp lệ, nhưng topology của nó vi phạm contract mong muốn:
+
+```powershell
+pnpm arch:model check `
+  test/fixtures/order-platform.architecture.yaml `
+  test/fixtures/order-platform.violation.architecture.yaml
+```
+
+Kết quả mong đợi:
+
+```text
+VIOLATION (2 violations, 2 architecture changes)
+- [ARCH-001] ERROR deny-rule ... frontend|http|payment-service
+- [ARCH-004] ERROR required-edge ... order-service|http|payment-service ... missing
+DELTA nodes +0/-0/~0, edges +1/-1
+```
+
+Giải thích:
+
+> Observed Architecture đã cho Frontend gọi trực tiếp Payment Service, đồng thời làm mất cạnh bắt buộc từ Order Service tới Payment Service. Đây mới là lỗi kiến trúc: YAML vẫn hợp lệ nhưng graph vi phạm `ARCH-001` và `ARCH-004`.
+
+Lệnh trả exit code 1 có chủ đích để CI có thể block.
+
+Sinh báo cáo draw.io tô đỏ lỗi:
+
+```powershell
+pnpm arch:model report `
+  test/fixtures/order-platform.architecture.yaml `
+  test/fixtures/order-platform.violation.architecture.yaml `
+  docs/demo/order-platform-violation-report.drawio
+
+Invoke-Item .\docs\demo\order-platform-violation-report.drawio
+```
+
+Màu sắc trong report:
+
+- Đỏ: rule violation hoặc required edge bị thiếu.
+- Cam: topology evolution cần approval.
+- Xám nét đứt: component/relationship bị loại bỏ.
+
+Demo evolution không vi phạm deterministic rule:
+
+```powershell
+pnpm arch:model check `
+  test/fixtures/order-platform.architecture.yaml `
+  test/fixtures/order-platform.evolution.architecture.yaml
+```
+
+Kết quả là `EVOLUTION`, exit code 3: Redis và cạnh mới được phát hiện nhưng cần kiến trúc sư phê duyệt, không được tự động coi là hợp lệ.
 
 ## 5. Demo phát hiện sai schema
 
@@ -200,13 +253,14 @@ Kết quả mong đợi:
 
 ```text
 VALID ...architecture.yaml (5 components, 5 relationships)
+VALID BENCHMARK (10/10 engine-evaluated: 5 no-impact, 3 violation, 2 evolution)
 VALID GROUND TRUTH (5 no-impact, 3 violation, 2 evolution)
 VALID PATCHES (10/10 apply cleanly)
 ```
 
 Giải thích:
 
-> Benchmark có 10 thay đổi code được phân loại trước: 5 no-impact, 3 violation và 2 evolution. Đây là đáp án chuẩn dùng để đo khả năng phát hiện của Guardian trong phase tiếp theo.
+> Benchmark có 10 thay đổi code được phân loại trước: 5 no-impact, 3 violation và 2 evolution. Lệnh `archsync benchmark` áp từng graph delta vào baseline rồi chạy chính conformance engine để đối chiếu đủ 10/10 kết quả với đáp án chuẩn. Đây cũng là dữ liệu để đo analyzer của Guardian trong phase tiếp theo.
 
 Có thể nêu ba ví dụ:
 
@@ -257,12 +311,12 @@ cd "D:\Little Boys\ArchSync\archsync-core"
 # 1. Mô hình hợp lệ
 pnpm arch:model validate test/fixtures/order-platform.architecture.yaml
 
-# 2. Violation có chủ đích
-pnpm arch:model validate test/fixtures/invalid-unknown-component.architecture.yaml
+# 2. Kiến trúc đúng schema nhưng vi phạm rule
+pnpm arch:model check test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml
 
-# 3. Sinh file draw.io
-pnpm arch:model drawio test/fixtures/order-platform.architecture.yaml order-platform-demo.drawio
-Invoke-Item .\order-platform-demo.drawio
+# 3. Sinh draw.io tô đỏ lỗi
+pnpm arch:model report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml docs/demo/order-platform-violation-report.drawio
+Invoke-Item .\docs\demo\order-platform-violation-report.drawio
 
 # 4. Toàn bộ exit gate
 pnpm phase1:verify
@@ -271,7 +325,7 @@ pnpm phase1:verify
 Sau đó trình bày kết quả benchmark đã kiểm tra trước:
 
 ```text
-5 no-impact + 3 violation + 2 evolution = 10 benchmark cases
+10/10 engine-evaluated: 5 no-impact + 3 violation + 2 evolution
 ```
 
 ## 12. Xử lý nhanh khi demo gặp lỗi

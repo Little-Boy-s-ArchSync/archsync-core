@@ -1,0 +1,50 @@
+version: "0.1"
+metadata:
+  name: order-platform-violation
+  description: Schema-valid observed model with one forbidden edge and one missing required edge.
+components:
+  frontend:
+    name: Storefront
+    type: frontend
+    layer: experience
+    technology: TypeScript
+  gateway:
+    name: API Gateway
+    type: gateway
+    layer: edge
+    technology: Node.js
+  order-service:
+    name: Order Service
+    type: service
+    layer: domain
+    technology: Node.js
+  payment-service:
+    name: Payment Service
+    type: service
+    layer: domain
+    technology: Node.js
+  postgres:
+    name: PostgreSQL
+    type: database
+    layer: data
+relationships:
+  - id: frontend-to-gateway
+    from: frontend
+    to: gateway
+    type: http
+  - id: gateway-to-order
+    from: gateway
+    to: order-service
+    type: http
+  - id: frontend-to-payment
+    from: frontend
+    to: payment-service
+    type: http
+  - id: order-to-postgres
+    from: order-service
+    to: postgres
+    type: data
+  - id: payment-to-postgres
+    from: payment-service
+    to: postgres
+    type: data

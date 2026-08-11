@@ -7,6 +7,9 @@ import { fileURLToPath } from "node:url";
 import {
   buildGraph,
   diffGraphs,
+  analyzeConformance,
+  generateConformanceDrawio,
+  generateConformanceMermaid,
   generateDrawio,
   generateMermaid,
   loadArchitecture,
@@ -70,6 +73,27 @@ const evolved = await requiredModel(join(fixturesDirectory, "minimal-evolution.a
 const graphDiff = diffGraphs(buildGraph(baseline), buildGraph(evolved));
 const mermaid = generateMermaid(reference);
 const drawio = generateDrawio(reference);
+const violationObservedPath = join(fixturesDirectory, "order-platform.violation.architecture.yaml");
+const violationObserved = await requiredModel(violationObservedPath);
+const violationResult = analyzeConformance(reference, violationObserved);
+assert.equal(violationResult.classification, "violation");
+const evolutionObservedPath = join(fixturesDirectory, "order-platform.evolution.architecture.yaml");
+const evolutionObserved = await requiredModel(evolutionObservedPath);
+const evolutionResult = analyzeConformance(reference, evolutionObserved);
+assert.equal(evolutionResult.classification, "evolution");
+const violationMermaid = generateConformanceMermaid(reference, violationObserved, violationResult);
+const violationDrawio = generateConformanceDrawio(reference, violationObserved, violationResult);
+const evolutionMermaid = generateConformanceMermaid(reference, evolutionObserved, evolutionResult);
+const evolutionDrawio = generateConformanceDrawio(reference, evolutionObserved, evolutionResult);
+const demoDirectory = join(root, "docs", "demo");
+const committedViolationMermaid = await readFile(join(demoDirectory, "order-platform-violation-report.mmd"), "utf8");
+const committedViolationDrawio = await readFile(join(demoDirectory, "order-platform-violation-report.drawio"), "utf8");
+const committedEvolutionMermaid = await readFile(join(demoDirectory, "order-platform-evolution-report.mmd"), "utf8");
+const committedEvolutionDrawio = await readFile(join(demoDirectory, "order-platform-evolution-report.drawio"), "utf8");
+assert.equal(committedViolationMermaid, violationMermaid, "Violation Mermaid demo is stale");
+assert.equal(committedViolationDrawio, violationDrawio, "Violation draw.io demo is stale");
+assert.equal(committedEvolutionMermaid, evolutionMermaid, "Evolution Mermaid demo is stale");
+assert.equal(committedEvolutionDrawio, evolutionDrawio, "Evolution draw.io demo is stale");
 
 const evidence = {
   phase: 1,
@@ -108,6 +132,29 @@ const evidence = {
     mermaid_sha256: sha256(mermaid),
     drawio_sha256: sha256(drawio),
   },
+  conformance_demo: {
+    expected: relativePath(referencePath),
+    violation_observed: relativePath(violationObservedPath),
+    violation_classification: violationResult.classification,
+    violated_rules: violationResult.findings
+      .filter(({ kind }) => kind !== "architecture-evolution")
+      .map(({ id }) => id),
+    evolution_observed: relativePath(evolutionObservedPath),
+    evolution_classification: evolutionResult.classification,
+    violation_report_mermaid_sha256: sha256(violationMermaid),
+    violation_report_drawio_sha256: sha256(violationDrawio),
+    evolution_report_mermaid_sha256: sha256(evolutionMermaid),
+    evolution_report_drawio_sha256: sha256(evolutionDrawio),
+  },
+  demo_artifacts: {
+    directory: "docs/demo",
+    violation_preview_png_sha256: sha256(
+      await readFile(join(demoDirectory, "order-platform-violation-report.png")),
+    ),
+    evolution_preview_png_sha256: sha256(
+      await readFile(join(demoDirectory, "order-platform-evolution-report.png")),
+    ),
+  },
   enforced_gates: {
     topology_scenarios_minimum: 10,
     coverage_thresholds_percent: {
@@ -121,8 +168,14 @@ const evidence = {
       "invalid model exits 1 with actionable path",
       "graph emits parseable JSON",
       "graph diff emits expected delta",
+      "clean conformance exits 0",
+      "rule violation exits 1 with actionable findings",
+      "machine-readable conformance JSON is stable",
+      "architecture evolution exits 3 for approval",
       "Mermaid output is deterministic",
       "draw.io output is deterministic editable XML",
+      "annotated Mermaid conformance report is deterministic",
+      "annotated draw.io conformance report is deterministic",
       "invalid CLI usage exits 2",
     ],
     benchmark_distribution: { "no-impact": 5, violation: 3, evolution: 2 },

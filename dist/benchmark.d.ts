@@ -51,6 +51,8 @@ export interface BenchmarkValidationResult {
     valid: boolean;
     issues: string[];
     summary: Record<BenchmarkCategory, number>;
+    evaluatedCases: number;
+    totalCases: number;
 }
 export declare function applyBenchmarkDelta(baseline: ArchitectureDocument, delta: BenchmarkCaseDelta): ArchitectureDocument;
 export declare function validateBenchmark(filePath: string): Promise<BenchmarkValidationResult>;

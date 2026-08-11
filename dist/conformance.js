@@ -1,0 +1,198 @@
+import { buildGraph, diffGraphs, edgeKey } from "./graph.js";
+function selectorExpression(selector) {
+    const escaped = selector
+        .split("*")
+        .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join(".*");
+    return new RegExp(`^${escaped}$`);
+}
+function matchesSelector(selector, componentId) {
+    return selectorExpression(selector).test(componentId);
+}
+function matchingComponents(graph, selector) {
+    return [...graph.nodes.keys()].filter((id) => matchesSelector(selector, id)).sort();
+}
+function ruleMatchesEdge(rule, relationship) {
+    return matchesSelector(rule.from, relationship.from) &&
+        matchesSelector(rule.to, relationship.to) &&
+        (!rule.relationship_type || rule.relationship_type === relationship.type);
+}
+function relationshipIndex(document, key) {
+    return document.relationships.findIndex((relationship) => edgeKey(relationship) === key);
+}
+function denyFindings(expected, observed) {
+    const findings = [];
+    for (const rule of expected.rules ?? []) {
+        if (rule.type !== "deny")
+            continue;
+        const matching = observed.relationships
+            .filter((relationship) => ruleMatchesEdge(rule, relationship))
+            .sort((a, b) => edgeKey(a).localeCompare(edgeKey(b)));
+        for (const relationship of matching) {
+            const key = edgeKey(relationship);
+            findings.push({
+                id: rule.id,
+                kind: "deny-rule",
+                severity: rule.severity,
+                message: `Forbidden relationship '${key}' matches deny rule '${rule.id}'`,
+                from: relationship.from,
+                to: relationship.to,
+                relationship_type: relationship.type,
+                edge_key: key,
+                evidence: {
+                    document: "observed",
+                    path: `/relationships/${relationshipIndex(observed, key)}`,
+                },
+            });
+        }
+    }
+    return findings;
+}
+function requiredFindings(expected, observed, observedGraph) {
+    const findings = [];
+    for (const [ruleIndex, rule] of (expected.rules ?? []).entries()) {
+        if (rule.type !== "require")
+            continue;
+        const sources = matchingComponents(observedGraph, rule.from);
+        for (const source of sources) {
+            const matching = observed.relationships.some((relationship) => relationship.from === source &&
+                matchesSelector(rule.to, relationship.to) &&
+                (!rule.relationship_type || rule.relationship_type === relationship.type));
+            if (matching)
+                continue;
+            const relationshipType = rule.relationship_type ?? "other";
+            const target = rule.to;
+            findings.push({
+                id: rule.id,
+                kind: "required-edge",
+                severity: rule.severity,
+                message: `Required relationship '${source}|${relationshipType}|${target}' is missing for rule '${rule.id}'`,
+                from: source,
+                to: target,
+                ...(rule.relationship_type ? { relationship_type: rule.relationship_type } : {}),
+                edge_key: `${source}|${relationshipType}|${target}`,
+                evidence: { document: "expected", path: `/rules/${ruleIndex}` },
+            });
+        }
+    }
+    return findings;
+}
+function evolutionFindings(expected, observed, diff) {
+    const findings = [];
+    let sequence = 1;
+    const nextId = () => `EVOLUTION-${String(sequence++).padStart(3, "0")}`;
+    for (const node of diff.addedNodes) {
+        findings.push({
+            id: nextId(),
+            kind: "architecture-evolution",
+            severity: "warning",
+            message: `Component '${node.id}' was added to the observed architecture`,
+            component: node.id,
+            change: "added",
+            evidence: { document: "observed", path: `/components/${node.id}` },
+        });
+    }
+    for (const node of diff.removedNodes) {
+        findings.push({
+            id: nextId(),
+            kind: "architecture-evolution",
+            severity: "warning",
+            message: `Component '${node.id}' is missing from the observed architecture`,
+            component: node.id,
+            change: "removed",
+            evidence: { document: "expected", path: `/components/${node.id}` },
+        });
+    }
+    for (const node of diff.changedNodes) {
+        findings.push({
+            id: nextId(),
+            kind: "architecture-evolution",
+            severity: "warning",
+            message: `Component '${node.id}' changed architecture metadata`,
+            component: node.id,
+            change: "changed",
+            evidence: { document: "observed", path: `/components/${node.id}` },
+        });
+    }
+    for (const edge of diff.addedEdges) {
+        findings.push({
+            id: nextId(),
+            kind: "architecture-evolution",
+            severity: "warning",
+            message: `Relationship '${edge.key}' was added to the observed architecture`,
+            from: edge.from,
+            to: edge.to,
+            relationship_type: edge.type,
+            edge_key: edge.key,
+            change: "added",
+            evidence: {
+                document: "observed",
+                path: `/relationships/${relationshipIndex(observed, edge.key)}`,
+            },
+        });
+    }
+    for (const edge of diff.removedEdges) {
+        findings.push({
+            id: nextId(),
+            kind: "architecture-evolution",
+            severity: "warning",
+            message: `Relationship '${edge.key}' is missing from the observed architecture`,
+            from: edge.from,
+            to: edge.to,
+            relationship_type: edge.type,
+            edge_key: edge.key,
+            change: "removed",
+            evidence: {
+                document: "expected",
+                path: `/relationships/${relationshipIndex(expected, edge.key)}`,
+            },
+        });
+    }
+    return findings;
+}
+export function analyzeConformance(expected, observed) {
+    const expectedGraph = buildGraph(expected);
+    const observedGraph = buildGraph(observed);
+    const diff = diffGraphs(expectedGraph, observedGraph);
+    const violations = [
+        ...denyFindings(expected, observed),
+        ...requiredFindings(expected, observed, observedGraph),
+    ];
+    const evolutions = evolutionFindings(expected, observed, diff);
+    const classification = violations.length > 0
+        ? "violation"
+        : evolutions.length > 0
+            ? "evolution"
+            : "no-impact";
+    return {
+        classification,
+        findings: [...violations, ...evolutions],
+        diff,
+        summary: {
+            violations: violations.length,
+            evolutions: evolutions.length,
+            added_nodes: diff.addedNodes.length,
+            removed_nodes: diff.removedNodes.length,
+            changed_nodes: diff.changedNodes.length,
+            added_edges: diff.addedEdges.length,
+            removed_edges: diff.removedEdges.length,
+        },
+    };
+}
+export function formatConformanceResult(result) {
+    const violationLabel = `${result.summary.violations} violation${result.summary.violations === 1 ? "" : "s"}`;
+    const changeLabel = `${result.summary.evolutions} architecture change${result.summary.evolutions === 1 ? "" : "s"}`;
+    const lines = [
+        `${result.classification.toUpperCase()} (${violationLabel}, ${changeLabel})`,
+    ];
+    for (const finding of result.findings) {
+        const location = `${finding.evidence.document}:${finding.evidence.path}`;
+        lines.push(`- [${finding.id}] ${finding.severity.toUpperCase()} ${finding.kind} at ${location}: ${finding.message}`);
+    }
+    if (result.findings.length === 0) {
+        lines.push("- No rule violations or architecture topology changes detected");
+    }
+    lines.push(`DELTA nodes +${result.summary.added_nodes}/-${result.summary.removed_nodes}/~${result.summary.changed_nodes}, edges +${result.summary.added_edges}/-${result.summary.removed_edges}`);
+    return lines.join("\n");
+}
+//# sourceMappingURL=conformance.js.map

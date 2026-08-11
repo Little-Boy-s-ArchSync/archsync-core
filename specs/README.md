@@ -24,6 +24,8 @@ Schema validation is followed by semantic validation. Semantic checks currently 
 pnpm arch:model validate test/fixtures/order-platform.architecture.yaml
 pnpm arch:model graph test/fixtures/order-platform.architecture.yaml
 pnpm arch:model diff test/fixtures/minimal.architecture.yaml test/fixtures/minimal-evolution.architecture.yaml
+pnpm arch:model check test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml
+pnpm arch:model report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml output.drawio
 pnpm arch:model mermaid test/fixtures/order-platform.architecture.yaml output.mmd
 pnpm arch:model drawio test/fixtures/order-platform.architecture.yaml output.drawio
 ```

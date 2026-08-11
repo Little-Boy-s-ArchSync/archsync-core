@@ -44,7 +44,30 @@ describe("architecture graph", () => {
       "api|data|redis",
     ]);
     expect(diff.removedNodes).toEqual([]);
+    expect(diff.changedNodes).toEqual([]);
     expect(diff.removedEdges).toEqual([]);
   });
-});
 
+  it("detects semantic component metadata changes without treating tag order as drift", () => {
+    const reorderedTags: ArchitectureDocument = {
+      ...baseline,
+      components: {
+        ...baseline.components,
+        api: { ...baseline.components.api!, tags: ["two", "one"] },
+      },
+    };
+    const taggedBaseline: ArchitectureDocument = {
+      ...baseline,
+      components: {
+        ...baseline.components,
+        api: { ...baseline.components.api!, tags: ["one", "two"] },
+      },
+    };
+    expect(diffGraphs(buildGraph(taggedBaseline), buildGraph(reorderedTags)).changedNodes).toEqual([]);
+
+    reorderedTags.components.api!.technology = "Bun";
+    expect(
+      diffGraphs(buildGraph(taggedBaseline), buildGraph(reorderedTags)).changedNodes.map(({ id }) => id),
+    ).toEqual(["api"]);
+  });
+});

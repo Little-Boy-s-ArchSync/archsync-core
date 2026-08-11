@@ -1,3 +1,14 @@
+function componentFingerprint(component) {
+    return JSON.stringify({
+        name: component.name ?? null,
+        type: component.type,
+        layer: component.layer,
+        description: component.description ?? null,
+        technology: component.technology ?? null,
+        owner: component.owner ?? null,
+        tags: [...(component.tags ?? [])].sort(),
+    });
+}
 export function edgeKey(relationship) {
     return `${relationship.from}|${relationship.type}|${relationship.to}`;
 }
@@ -28,6 +39,17 @@ export function diffGraphs(expected, observed) {
     return {
         addedNodes: [...observed.nodes.values()].filter((node) => !expected.nodes.has(node.id)),
         removedNodes: [...expected.nodes.values()].filter((node) => !observed.nodes.has(node.id)),
+        changedNodes: [...observed.nodes.values()]
+            .filter((node) => {
+            const expectedNode = expected.nodes.get(node.id);
+            return expectedNode !== undefined &&
+                componentFingerprint(expectedNode.component) !== componentFingerprint(node.component);
+        })
+            .map((observedNode) => ({
+            id: observedNode.id,
+            expected: expected.nodes.get(observedNode.id),
+            observed: observedNode,
+        })),
         addedEdges: [...observedEdges.values()].filter((edge) => !expectedEdges.has(edge.key)),
         removedEdges: [...expectedEdges.values()].filter((edge) => !observedEdges.has(edge.key)),
     };

@@ -2,6 +2,7 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { parseDocument } from "yaml";
 
+import { analyzeConformance } from "./conformance.js";
 import { edgeKey } from "./graph.js";
 import type {
   ArchitectureComponent,
@@ -68,6 +69,8 @@ export interface BenchmarkValidationResult {
   valid: boolean;
   issues: string[];
   summary: Record<BenchmarkCategory, number>;
+  evaluatedCases: number;
+  totalCases: number;
 }
 
 export function applyBenchmarkDelta(
@@ -135,9 +138,11 @@ export async function validateBenchmark(
     violation: 0,
     evolution: 0,
   };
+  let evaluatedCases = 0;
+  let totalCases = 0;
 
   if (issues.length > 0) {
-    return { valid: false, issues, summary };
+    return { valid: false, issues, summary, evaluatedCases, totalCases };
   }
 
   const groundTruth = parsed.toJS() as BenchmarkGroundTruth;
@@ -146,15 +151,18 @@ export async function validateBenchmark(
       valid: false,
       issues: ["Ground truth must contain benchmark metadata and a cases array"],
       summary,
+      evaluatedCases,
+      totalCases,
     };
   }
+  totalCases = groundTruth.cases.length;
 
   const architecturePath = resolve(baseDir, groundTruth.benchmark.architecture);
   const architectureResult = await loadArchitecture(architecturePath);
   if (!architectureResult.valid || !architectureResult.value) {
     issues.push("Benchmark architecture is invalid");
     issues.push(...architectureResult.issues.map((issue) => `${issue.path}: ${issue.message}`));
-    return { valid: false, issues, summary };
+    return { valid: false, issues, summary, evaluatedCases, totalCases };
   }
 
   const componentIds = new Set(Object.keys(architectureResult.value.components));
@@ -295,6 +303,30 @@ export async function validateBenchmark(
       }
     }
 
+    const observed = applyBenchmarkDelta(architectureResult.value, scenario.delta);
+    const conformance = analyzeConformance(architectureResult.value, observed);
+    evaluatedCases += 1;
+    if (conformance.classification !== scenario.expected.classification) {
+      issues.push(
+        `cases/${index}: conformance engine classified '${conformance.classification}', expected '${scenario.expected.classification}'`,
+      );
+    }
+    if (scenario.expected.classification === "violation") {
+      const actualRuleIds = conformance.findings
+        .filter((finding) => finding.kind !== "architecture-evolution")
+        .map((finding) => finding.id)
+        .sort();
+      const expectedRuleIds = scenario.expected.findings
+        .filter((finding) => finding.kind !== "architecture-evolution")
+        .map((finding) => finding.id)
+        .sort();
+      if (actualRuleIds.join("\0") !== expectedRuleIds.join("\0")) {
+        issues.push(
+          `cases/${index}: conformance engine rule findings [${actualRuleIds.join(", ")}] differ from expected [${expectedRuleIds.join(", ")}]`,
+        );
+      }
+    }
+
     const patchPath = resolve(baseDir, scenario.patch);
     const repositoryPath = resolve(baseDir, groundTruth.benchmark.repository);
     try {
@@ -325,5 +357,5 @@ export async function validateBenchmark(
     }
   }
 
-  return { valid: issues.length === 0, issues, summary };
+  return { valid: issues.length === 0, issues, summary, evaluatedCases, totalCases };
 }

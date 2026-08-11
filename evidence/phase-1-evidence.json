@@ -36,6 +36,16 @@
         "file": "test/fixtures/order-platform.architecture.yaml",
         "components": 5,
         "relationships": 5
+      },
+      {
+        "file": "test/fixtures/order-platform.evolution.architecture.yaml",
+        "components": 6,
+        "relationships": 6
+      },
+      {
+        "file": "test/fixtures/order-platform.violation.architecture.yaml",
+        "components": 5,
+        "relationships": 5
       }
     ],
     "expected_invalid": [
@@ -120,6 +130,26 @@
     "mermaid_sha256": "01bcb21921bc25fdc259b69bc5191947969567877d4dc76a74b47bdd6e94e93f",
     "drawio_sha256": "414fb3f0bc3402797d89d963c994f1ff7f795489fcdbe5937f517b6350c35f4a"
   },
+  "conformance_demo": {
+    "expected": "test/fixtures/order-platform.architecture.yaml",
+    "violation_observed": "test/fixtures/order-platform.violation.architecture.yaml",
+    "violation_classification": "violation",
+    "violated_rules": [
+      "ARCH-001",
+      "ARCH-004"
+    ],
+    "evolution_observed": "test/fixtures/order-platform.evolution.architecture.yaml",
+    "evolution_classification": "evolution",
+    "violation_report_mermaid_sha256": "ee93166e79d25a4ccfffe51c72e378c2574684bd44b2ca8168e2f0d1c02e7260",
+    "violation_report_drawio_sha256": "6cc635e878d9a9087daca69f532e8798003a3c8ca2729eb378315695d280171e",
+    "evolution_report_mermaid_sha256": "ea6f860eb77ddb8e5c2ed177f180735740b048f8fab27123b65ebe0acac36779",
+    "evolution_report_drawio_sha256": "93b9abbef07f69e66ca379ee37a9c1a5e4bcfd560c03b2e127a35c97ad6e6689"
+  },
+  "demo_artifacts": {
+    "directory": "docs/demo",
+    "violation_preview_png_sha256": "b48bb6513a40f7fafdfa5c099a162f9317f2e74e73fa8110df13656dfb091560",
+    "evolution_preview_png_sha256": "6e9a817a6605c2f40532f5bdfad1faf8c45eadb81bb3fb354b580ac201bf8269"
+  },
   "enforced_gates": {
     "topology_scenarios_minimum": 10,
     "coverage_thresholds_percent": {
@@ -133,8 +163,14 @@
       "invalid model exits 1 with actionable path",
       "graph emits parseable JSON",
       "graph diff emits expected delta",
+      "clean conformance exits 0",
+      "rule violation exits 1 with actionable findings",
+      "machine-readable conformance JSON is stable",
+      "architecture evolution exits 3 for approval",
       "Mermaid output is deterministic",
       "draw.io output is deterministic editable XML",
+      "annotated Mermaid conformance report is deterministic",
+      "annotated draw.io conformance report is deterministic",
       "invalid CLI usage exits 2"
     ],
     "benchmark_distribution": {

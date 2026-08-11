@@ -6,6 +6,8 @@ export default defineConfig({
       provider: "v8",
       include: [
         "src/benchmark.ts",
+        "src/conformance.ts",
+        "src/conformance-report.ts",
         "src/drawio.ts",
         "src/graph.ts",
         "src/mermaid.ts",

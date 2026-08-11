@@ -73,8 +73,14 @@ export interface ArchitectureGraph {
 export interface GraphDiff {
     addedNodes: GraphNode[];
     removedNodes: GraphNode[];
+    changedNodes: GraphNodeChange[];
     addedEdges: GraphEdge[];
     removedEdges: GraphEdge[];
+}
+export interface GraphNodeChange {
+    id: string;
+    expected: GraphNode;
+    observed: GraphNode;
 }
 export interface ValidationIssue {
     path: string;
