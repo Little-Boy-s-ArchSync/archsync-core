@@ -4,6 +4,7 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { dirname, extname, join, resolve } from "node:path";
 
 import { validateBenchmark } from "./benchmark.js";
+import { generateDrawio } from "./drawio.js";
 import { buildGraph } from "./graph.js";
 import { generateMermaid } from "./mermaid.js";
 import {
@@ -17,6 +18,7 @@ function usage(): never {
   archsync validate-dir <directory>
   archsync graph <architecture.yaml>
   archsync mermaid <architecture.yaml> [output.mmd]
+  archsync drawio <architecture.yaml> [output.drawio]
   archsync benchmark <ground-truth.json>`);
   process.exit(2);
 }
@@ -70,7 +72,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  if (command === "graph" || command === "mermaid") {
+  if (command === "graph" || command === "mermaid" || command === "drawio") {
     const filePath = resolve(input);
     const result = await loadArchitecture(filePath);
     if (!result.valid || !result.value) {
@@ -88,14 +90,16 @@ async function main(): Promise<void> {
       return;
     }
 
-    const mermaid = generateMermaid(result.value);
+    const rendered = command === "drawio"
+      ? generateDrawio(result.value)
+      : generateMermaid(result.value);
     if (output) {
       const outputPath = resolve(output);
       await mkdir(dirname(outputPath), { recursive: true });
-      await writeFile(outputPath, mermaid, "utf8");
+      await writeFile(outputPath, rendered, "utf8");
       console.log(`WROTE ${outputPath}`);
     } else {
-      console.log(mermaid);
+      console.log(rendered);
     }
     return;
   }

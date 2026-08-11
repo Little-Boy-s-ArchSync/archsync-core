@@ -1,6 +1,6 @@
 # ArchSync Core
 
-`@archsync/core` provides the machine-readable architecture contract, validation, graph primitives and deterministic Mermaid generation for ArchSync.
+`@archsync/core` provides the machine-readable architecture contract, validation, graph primitives and deterministic Mermaid/draw.io generation for ArchSync.
 
 This repository contains the deterministic foundation completed in **Phase 1: Architecture Model and Benchmark Lab**. It deliberately excludes Guardian orchestration, LLM, MCP, IaC and runtime features.
 
@@ -10,6 +10,7 @@ This repository contains the deterministic foundation completed in **Phase 1: Ar
 - YAML schema and semantic validation.
 - Graph builder and graph diff.
 - Deterministic Mermaid generation.
+- Editable draw.io diagram generation.
 - Benchmark manifest validation primitives.
 
 ## Requirements
@@ -36,6 +37,9 @@ pnpm arch:model graph test/fixtures/order-platform.architecture.yaml
 # Generate a Mermaid diagram
 pnpm arch:model mermaid test/fixtures/order-platform.architecture.yaml output.mmd
 
+# Generate an editable draw.io diagram
+pnpm arch:model drawio test/fixtures/order-platform.architecture.yaml output.drawio
+
 # Validate all Phase 1 artifacts
 pnpm phase1:verify
 ```
@@ -43,7 +47,7 @@ pnpm phase1:verify
 ## Repository map
 
 ```text
-src/            model, validation, graph, benchmark and Mermaid tooling
+src/            model, validation, graph, benchmark and diagram tooling
 specs/          JSON Schema v0.1
 test/fixtures/  valid and invalid model fixtures
 docs/adr/       architecture decision records

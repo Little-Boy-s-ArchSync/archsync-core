@@ -1,4 +1,5 @@
 export * from "./benchmark.js";
+export * from "./drawio.js";
 export * from "./graph.js";
 export * from "./mermaid.js";
 export * from "./model.js";
