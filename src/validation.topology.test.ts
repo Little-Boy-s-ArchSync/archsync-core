@@ -96,6 +96,10 @@ const rejectedScenarios: TopologyScenario[] = [
 ];
 
 describe("schema v0.1 topology review", () => {
+  it("keeps at least ten rejected topology scenarios in the contract", () => {
+    expect(rejectedScenarios.length).toBeGreaterThanOrEqual(10);
+  });
+
   it("accepts a valid three-layer topology", () => {
     expect(validateArchitectureSemantics(baseline())).toEqual([]);
   });
