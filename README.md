@@ -14,7 +14,7 @@ This repository contains the deterministic foundation completed in **Phase 1: Ar
 
 ## Requirements
 
-- Node.js 24+
+- Node.js 22+
 - pnpm 11+
 
 ## Setup
