@@ -5,6 +5,13 @@
   "type": "module",
   "packageManager": "pnpm@11.16.0",
   "description": "Architecture model, validation and graph primitives for ArchLoop.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Little-Boy-s-ArchSync/archloop-core.git"
+  },
+  "engines": {
+    "node": ">=24"
+  },
   "files": [
     "dist",
     "specs",
@@ -21,6 +28,7 @@
   },
   "scripts": {
     "build": "tsc -b",
+    "prepare": "pnpm build",
     "typecheck": "tsc -b --pretty false && tsc -p tsconfig.test.json --noEmit --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
