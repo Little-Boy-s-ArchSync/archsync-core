@@ -1,13 +1,13 @@
 {
-  "name": "@archloop/core",
+  "name": "@archsync/core",
   "version": "0.1.0",
   "private": false,
   "type": "module",
   "packageManager": "pnpm@11.16.0",
-  "description": "Architecture model, validation and graph primitives for ArchLoop.",
+  "description": "Architecture model, validation and graph primitives for ArchSync.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Little-Boy-s-ArchSync/archloop-core.git"
+    "url": "git+https://github.com/Little-Boy-s-ArchSync/archsync-core.git"
   },
   "engines": {
     "node": ">=22"
@@ -18,7 +18,7 @@
     "README.md"
   ],
   "bin": {
-    "archloop": "dist/bin.js"
+    "archsync": "dist/bin.js"
   },
   "exports": {
     ".": {

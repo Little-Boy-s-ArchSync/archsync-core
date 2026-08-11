@@ -1,6 +1,6 @@
 # Phase 1 - Architecture Model and Benchmark Lab
 
-**Status:** Completed on 2026-08-11 as ArchLoop v0.0.
+**Status:** Completed on 2026-08-11 as ArchSync v0.0.
 
 ## Objective
 
@@ -30,31 +30,31 @@ Turn architecture into a machine-readable contract and create ground truth for t
 3. All ten benchmark cases have an explicit delta and expected classification.
 4. Benchmark distribution is exactly 5 no-impact / 3 violation / 2 evolution.
 5. Mermaid output can be generated deterministically from any valid model.
-6. `pnpm phase1:verify` passes from a clean checkout of `archloop-core`.
+6. `pnpm phase1:verify` passes from a clean checkout of `archsync-core`.
 
 ## Completion evidence
 
 | Requirement | Owner | Authoritative artifact or check |
 | --- | --- | --- |
 | Schema v0.1 for components, relationships, rules and goals | Core engineer | [`specs/architecture.schema.json`](../specs/architecture.schema.json) |
-| Three example `architecture.yaml` models | Core engineer | Core fixtures plus [`archloop-examples/models`](https://github.com/Little-Boy-s-ArchSync/archloop-examples/tree/main/models) |
+| Three example `architecture.yaml` models | Core engineer | Core fixtures plus [`archsync-examples/models`](https://github.com/Little-Boy-s-ArchSync/archsync-examples/tree/main/models) |
 | Graph domain model, graph diff and semantic validation | Core engineer | [`src/graph.ts`](../src/graph.ts), [`src/validation.ts`](../src/validation.ts) and their tests |
-| One-stack, five-component benchmark | Research engineer | [`archloop-benchmark/order-platform`](https://github.com/Little-Boy-s-ArchSync/archloop-benchmark/tree/main/order-platform) |
-| Ten owned cases with explicit graph deltas and expected classifications | Research engineer | [`ground-truth.json`](https://github.com/Little-Boy-s-ArchSync/archloop-benchmark/blob/main/order-platform/ground-truth.json) |
+| One-stack, five-component benchmark | Research engineer | [`archsync-benchmark/order-platform`](https://github.com/Little-Boy-s-ArchSync/archsync-benchmark/tree/main/order-platform) |
+| Ten owned cases with explicit graph deltas and expected classifications | Research engineer | [`ground-truth.json`](https://github.com/Little-Boy-s-ArchSync/archsync-benchmark/blob/main/order-platform/ground-truth.json) |
 | Deterministic Mermaid view | Core engineer | [`src/mermaid.ts`](../src/mermaid.ts) and the generated example view |
 
 Run the independent checks from each repository:
 
 ```bash
-# archloop-core
+# archsync-core
 pnpm install --frozen-lockfile
 pnpm phase1:verify
 
-# archloop-benchmark
+# archsync-benchmark
 pnpm install --frozen-lockfile
 pnpm verify
 
-# archloop-examples
+# archsync-examples
 pnpm install --frozen-lockfile
 pnpm verify
 ```

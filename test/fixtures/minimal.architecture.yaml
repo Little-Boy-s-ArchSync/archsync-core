@@ -1,7 +1,7 @@
 version: "0.1"
 metadata:
   name: minimal-service
-  description: Smallest valid ArchLoop model.
+  description: Smallest valid ArchSync model.
 components:
   api:
     name: Public API

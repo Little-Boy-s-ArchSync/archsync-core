@@ -6,7 +6,7 @@
 
 ## Context
 
-ArchLoop needs a representation that can be validated, versioned, compared and consumed by deterministic tooling. A Draw.io file is useful for communication but difficult to query and diff semantically.
+ArchSync needs a representation that can be validated, versioned, compared and consumed by deterministic tooling. A Draw.io file is useful for communication but difficult to query and diff semantically.
 
 ## Decision
 

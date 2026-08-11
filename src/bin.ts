@@ -13,11 +13,11 @@ import {
 
 function usage(): never {
   console.error(`Usage:
-  archloop validate <architecture.yaml>
-  archloop validate-dir <directory>
-  archloop graph <architecture.yaml>
-  archloop mermaid <architecture.yaml> [output.mmd]
-  archloop benchmark <ground-truth.yaml>`);
+  archsync validate <architecture.yaml>
+  archsync validate-dir <directory>
+  archsync graph <architecture.yaml>
+  archsync mermaid <architecture.yaml> [output.mmd]
+  archsync benchmark <ground-truth.json>`);
   process.exit(2);
 }
 

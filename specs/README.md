@@ -1,4 +1,4 @@
-# ArchLoop Architecture Model v0.1
+# ArchSync Architecture Model v0.1
 
 `architecture.schema.json` is the machine-readable contract for Phase 1.
 

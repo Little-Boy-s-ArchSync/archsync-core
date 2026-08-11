@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://archloop.dev/schemas/architecture-v0.1.json",
-  "title": "ArchLoop Architecture Model",
+  "$id": "https://archsync.dev/schemas/architecture-v0.1.json",
+  "title": "ArchSync Architecture Model",
   "description": "Machine-readable contract for the intended software architecture.",
   "type": "object",
   "additionalProperties": false,

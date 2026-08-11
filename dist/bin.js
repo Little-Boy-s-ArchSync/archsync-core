@@ -7,11 +7,11 @@ import { generateMermaid } from "./mermaid.js";
 import { formatValidationIssues, loadArchitecture, } from "./validation.js";
 function usage() {
     console.error(`Usage:
-  archloop validate <architecture.yaml>
-  archloop validate-dir <directory>
-  archloop graph <architecture.yaml>
-  archloop mermaid <architecture.yaml> [output.mmd]
-  archloop benchmark <ground-truth.yaml>`);
+  archsync validate <architecture.yaml>
+  archsync validate-dir <directory>
+  archsync graph <architecture.yaml>
+  archsync mermaid <architecture.yaml> [output.mmd]
+  archsync benchmark <ground-truth.json>`);
     process.exit(2);
 }
 async function validateFile(filePath) {
