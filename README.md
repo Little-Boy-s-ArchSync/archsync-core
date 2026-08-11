@@ -12,6 +12,7 @@ This repository contains the deterministic foundation completed in **Phase 1: Ar
 - Deterministic Mermaid generation.
 - Editable draw.io diagram generation.
 - Benchmark manifest validation primitives.
+- Reproducible Phase 1 evidence and enforced coverage thresholds.
 
 ## Requirements
 
@@ -34,6 +35,9 @@ pnpm arch:model validate test/fixtures/order-platform.architecture.yaml
 # Print the normalized graph
 pnpm arch:model graph test/fixtures/order-platform.architecture.yaml
 
+# Compare an expected and observed graph
+pnpm arch:model diff test/fixtures/minimal.architecture.yaml test/fixtures/minimal-evolution.architecture.yaml
+
 # Generate a Mermaid diagram
 pnpm arch:model mermaid test/fixtures/order-platform.architecture.yaml output.mmd
 
@@ -44,6 +48,8 @@ pnpm arch:model drawio test/fixtures/order-platform.architecture.yaml output.dra
 pnpm phase1:verify
 ```
 
+`phase1:verify` enforces coverage thresholds, validates fixtures, builds the tracked distribution, smoke-tests the built CLI and verifies [`evidence/phase-1-evidence.json`](evidence/phase-1-evidence.json). CI runs the same gate on Ubuntu and Windows and uploads coverage/evidence artifacts.
+
 ## Repository map
 
 ```text
@@ -51,6 +57,8 @@ src/            model, validation, graph, benchmark and diagram tooling
 specs/          JSON Schema v0.1
 test/fixtures/  valid and invalid model fixtures
 docs/adr/       architecture decision records
+evidence/       deterministic Phase 1 evidence manifest
+scripts/        CLI smoke and evidence verification
 ```
 
 The user-facing models live in `archsync-examples`; benchmark data lives in `archsync-benchmark`. See [Phase 1](docs/phase-1.md) and [ADR-0001](docs/adr/0001-architecture-model-is-source-of-truth.md).

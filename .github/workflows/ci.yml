@@ -10,7 +10,13 @@ permissions:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    name: verify (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -22,3 +28,15 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm phase1:verify
+      - name: Ensure committed build and evidence are current
+        run: git diff --exit-code -- dist evidence
+      - name: Upload Phase 1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-1-evidence-${{ matrix.os }}
+          if-no-files-found: error
+          path: |
+            evidence/phase-1-evidence.json
+            coverage/coverage-summary.json
+            coverage/index.html

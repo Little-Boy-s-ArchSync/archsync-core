@@ -1,0 +1,146 @@
+{
+  "phase": 1,
+  "release": "v0.0",
+  "objective": "Machine-readable architecture contract and analyzer ground truth",
+  "schema": {
+    "file": "specs/architecture.schema.json",
+    "id": "https://archsync.dev/schemas/architecture-v0.1.json",
+    "title": "ArchSync Architecture Model",
+    "sha256": "49fb3077b6a8d61b48a99aa8ef94d3c9557a5a75ddd9ab23f71fa699de79d117",
+    "required_sections": [
+      "version",
+      "metadata",
+      "components",
+      "relationships"
+    ],
+    "contract_sections": [
+      "components",
+      "relationships",
+      "rules",
+      "quality_goals"
+    ]
+  },
+  "fixtures": {
+    "valid": [
+      {
+        "file": "test/fixtures/minimal-evolution.architecture.yaml",
+        "components": 3,
+        "relationships": 2
+      },
+      {
+        "file": "test/fixtures/minimal.architecture.yaml",
+        "components": 2,
+        "relationships": 1
+      },
+      {
+        "file": "test/fixtures/order-platform.architecture.yaml",
+        "components": 5,
+        "relationships": 5
+      }
+    ],
+    "expected_invalid": [
+      {
+        "file": "test/fixtures/invalid-schema.architecture.yaml",
+        "issues": [
+          {
+            "path": "/version",
+            "keyword": "schema",
+            "message": "must match pattern \"^0\\.1(?:\\.[0-9]+)?$\""
+          },
+          {
+            "path": "/components",
+            "keyword": "schema",
+            "message": "must match pattern \"^[a-z][a-z0-9-]*$\""
+          },
+          {
+            "path": "/components",
+            "keyword": "schema",
+            "message": "property name must be valid"
+          },
+          {
+            "path": "/components/Bad_Component_ID/type",
+            "keyword": "schema",
+            "message": "must be equal to one of the allowed values"
+          },
+          {
+            "path": "/components/Bad_Component_ID/layer",
+            "keyword": "schema",
+            "message": "must be equal to one of the allowed values"
+          },
+          {
+            "path": "/relationships",
+            "keyword": "schema",
+            "message": "must be array"
+          }
+        ]
+      },
+      {
+        "file": "test/fixtures/invalid-unknown-component.architecture.yaml",
+        "issues": [
+          {
+            "path": "/relationships/0/to",
+            "keyword": "reference",
+            "message": "Unknown component 'missing-database'"
+          }
+        ]
+      }
+    ]
+  },
+  "reference_graph": {
+    "source": "test/fixtures/order-platform.architecture.yaml",
+    "nodes": [
+      "frontend",
+      "gateway",
+      "order-service",
+      "payment-service",
+      "postgres"
+    ],
+    "edges": [
+      "frontend|http|gateway",
+      "gateway|http|order-service",
+      "order-service|http|payment-service",
+      "order-service|data|postgres",
+      "payment-service|data|postgres"
+    ],
+    "normalized_sha256": "2b76c65b81e31f1314bde516807a482b64f43fe814801260ed46d69ec5028bee"
+  },
+  "graph_diff_demo": {
+    "expected": "test/fixtures/minimal.architecture.yaml",
+    "observed": "test/fixtures/minimal-evolution.architecture.yaml",
+    "added_nodes": [
+      "redis"
+    ],
+    "removed_nodes": [],
+    "added_edges": [
+      "api|data|redis"
+    ],
+    "removed_edges": []
+  },
+  "deterministic_views": {
+    "mermaid_sha256": "01bcb21921bc25fdc259b69bc5191947969567877d4dc76a74b47bdd6e94e93f",
+    "drawio_sha256": "414fb3f0bc3402797d89d963c994f1ff7f795489fcdbe5937f517b6350c35f4a"
+  },
+  "enforced_gates": {
+    "topology_scenarios_minimum": 10,
+    "coverage_thresholds_percent": {
+      "statements": 90,
+      "branches": 85,
+      "functions": 90,
+      "lines": 90
+    },
+    "cli_smoke_checks": [
+      "valid model exits 0",
+      "invalid model exits 1 with actionable path",
+      "graph emits parseable JSON",
+      "graph diff emits expected delta",
+      "Mermaid output is deterministic",
+      "draw.io output is deterministic editable XML",
+      "invalid CLI usage exits 2"
+    ],
+    "benchmark_distribution": {
+      "no-impact": 5,
+      "violation": 3,
+      "evolution": 2
+    }
+  }
+}

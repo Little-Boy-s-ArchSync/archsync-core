@@ -1,0 +1,24 @@
+version: "0.1"
+metadata:
+  name: minimal-service-with-cache
+  description: Valid evolved model used to demonstrate graph diff.
+components:
+  api:
+    name: Public API
+    type: service
+    layer: application
+  database:
+    name: Primary Database
+    type: database
+    layer: data
+  redis:
+    name: Redis Cache
+    type: cache
+    layer: data
+relationships:
+  - from: api
+    to: database
+    type: data
+  - from: api
+    to: redis
+    type: data

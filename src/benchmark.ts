@@ -27,6 +27,12 @@ export interface BenchmarkExpectedFinding {
   to?: string;
 }
 
+export interface BenchmarkEvidenceLocation {
+  file: string;
+  line: number;
+  kind: "source-location";
+}
+
 export interface BenchmarkCase {
   id: string;
   title: string;
@@ -37,9 +43,11 @@ export interface BenchmarkCase {
   patch: string;
   changed_files: string[];
   delta: BenchmarkCaseDelta;
+  acceptance_criteria: string[];
   expected: {
     classification: BenchmarkCategory;
     findings: BenchmarkExpectedFinding[];
+    evidence: BenchmarkEvidenceLocation[];
     approval_required: boolean;
   };
 }
@@ -108,6 +116,10 @@ function hasComponent(
   return baseline.has(id) || Object.hasOwn(added, id);
 }
 
+function isExactSelector(selector: string): boolean {
+  return !selector.includes("*");
+}
+
 export async function validateBenchmark(
   filePath: string,
 ): Promise<BenchmarkValidationResult> {
@@ -149,6 +161,9 @@ export async function validateBenchmark(
   const baselineEdgeKeys = new Set(
     architectureResult.value.relationships.map(edgeKey),
   );
+  const rulesById = new Map(
+    (architectureResult.value.rules ?? []).map((rule) => [rule.id, rule]),
+  );
   const caseIds = new Set<string>();
 
   for (const [index, scenario] of groundTruth.cases.entries()) {
@@ -162,6 +177,13 @@ export async function validateBenchmark(
     }
     if (!Array.isArray(scenario.changed_files) || scenario.changed_files.length === 0) {
       issues.push(`cases/${index}: changed_files must not be empty`);
+    }
+    if (
+      !Array.isArray(scenario.acceptance_criteria) ||
+      scenario.acceptance_criteria.length === 0 ||
+      scenario.acceptance_criteria.some((criterion) => !criterion.trim())
+    ) {
+      issues.push(`cases/${index}: acceptance_criteria must contain a non-empty criterion`);
     }
 
     if (!(scenario.category in summary)) {
@@ -187,6 +209,22 @@ export async function validateBenchmark(
     }
     if (scenario.category === "evolution" && !deltaHasTopologyImpact(scenario.delta)) {
       issues.push(`cases/${index}: evolution must contain a topology delta`);
+    }
+
+    if (!Array.isArray(scenario.expected.evidence) || scenario.expected.evidence.length === 0) {
+      issues.push(`cases/${index}: expected evidence must not be empty`);
+    } else {
+      for (const evidence of scenario.expected.evidence) {
+        if (!scenario.changed_files.includes(evidence.file)) {
+          issues.push(`cases/${index}: evidence file '${evidence.file}' is not a changed file`);
+        }
+        if (!Number.isInteger(evidence.line) || evidence.line < 1) {
+          issues.push(`cases/${index}: evidence line must be a positive integer`);
+        }
+        if (evidence.kind !== "source-location") {
+          issues.push(`cases/${index}: unsupported evidence kind '${String(evidence.kind)}'`);
+        }
+      }
     }
 
     const added = scenario.delta.components_added ?? {};
@@ -221,6 +259,39 @@ export async function validateBenchmark(
       }
       if (finding.to && !hasComponent(finding.to, componentIds, added)) {
         issues.push(`cases/${index}: finding references unknown '${finding.to}'`);
+      }
+
+      if (finding.kind !== "architecture-evolution") {
+        const rule = rulesById.get(finding.id);
+        if (!rule) {
+          issues.push(`cases/${index}: finding references unknown rule '${finding.id}'`);
+          continue;
+        }
+        const expectedKind = rule.type === "deny" ? "deny-rule" : "required-edge";
+        if (finding.kind !== expectedKind) {
+          issues.push(`cases/${index}: finding kind '${finding.kind}' differs from rule '${rule.id}'`);
+        }
+        if (finding.severity !== rule.severity) {
+          issues.push(`cases/${index}: finding severity differs from rule '${rule.id}'`);
+        }
+        if (isExactSelector(rule.from) && finding.from !== rule.from) {
+          issues.push(`cases/${index}: finding source differs from rule '${rule.id}'`);
+        }
+        if (isExactSelector(rule.to) && finding.to !== rule.to) {
+          issues.push(`cases/${index}: finding target differs from rule '${rule.id}'`);
+        }
+
+        const expectedEdges = finding.kind === "deny-rule"
+          ? scenario.delta.relationships_added ?? []
+          : scenario.delta.relationships_removed ?? [];
+        const matchingDelta = expectedEdges.some((relationship) =>
+          relationship.from === finding.from &&
+          relationship.to === finding.to &&
+          (!rule.relationship_type || relationship.type === rule.relationship_type),
+        );
+        if (!matchingDelta) {
+          issues.push(`cases/${index}: finding '${finding.id}' has no matching graph delta`);
+        }
       }
     }
 

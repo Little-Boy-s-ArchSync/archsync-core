@@ -5,7 +5,7 @@ import { dirname, extname, join, resolve } from "node:path";
 
 import { validateBenchmark } from "./benchmark.js";
 import { generateDrawio } from "./drawio.js";
-import { buildGraph } from "./graph.js";
+import { buildGraph, diffGraphs } from "./graph.js";
 import { generateMermaid } from "./mermaid.js";
 import {
   formatValidationIssues,
@@ -17,6 +17,7 @@ function usage(): never {
   archsync validate <architecture.yaml>
   archsync validate-dir <directory>
   archsync graph <architecture.yaml>
+  archsync diff <expected.yaml> <observed.yaml>
   archsync mermaid <architecture.yaml> [output.mmd]
   archsync drawio <architecture.yaml> [output.drawio]
   archsync benchmark <ground-truth.json>`);
@@ -69,6 +70,38 @@ async function main(): Promise<void> {
       }
     }
     process.exitCode = valid ? 0 : 1;
+    return;
+  }
+
+  if (command === "diff") {
+    if (!output) usage();
+    const expectedPath = resolve(input);
+    const observedPath = resolve(output);
+    const [expected, observed] = await Promise.all([
+      loadArchitecture(expectedPath),
+      loadArchitecture(observedPath),
+    ]);
+
+    if (!expected.valid || !expected.value) {
+      console.error(`INVALID EXPECTED ${expectedPath}`);
+      console.error(formatValidationIssues(expected.issues));
+      process.exitCode = 1;
+      return;
+    }
+    if (!observed.valid || !observed.value) {
+      console.error(`INVALID OBSERVED ${observedPath}`);
+      console.error(formatValidationIssues(observed.issues));
+      process.exitCode = 1;
+      return;
+    }
+
+    const diff = diffGraphs(buildGraph(expected.value), buildGraph(observed.value));
+    console.log(JSON.stringify({
+      addedNodes: diff.addedNodes.map(({ id }) => id),
+      removedNodes: diff.removedNodes.map(({ id }) => id),
+      addedEdges: diff.addedEdges.map(({ key, from, to, type }) => ({ key, from, to, type })),
+      removedEdges: diff.removedEdges.map(({ key, from, to, type }) => ({ key, from, to, type })),
+    }, null, 2));
     return;
   }
 

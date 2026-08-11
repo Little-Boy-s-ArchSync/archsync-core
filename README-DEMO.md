@@ -140,6 +140,16 @@ Giải thích:
 
 > Đây là biểu diễn graph chuẩn của kiến trúc mong muốn. Guardian sẽ dùng graph này làm Expected Model để so sánh với kiến trúc thực tế được phát hiện từ source code.
 
+### Demo Graph Diff bằng input giả lập
+
+```powershell
+pnpm arch:model diff `
+  test/fixtures/minimal.architecture.yaml `
+  test/fixtures/minimal-evolution.architecture.yaml
+```
+
+Kết quả mong đợi cho thấy `redis` và edge `api|data|redis` được thêm. Đây là bằng chứng trực tiếp cho hạng mục Graph Diff trong sprint Phase 1; input observed hiện vẫn là fixture giả lập, chưa phải graph được phân tích từ source code.
+
 ## 7. Demo sinh sơ đồ tự động
 
 ### Mermaid
@@ -220,16 +230,9 @@ Lệnh này thực hiện:
 3. Kiểm tra toàn bộ fixture hợp lệ và fixture cố ý không hợp lệ.
 4. Build package `@archsync/core`.
 
-Kết quả mong đợi tại phiên bản hiện tại:
-
-```text
-Test Files  5 passed (5)
-Tests       10 passed (10)
-```
-
 Giải thích:
 
-> Đây là exit gate của Phase 1. Nếu bất kỳ schema, validator, graph, benchmark hoặc diagram generator nào bị lỗi, lệnh sẽ trả exit code khác 0.
+> Đây là exit gate của Phase 1. Nó bao gồm coverage threshold, topology scenarios, fixture validation, build, CLI smoke test và evidence manifest. Nếu bất kỳ schema, validator, graph, benchmark hoặc diagram generator nào bị lỗi, lệnh sẽ trả exit code khác 0.
 
 ## 10. Câu kết thúc
 

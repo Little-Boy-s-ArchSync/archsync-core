@@ -13,6 +13,11 @@ export interface BenchmarkExpectedFinding {
     from?: string;
     to?: string;
 }
+export interface BenchmarkEvidenceLocation {
+    file: string;
+    line: number;
+    kind: "source-location";
+}
 export interface BenchmarkCase {
     id: string;
     title: string;
@@ -23,9 +28,11 @@ export interface BenchmarkCase {
     patch: string;
     changed_files: string[];
     delta: BenchmarkCaseDelta;
+    acceptance_criteria: string[];
     expected: {
         classification: BenchmarkCategory;
         findings: BenchmarkExpectedFinding[];
+        evidence: BenchmarkEvidenceLocation[];
         approval_required: boolean;
     };
 }

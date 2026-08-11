@@ -85,4 +85,21 @@ relationships:
       expect.objectContaining({ keyword: "duplicate" }),
     );
   });
+
+  it("rejects malformed YAML and duplicate mapping keys", async () => {
+    const malformed = await parseArchitecture("components: [unterminated");
+    const duplicate = await parseArchitecture(`
+version: "0.1"
+version: "0.1.1"
+metadata:
+  name: duplicate-key
+components: {}
+relationships: []
+`);
+
+    expect(malformed.valid).toBe(false);
+    expect(malformed.issues[0]?.path).toBe("/");
+    expect(duplicate.valid).toBe(false);
+    expect(formatValidationIssues(duplicate.issues)).toMatch(/Map keys must be unique/);
+  });
 });
