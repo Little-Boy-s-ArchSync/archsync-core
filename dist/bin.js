@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { readdir, writeFile } from "node:fs/promises";
-import { extname, join, resolve } from "node:path";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { dirname, extname, join, resolve } from "node:path";
 import { validateBenchmark } from "./benchmark.js";
 import { buildGraph } from "./graph.js";
 import { generateMermaid } from "./mermaid.js";
@@ -77,8 +77,10 @@ async function main() {
         }
         const mermaid = generateMermaid(result.value);
         if (output) {
-            await writeFile(resolve(output), mermaid, "utf8");
-            console.log(`WROTE ${resolve(output)}`);
+            const outputPath = resolve(output);
+            await mkdir(dirname(outputPath), { recursive: true });
+            await writeFile(outputPath, mermaid, "utf8");
+            console.log(`WROTE ${outputPath}`);
         }
         else {
             console.log(mermaid);
