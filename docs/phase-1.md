@@ -1,5 +1,7 @@
 # Phase 1 - Architecture Model and Benchmark Lab
 
+**Status:** Completed on 2026-08-11 as ArchLoop v0.0.
+
 ## Objective
 
 Turn architecture into a machine-readable contract and create ground truth for the first analyzer.
@@ -29,3 +31,32 @@ Turn architecture into a machine-readable contract and create ground truth for t
 4. Benchmark distribution is exactly 5 no-impact / 3 violation / 2 evolution.
 5. Mermaid output can be generated deterministically from any valid model.
 6. `pnpm phase1:verify` passes from a clean checkout of `archloop-core`.
+
+## Completion evidence
+
+| Requirement | Authoritative artifact or check |
+| --- | --- |
+| Schema v0.1 for components, relationships, rules and goals | [`specs/architecture.schema.json`](../specs/architecture.schema.json) |
+| Example `architecture.yaml` models | Core fixtures plus [`archloop-examples/models`](https://github.com/Little-Boy-s-ArchSync/archloop-examples/tree/main/models) |
+| Graph domain model, graph diff and semantic validation | [`src/graph.ts`](../src/graph.ts), [`src/validation.ts`](../src/validation.ts) and their tests |
+| One-stack, five-component benchmark | [`archloop-benchmark/order-platform`](https://github.com/Little-Boy-s-ArchSync/archloop-benchmark/tree/main/order-platform) |
+| Ten owned cases with explicit graph deltas and expected classifications | [`ground-truth.json`](https://github.com/Little-Boy-s-ArchSync/archloop-benchmark/blob/main/order-platform/ground-truth.json) |
+| Deterministic Mermaid view | [`src/mermaid.ts`](../src/mermaid.ts) and the generated example view |
+
+Run the independent checks from each repository:
+
+```bash
+# archloop-core
+pnpm install --frozen-lockfile
+pnpm phase1:verify
+
+# archloop-benchmark
+pnpm install --frozen-lockfile
+pnpm verify
+
+# archloop-examples
+pnpm install --frozen-lockfile
+pnpm verify
+```
+
+The benchmark verifier requires exactly ten cases, checks every owner and graph delta, enforces the 5/3/2 classification split, matches declared files to patch contents and proves that all patches apply cleanly to the baseline. Phase 2 work remains intentionally outside this gate.

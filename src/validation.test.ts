@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { parseArchitecture } from "./validation.js";
+import { formatValidationIssues, parseArchitecture } from "./validation.js";
 
 const examplesDirectory = new URL("../test/fixtures/", import.meta.url);
 
@@ -42,6 +42,9 @@ describe("architecture validation", () => {
         keyword: "reference",
       }),
     );
+    expect(formatValidationIssues(result.issues)).toContain(
+      "- /relationships/0/to: Unknown component 'missing-database'",
+    );
   });
 
   it("rejects a document that violates the JSON schema", async () => {
@@ -51,6 +54,9 @@ describe("architecture validation", () => {
 
     expect(result.valid).toBe(false);
     expect(result.issues.some((issue) => issue.keyword === "schema")).toBe(true);
+    expect(formatValidationIssues(result.issues)).toMatch(
+      /- \/(components|relationships)/,
+    );
   });
 
   it("rejects duplicate topology edges", async () => {
