@@ -30,6 +30,37 @@ describe("architecture validation", () => {
     expect(result.value?.quality_goals).toHaveLength(3);
   });
 
+  it("accepts allow and required-path rule types", async () => {
+    const result = await parseArchitecture(`
+version: "0.1"
+metadata:
+  name: rule-types
+components:
+  app:
+    type: service
+    layer: application
+  database:
+    type: database
+    layer: data
+relationships: []
+rules:
+  - id: ALLOW-001
+    type: allow
+    from: app
+    to: database
+    severity: error
+  - id: PATH-001
+    type: require-path
+    from: app
+    to: database
+    relationship_type: data
+    severity: critical
+`);
+
+    expect(result.valid).toBe(true);
+    expect(result.value?.rules?.map((rule) => rule.type)).toEqual(["allow", "require-path"]);
+  });
+
   it("rejects an unknown relationship reference", async () => {
     const result = await parseArchitecture(
       await readExample("invalid-unknown-component.architecture.yaml"),

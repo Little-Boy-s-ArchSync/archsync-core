@@ -6,7 +6,7 @@
     "file": "specs/architecture.schema.json",
     "id": "https://archsync.dev/schemas/architecture-v0.1.json",
     "title": "ArchSync Architecture Model",
-    "sha256": "49fb3077b6a8d61b48a99aa8ef94d3c9557a5a75ddd9ab23f71fa699de79d117",
+    "sha256": "d93a3179d02b11a8efe0b18be4096a244182e2b3928d6f2c5919aa3670a0402c",
     "required_sections": [
       "version",
       "metadata",

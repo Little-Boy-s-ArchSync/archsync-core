@@ -31,7 +31,7 @@ export interface ArchitectureRelationship {
 }
 export interface ArchitectureRule {
     id: string;
-    type: "deny" | "require";
+    type: "deny" | "allow" | "require" | "require-path";
     from: string;
     to: string;
     relationship_type?: RelationshipType;

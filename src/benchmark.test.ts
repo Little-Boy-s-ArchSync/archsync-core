@@ -176,10 +176,96 @@ describe("Phase 1 benchmark ground truth", () => {
   it("validates a complete ground-truth manifest", async () => {
     const result = await validateBenchmark(await writeBenchmark(groundTruth()));
 
-    expect(result.valid).toBe(true);
+    expect(result.valid, result.issues.join("\n")).toBe(true);
     expect(result.summary).toEqual({ "no-impact": 1, violation: 1, evolution: 1 });
     expect(result.evaluatedCases).toBe(3);
     expect(result.totalCases).toBe(3);
+  });
+
+  it("validates an allow-rule benchmark case", async () => {
+    const value = groundTruth();
+    value.cases[1]!.title = "Allowlist violation";
+    value.cases[1]!.description = "The service calls a target outside its allowlist";
+    value.cases[1]!.delta = {
+      relationships_added: [{ from: "service", to: "external", type: "http" }],
+    };
+    value.cases[1]!.expected.findings = [
+      { id: "ARCH-001", kind: "allow-rule", severity: "error", from: "service", to: "external" },
+    ];
+    const architecture = `
+version: "0.1"
+metadata:
+  name: allow-benchmark-test
+components:
+  service:
+    type: service
+    layer: domain
+  database:
+    type: database
+    layer: data
+  external:
+    type: external
+    layer: external
+relationships:
+  - from: service
+    to: database
+    type: data
+rules:
+  - id: ARCH-001
+    type: allow
+    from: service
+    to: database
+    relationship_type: http
+    severity: error
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid, result.issues.join("\n")).toBe(true);
+  });
+
+  it("validates a required-path case broken by an intermediate edge removal", async () => {
+    const value = groundTruth();
+    value.cases[1]!.title = "Required path removed";
+    value.cases[1]!.delta = {
+      relationships_removed: [{ from: "middleware", to: "database", type: "data" }],
+    };
+    value.cases[1]!.expected.findings = [
+      { id: "PATH-001", kind: "required-path", severity: "error", from: "service", to: "database" },
+    ];
+    const architecture = `
+version: "0.1"
+metadata:
+  name: path-benchmark-test
+components:
+  service:
+    type: service
+    layer: domain
+  middleware:
+    type: service
+    layer: application
+  database:
+    type: database
+    layer: data
+relationships:
+  - from: service
+    to: middleware
+    type: data
+  - from: middleware
+    to: database
+    type: data
+rules:
+  - id: PATH-001
+    type: require-path
+    from: service
+    to: database
+    relationship_type: data
+    severity: error
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid).toBe(true);
   });
 
   it("rejects a ground-truth classification that disagrees with the conformance engine", async () => {

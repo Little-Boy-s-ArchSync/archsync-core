@@ -9,7 +9,7 @@ This repository contains the deterministic foundation completed in **Phase 1: Ar
 - Architecture-as-code schema v0.1.
 - YAML schema and semantic validation.
 - Graph builder and graph diff.
-- Deterministic deny/require conformance checks with no-impact, violation and evolution classification.
+- Deterministic `deny`, `allow`, direct `require` and multi-hop `require-path` conformance checks with no-impact, violation and evolution classification.
 - Deterministic Mermaid generation.
 - Editable draw.io diagram generation.
 - Annotated Mermaid/draw.io reports that highlight violations, missing edges and architecture evolution.

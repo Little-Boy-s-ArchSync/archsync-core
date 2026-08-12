@@ -6,7 +6,7 @@ export interface ConformanceEvidence {
 }
 export interface ConformanceFinding {
     id: string;
-    kind: "deny-rule" | "required-edge" | "architecture-evolution";
+    kind: "deny-rule" | "allow-rule" | "required-edge" | "required-path" | "architecture-evolution";
     severity: Severity;
     message: string;
     from?: string;

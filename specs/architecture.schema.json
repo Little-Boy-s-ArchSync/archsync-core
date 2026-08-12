@@ -106,7 +106,7 @@
           "type": "string",
           "pattern": "^[A-Z][A-Z0-9-]*$"
         },
-        "type": { "enum": ["deny", "require"] },
+        "type": { "enum": ["deny", "allow", "require", "require-path"] },
         "from": { "$ref": "#/$defs/selector" },
         "to": { "$ref": "#/$defs/selector" },
         "relationship_type": {

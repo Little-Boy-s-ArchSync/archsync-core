@@ -81,6 +81,43 @@ describe("architecture conformance", () => {
     expect(result.findings).toContainEqual(expect.objectContaining({ id: "DATA-001" }));
   });
 
+  it("enforces an allowlist for matching outgoing relationships", () => {
+    const expected = expectedModel();
+    expected.rules = [
+      { id: "EDGE-001", type: "allow", from: "frontend", to: "gateway", relationship_type: "http", severity: "error" },
+    ];
+    const allowed = analyzeConformance(expected, structuredClone(expected));
+    const observed = structuredClone(expected);
+    observed.relationships.push({ from: "frontend", to: "service", type: "http" });
+    observed.relationships.push({ from: "frontend", to: "database", type: "data" });
+
+    const result = analyzeConformance(expected, observed);
+
+    expect(allowed.classification).toBe("no-impact");
+    expect(result.findings.filter((finding) => finding.id === "EDGE-001")).toEqual([
+      expect.objectContaining({
+        kind: "allow-rule",
+        edge_key: "frontend|http|service",
+        evidence: { document: "observed", path: "/relationships/3" },
+      }),
+    ]);
+  });
+
+  it("supports wildcard targets in allow rules", () => {
+    const expected = expectedModel();
+    expected.rules = [
+      { id: "EDGE-002", type: "allow", from: "*", to: "*service", severity: "warning" },
+    ];
+    const observed = structuredClone(expected);
+
+    const result = analyzeConformance(expected, observed);
+
+    expect(result.findings.filter((finding) => finding.id === "EDGE-002")).toEqual([
+      expect.objectContaining({ edge_key: "frontend|http|gateway" }),
+      expect.objectContaining({ edge_key: "service|data|database" }),
+    ]);
+  });
+
   it("evaluates a wildcard require rule for every matching source", () => {
     const expected = expectedModel();
     expected.components.worker = { type: "worker", layer: "domain" };
@@ -92,6 +129,42 @@ describe("architecture conformance", () => {
     const result = analyzeConformance(expected, observed);
 
     expect(result.findings.filter((finding) => finding.id === "SERVICE-001").length).toBe(4);
+  });
+
+  it("accepts a multi-hop required path and reports it when broken", () => {
+    const expected = expectedModel();
+    expected.rules = [
+      { id: "PATH-001", type: "require-path", from: "frontend", to: "database", severity: "critical" },
+    ];
+    const passing = analyzeConformance(expected, structuredClone(expected));
+    const observed = structuredClone(expected);
+    observed.relationships = observed.relationships.filter((edge) => edge.from !== "gateway");
+
+    const failing = analyzeConformance(expected, observed);
+
+    expect(passing.classification).toBe("no-impact");
+    expect(failing.findings).toContainEqual(expect.objectContaining({
+      id: "PATH-001",
+      kind: "required-path",
+      from: "frontend",
+      to: "database",
+      evidence: { document: "expected", path: "/rules/0" },
+    }));
+  });
+
+  it("can constrain every edge in a required path by relationship type", () => {
+    const expected = expectedModel();
+    expected.rules = [
+      { id: "PATH-HTTP", type: "require-path", from: "frontend", to: "database", relationship_type: "http", severity: "error" },
+    ];
+
+    const result = analyzeConformance(expected, structuredClone(expected));
+
+    expect(result.findings).toContainEqual(expect.objectContaining({
+      id: "PATH-HTTP",
+      kind: "required-path",
+      relationship_type: "http",
+    }));
   });
 
   it("classifies an unruled topology addition as evolution", () => {

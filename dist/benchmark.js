@@ -33,6 +33,13 @@ function hasComponent(id, baseline, added) {
 function isExactSelector(selector) {
     return !selector.includes("*");
 }
+function selectorMatches(selector, componentId) {
+    const escaped = selector
+        .split("*")
+        .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join(".*");
+    return new RegExp(`^${escaped}$`).test(componentId);
+}
 export async function validateBenchmark(filePath) {
     const absolutePath = resolve(filePath);
     const baseDir = dirname(absolutePath);
@@ -165,7 +172,12 @@ export async function validateBenchmark(filePath) {
                     issues.push(`cases/${index}: finding references unknown rule '${finding.id}'`);
                     continue;
                 }
-                const expectedKind = rule.type === "deny" ? "deny-rule" : "required-edge";
+                const expectedKind = {
+                    deny: "deny-rule",
+                    allow: "allow-rule",
+                    require: "required-edge",
+                    "require-path": "required-path",
+                }[rule.type];
                 if (finding.kind !== expectedKind) {
                     issues.push(`cases/${index}: finding kind '${finding.kind}' differs from rule '${rule.id}'`);
                 }
@@ -175,15 +187,21 @@ export async function validateBenchmark(filePath) {
                 if (isExactSelector(rule.from) && finding.from !== rule.from) {
                     issues.push(`cases/${index}: finding source differs from rule '${rule.id}'`);
                 }
-                if (isExactSelector(rule.to) && finding.to !== rule.to) {
+                if (rule.type !== "allow" && isExactSelector(rule.to) && finding.to !== rule.to) {
                     issues.push(`cases/${index}: finding target differs from rule '${rule.id}'`);
                 }
-                const expectedEdges = finding.kind === "deny-rule"
-                    ? scenario.delta.relationships_added ?? []
-                    : scenario.delta.relationships_removed ?? [];
-                const matchingDelta = expectedEdges.some((relationship) => relationship.from === finding.from &&
-                    relationship.to === finding.to &&
-                    (!rule.relationship_type || relationship.type === rule.relationship_type));
+                if (rule.type === "allow" && finding.to && selectorMatches(rule.to, finding.to)) {
+                    issues.push(`cases/${index}: allow-rule finding target is inside rule '${rule.id}'`);
+                }
+                const matchingDelta = finding.kind === "required-path"
+                    ? (scenario.delta.relationships_removed?.length ?? 0) > 0 ||
+                        (scenario.delta.components_removed?.length ?? 0) > 0
+                    : (finding.kind === "deny-rule" || finding.kind === "allow-rule"
+                        ? scenario.delta.relationships_added ?? []
+                        : scenario.delta.relationships_removed ?? [])
+                        .some((relationship) => relationship.from === finding.from &&
+                        relationship.to === finding.to &&
+                        (!rule.relationship_type || relationship.type === rule.relationship_type));
                 if (!matchingDelta) {
                     issues.push(`cases/${index}: finding '${finding.id}' has no matching graph delta`);
                 }

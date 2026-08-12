@@ -8,7 +8,7 @@ export interface BenchmarkCaseDelta {
 }
 export interface BenchmarkExpectedFinding {
     id: string;
-    kind: "deny-rule" | "required-edge" | "architecture-evolution";
+    kind: "deny-rule" | "allow-rule" | "required-edge" | "required-path" | "architecture-evolution";
     severity: "info" | "warning" | "error" | "critical";
     from?: string;
     to?: string;

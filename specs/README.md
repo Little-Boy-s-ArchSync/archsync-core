@@ -7,7 +7,7 @@
 - `metadata`: model identity and ownership.
 - `components`: stable component identifiers and properties.
 - `relationships`: intended directed edges.
-- `rules`: deterministic `deny` or `require` constraints.
+- `rules`: deterministic `deny`, `allow`, direct `require` or multi-hop `require-path` constraints.
 - `quality_goals`: measurable targets used later by the Evolution Engine.
 
 Schema validation is followed by semantic validation. Semantic checks currently cover unknown references, duplicate ids/edges and self relationships.
@@ -16,7 +16,14 @@ Schema validation is followed by semantic validation. Semantic checks currently 
 
 - Component ids use lowercase kebab-case, for example `order-service`.
 - Rule and quality goal ids use uppercase ids, for example `ARCH-001`.
-- A selector may use `*` for future rule matching, but Phase 1 does not evaluate wildcard rules yet.
+- A selector may use `*`; the conformance engine evaluates wildcard selectors deterministically.
+
+## Rule semantics
+
+- `deny`: every matching observed relationship is a violation.
+- `allow`: for matching sources (and optional relationship type), every target outside `to` is a violation.
+- `require`: every matching source must have a direct relationship to a target matching `to`.
+- `require-path`: every matching source must have a non-empty directed path to a target matching `to`; when `relationship_type` is set, every edge on the path must use that type.
 
 ## Commands
 

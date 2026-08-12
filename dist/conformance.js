@@ -48,6 +48,36 @@ function denyFindings(expected, observed) {
     }
     return findings;
 }
+function allowFindings(expected, observed) {
+    const findings = [];
+    for (const rule of expected.rules ?? []) {
+        if (rule.type !== "allow")
+            continue;
+        const disallowed = observed.relationships
+            .filter((relationship) => matchesSelector(rule.from, relationship.from) &&
+            !matchesSelector(rule.to, relationship.to) &&
+            (!rule.relationship_type || rule.relationship_type === relationship.type))
+            .sort((a, b) => edgeKey(a).localeCompare(edgeKey(b)));
+        for (const relationship of disallowed) {
+            const key = edgeKey(relationship);
+            findings.push({
+                id: rule.id,
+                kind: "allow-rule",
+                severity: rule.severity,
+                message: `Relationship '${key}' is outside allow rule '${rule.id}'`,
+                from: relationship.from,
+                to: relationship.to,
+                relationship_type: relationship.type,
+                edge_key: key,
+                evidence: {
+                    document: "observed",
+                    path: `/relationships/${relationshipIndex(observed, key)}`,
+                },
+            });
+        }
+    }
+    return findings;
+}
 function requiredFindings(expected, observed, observedGraph) {
     const findings = [];
     for (const [ruleIndex, rule] of (expected.rules ?? []).entries()) {
@@ -71,6 +101,47 @@ function requiredFindings(expected, observed, observedGraph) {
                 to: target,
                 ...(rule.relationship_type ? { relationship_type: rule.relationship_type } : {}),
                 edge_key: `${source}|${relationshipType}|${target}`,
+                evidence: { document: "expected", path: `/rules/${ruleIndex}` },
+            });
+        }
+    }
+    return findings;
+}
+function hasRequiredPath(graph, source, targetSelector, relationshipType) {
+    const visited = new Set([source]);
+    const queue = [source];
+    while (queue.length > 0) {
+        const current = queue.shift();
+        for (const edge of graph.outgoing.get(current) ?? []) {
+            if (relationshipType && edge.type !== relationshipType)
+                continue;
+            if (matchesSelector(targetSelector, edge.to))
+                return true;
+            if (!visited.has(edge.to)) {
+                visited.add(edge.to);
+                queue.push(edge.to);
+            }
+        }
+    }
+    return false;
+}
+function requiredPathFindings(expected, observedGraph) {
+    const findings = [];
+    for (const [ruleIndex, rule] of (expected.rules ?? []).entries()) {
+        if (rule.type !== "require-path")
+            continue;
+        const sources = matchingComponents(observedGraph, rule.from);
+        for (const source of sources) {
+            if (hasRequiredPath(observedGraph, source, rule.to, rule.relationship_type))
+                continue;
+            findings.push({
+                id: rule.id,
+                kind: "required-path",
+                severity: rule.severity,
+                message: `Required path from '${source}' to '${rule.to}' is missing for rule '${rule.id}'`,
+                from: source,
+                to: rule.to,
+                ...(rule.relationship_type ? { relationship_type: rule.relationship_type } : {}),
                 evidence: { document: "expected", path: `/rules/${ruleIndex}` },
             });
         }
@@ -156,7 +227,9 @@ export function analyzeConformance(expected, observed) {
     const diff = diffGraphs(expectedGraph, observedGraph);
     const violations = [
         ...denyFindings(expected, observed),
+        ...allowFindings(expected, observed),
         ...requiredFindings(expected, observed, observedGraph),
+        ...requiredPathFindings(expected, observedGraph),
     ];
     const evolutions = evolutionFindings(expected, observed, diff);
     const classification = violations.length > 0
