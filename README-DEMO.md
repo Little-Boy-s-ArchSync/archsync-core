@@ -1,6 +1,6 @@
-# ArchSync Phase 1–2 — Demo Guide
+# ArchSync Phase 1–3 — Demo Guide
 
-Tài liệu này hướng dẫn demo từ **Phase 1: Architecture Model and Benchmark Lab** đến **Phase 2: Deterministic Guardian Core** trên Windows PowerShell.
+Tài liệu này hướng dẫn demo từ **Phase 1: Architecture Model and Benchmark Lab**, **Phase 2: Deterministic Guardian Core** đến **Phase 3: Git Diff and Pull-Request Gate** trên Windows PowerShell.
 
 Mục tiêu của demo là chứng minh ArchSync có thể:
 
@@ -14,8 +14,10 @@ Mục tiêu của demo là chứng minh ArchSync có thể:
 8. Phân tích source TypeScript để tự động tạo Observed Graph.
 9. Trả về quyết định `PASS`, `BLOCK` hoặc `REVIEW` kèm đúng file và dòng code.
 10. Đo analyzer trên 20 thay đổi code và 40 tín hiệu detector bằng precision, recall, specificity, classification và determinism.
+11. Chỉ phân tích các component bị Git diff tác động, tái sử dụng baseline graph được cache.
+12. Sinh GitHub annotation, Markdown report và merge decision cho pull request.
 
-> **Phạm vi hiện tại:** Phase 1 và Phase 2 đã hoàn thành. Guardian có thể phân tích toàn bộ repository TypeScript/Node.js để tạo Observed Graph và phát hiện drift. Phân tích riêng Git diff, comment pull request và merge gate thuộc Phase 3.
+> **Phạm vi hiện tại:** Phase 1, Phase 2 và deterministic core của Phase 3 đã hoàn thành. Guardian có thể phân tích toàn repository hoặc Git diff, sinh source annotation và trả exit code để CI gate quyết định `PASS`, `BLOCK` hoặc `REVIEW`. ArchSync không tự chấp nhận evolution và không tự cập nhật `architecture.yaml`.
 
 ## 1. Chuẩn bị
 
@@ -56,7 +58,7 @@ pnpm khi một fixture cố ý bị từ chối.
 
 Có thể giới thiệu như sau:
 
-> ArchSync biến kiến trúc từ tài liệu tĩnh thành một hợp đồng có thể kiểm tra tự động. Phase 1 tạo Expected Architecture Graph từ `architecture.yaml`. Phase 2 dùng Guardian để đọc source TypeScript, tạo Observed Graph, so sánh hai graph và chỉ ra chính xác file, dòng code gây vi phạm hoặc kiến trúc mới cần review.
+> ArchSync biến kiến trúc từ tài liệu tĩnh thành một hợp đồng sống nhưng có kiểm soát. Phase 1 tạo Expected Architecture Graph từ `architecture.yaml`. Phase 2 dùng Guardian để đọc source TypeScript và tạo Observed Graph. Phase 3 chạy vòng kiểm soát đó trên từng Git diff: code lệch hard rule bị block, topology mới phải review, và baseline chỉ đổi sau khi kiến trúc được phê duyệt.
 
 Luồng xử lý:
 
@@ -74,6 +76,10 @@ TypeScript source
 Guardian AST Analyzer
         ↓
 Observed Architecture Graph
+        ↓
+Git diff + cached baseline
+        ↓
+PR annotation + CI merge gate
 ```
 
 ## 3. Demo mô hình hợp lệ
@@ -401,7 +407,57 @@ Benchmark gồm 20 patch độc lập:
 
 Mỗi patch được áp lên một bản sao sạch của baseline. Guardian phân tích source sau patch và so sánh kết quả với ground truth. Vì vậy metric đo output thực tế của analyzer, không chỉ kiểm tra dữ liệu khai báo.
 
-## 12. Demo các exit gate
+## 12. Demo Phase 3 — Git diff và pull-request gate
+
+Ba lệnh sau tạo repository Git tạm từ cùng baseline, áp patch thật, chạy một lần cache miss và một lần cache hit, rồi tự xóa thư mục tạm:
+
+```powershell
+cd "D:\Little Boys\ArchSync\archsync-benchmark"
+
+# Internal refactor, topology không đổi
+pnpm demo:phase3:pass
+
+# Frontend bypass Payment Service
+pnpm demo:phase3:block
+
+# Order Service thêm Redis
+pnpm demo:phase3:review
+```
+
+Các quyết định mong đợi:
+
+```text
+case-01 -> PASS
+case-06 -> BLOCK, ARCH-001 tại frontend/src/app.ts:14:26
+case-09 -> REVIEW, Redis tại order-service/src/cache.ts:12:9
+```
+
+Mỗi output cũng hiển thị số component được phân tích, số file TypeScript thực sự được parse, trạng thái baseline cache và architecture delta. Wrapper demo trả thành công khi quyết định thực tế khớp ground truth; trong pull request thật, Guardian trực tiếp trả exit `1` cho `BLOCK` và exit `3` cho `REVIEW`.
+
+CLI dùng trong một repository Git thật:
+
+```powershell
+pnpm guardian check architecture.yaml . `
+  --diff main `
+  --github `
+  --report archsync-pr-report.md
+```
+
+Workflow GitHub Actions mẫu nằm tại `archsync-guardian/docs/examples/github-actions/architecture-gate.yml`. File `architecture.yaml` phải được bảo vệ bằng CODEOWNERS hoặc policy tương đương; đây là phần bắt buộc để code không thể tự hợp thức hóa bằng cách âm thầm sửa kiến trúc mong đợi.
+
+Kết quả benchmark Phase 3 trên 20 patch:
+
+- `20/20` classification và merge decision đúng.
+- `20/20` changed-file set đúng.
+- `7/7` violation rule-set đúng.
+- `11/11` finding-bearing case đúng file và dòng evidence.
+- `20/20` lần chạy lặp lại dùng cache và giữ nguyên normalized result.
+- Incremental analyzer parse `57/189` lượt file TypeScript (`0.3016`).
+- Trên máy evidence Windows đã ghi nhận: cold median/p95 `549.30/561.91 ms`; warm median/p95 `255.89/262.68 ms`.
+
+Các latency trên chỉ là phép đo của máy và corpus đã ghi trong evidence, không phải tuyên bố performance tổng quát.
+
+## 13. Demo các exit gate
 
 ### Core — Phase 1
 
@@ -421,6 +477,15 @@ pnpm phase2:verify
 
 Gate kiểm tra analyzer, Finding/Observed Graph contracts, bốn loại rule (`deny`, `allow`, `require`, `require-path`), coverage, CLI và evidence.
 
+### Guardian — Phase 3
+
+```powershell
+cd "D:\Little Boys\ArchSync\archsync-guardian"
+pnpm phase3:verify
+```
+
+Gate kiểm tra Phase 2 cùng Git diff, feature-branch merge base, cache miss/hit, incremental graph merge, pre-existing/resolved findings, GitHub annotations, Markdown report, coverage và Phase 3 evidence.
+
 ### Benchmark tích hợp
 
 ```powershell
@@ -428,11 +493,11 @@ cd "D:\Little Boys\ArchSync\archsync-benchmark"
 pnpm verify
 ```
 
-Gate kiểm tra model, ground truth, 20 patch, 40 tín hiệu detector, SHA-256 integrity, mutation tests và chạy lại analyzer trên toàn bộ dữ liệu.
+Gate kiểm tra model, ground truth, 20 patch, 40 tín hiệu detector, SHA-256 integrity, mutation tests, Phase 2 full scans và 40 lần Phase 3 cold/warm Git-diff execution.
 
-## 13. Câu kết thúc
+## 14. Câu kết thúc
 
-> Phase 1 biến `architecture.yaml` thành Expected Architecture Graph có thể validation, diff và trực quan hóa. Phase 2 biến source TypeScript thành Observed Graph, so sánh hai phía và trả Finding có bằng chứng tới đúng dòng code. Trên 20 patch độc lập, Guardian khớp 20/20 phân loại và 11/11 vị trí evidence; trên corpus 40 tín hiệu, v0.2 đạt 20 TP, 0 FP, 0 FN và 20 TN. Đây là kết quả trong corpus kiểm soát, không phải tuyên bố hoàn hảo cho mọi repository TypeScript.
+> Phase 1 biến `architecture.yaml` thành Expected Architecture Graph. Phase 2 biến source TypeScript thành Observed Graph có evidence. Phase 3 nối hai phần vào Git diff và CI: rule violation bị block, topology evolution phải review, còn refactor nội bộ được pass. Kiến trúc “động” ở chỗ Observed Graph được dựng lại liên tục theo code; Expected Graph không chạy theo code sai mà chỉ đổi sau phê duyệt.
 
 Có thể tuyên bố ArchSync hiện đã:
 
@@ -441,35 +506,35 @@ Có thể tuyên bố ArchSync hiện đã:
 - Trả quyết định `PASS`, `BLOCK` hoặc `REVIEW`.
 - Chỉ ra file, dòng, cột, detector và confidence của source evidence.
 - Kiểm tra deterministic rule `deny`, `allow`, `require` và `require-path`.
+- Phân tích Git diff theo component, cache baseline graph và không block PR vì finding cũ không liên quan.
+- Sinh GitHub annotation, Markdown PR report và exit code cho CI merge gate.
 
 Chưa nên tuyên bố ArchSync đã:
 
-- Chỉ phân tích phần Git diff của pull request.
-- Tự động đăng comment hoặc chặn merge trên GitHub pull request.
+- Được đánh giá tổng quát trên nhiều repository thực tế hoặc nhiều ngôn ngữ.
+- Tự động đăng PR comment, tự phê duyệt evolution hoặc tự merge.
 - Phân tích Terraform, Kubernetes hoặc runtime telemetry.
 - Dùng AI để tự sửa code hoặc tự cập nhật architecture baseline.
 
-Các khả năng này nằm ngoài Phase 2.
+Các khả năng này nằm ngoài deterministic Phase 3 hiện tại.
 
-## 14. Kịch bản demo nhanh trong 2–3 phút
+## 15. Kịch bản demo nhanh trong 2–3 phút
 
 Nếu thời gian ngắn, chạy bốn lệnh sau:
 
 ```powershell
-# 1. Source baseline khớp kiến trúc -> PASS
-cd "D:\Little Boys\ArchSync\archsync-guardian"
-pnpm guardian check "..\archsync-benchmark\order-platform\architecture.yaml" "..\archsync-benchmark\order-platform\repository"
-
-# 2. Frontend gọi tắt Payment Service -> BLOCK + file:line
+# 1. Git diff chỉ refactor nội bộ -> PASS
 cd "D:\Little Boys\ArchSync\archsync-benchmark"
-pnpm demo:case06
+pnpm demo:phase3:pass
 
-# 3. Thêm Redis -> REVIEW
-pnpm demo:case09
+# 2. Git diff làm Frontend gọi tắt Payment Service -> BLOCK + file:line
+pnpm demo:phase3:block
 
-# 4. Chứng minh trên toàn bộ 20 case
-cd "D:\Little Boys\ArchSync\archsync-guardian"
-pnpm guardian benchmark "..\archsync-benchmark\order-platform\ground-truth.json"
+# 3. Git diff thêm Redis -> REVIEW
+pnpm demo:phase3:review
+
+# 4. Chứng minh trên toàn bộ 20 Git-diff case
+pnpm phase3:verify
 ```
 
 Ba câu cần nhấn mạnh:
@@ -477,8 +542,9 @@ Ba câu cần nhấn mạnh:
 1. `architecture.yaml` là Expected Architecture đã được phê duyệt.
 2. Observed Architecture được suy ra từ source, không phải người dùng nhập tay.
 3. ArchSync phân biệt lỗi phải block với thay đổi kiến trúc cần con người review.
+4. `architecture.yaml` không bao giờ bị tự động sửa để chạy theo code sai.
 
-## 15. Xử lý nhanh khi demo gặp lỗi
+## 16. Xử lý nhanh khi demo gặp lỗi
 
 ### `pnpm` không được nhận diện
 

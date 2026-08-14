@@ -59,9 +59,9 @@ pnpm phase1:verify
 
 `phase1:verify` enforces coverage thresholds, validates fixtures, builds the tracked distribution, smoke-tests the built CLI and verifies [`evidence/phase-1-evidence.json`](evidence/phase-1-evidence.json). CI runs the same gate on Ubuntu and Windows and uploads coverage/evidence artifacts.
 
-See the [architecture conformance demo](docs/demo/README.md) for violation and evolution screenshots. `check` returns exit code `0` for no-impact, `1` for violation and `3` for evolution requiring approval. These Core commands compare declared models; source-code analysis is implemented by Guardian in Phase 2.
+See the [architecture conformance demo](docs/demo/README.md) for violation and evolution screenshots. `check` returns exit code `0` for no-impact, `1` for violation and `3` for evolution requiring approval. These Core commands compare declared models; Guardian adds source-code reconstruction in Phase 2 and Git-diff/PR gating in Phase 3.
 
-For the complete Vietnamese presentation script covering both the Architecture Model and Guardian source analysis, see [`README-DEMO.md`](README-DEMO.md).
+For the complete Vietnamese presentation script covering the Architecture Model, Guardian source analysis and Phase 3 pull-request gate, see [`README-DEMO.md`](README-DEMO.md).
 
 ## Repository map
 
