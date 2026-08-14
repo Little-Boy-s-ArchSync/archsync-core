@@ -32,6 +32,7 @@ Mở PowerShell và cài dependency cho ba repository dùng trong demo:
 ```powershell
 cd "D:\Little Boys\ArchSync\archsync-core"
 pnpm install --frozen-lockfile
+pnpm build
 
 cd "D:\Little Boys\ArchSync\archsync-guardian"
 pnpm install --frozen-lockfile
@@ -46,6 +47,10 @@ Kiểm tra phiên bản công cụ nếu cần:
 node --version
 pnpm --version
 ```
+
+Các lệnh Core bên dưới gọi bản CLI đã build bằng `node dist/bin.js`. Cách này giữ
+nguyên exit code dành cho automation nhưng không thêm thông báo `ELIFECYCLE` của
+pnpm khi một fixture cố ý bị từ chối.
 
 ## 2. Câu mở đầu
 
@@ -77,13 +82,15 @@ Chạy:
 
 ```powershell
 cd "D:\Little Boys\ArchSync\archsync-core"
-pnpm arch:model validate test/fixtures/order-platform.architecture.yaml
+node dist/bin.js validate test/fixtures/order-platform.architecture.yaml
 ```
 
 Kết quả mong đợi:
 
 ```text
-VALID ...order-platform.architecture.yaml (5 components, 5 relationships)
+RESULT: VALID
+FILE: ...order-platform.architecture.yaml
+SUMMARY: 5 components, 5 relationships
 ```
 
 Giải thích:
@@ -99,29 +106,34 @@ Thông báo trước khi chạy:
 Chạy:
 
 ```powershell
-pnpm arch:model validate test/fixtures/invalid-unknown-component.architecture.yaml
+node dist/bin.js validate test/fixtures/invalid-unknown-component.architecture.yaml
 ```
 
 Kết quả mong đợi:
 
 ```text
-INVALID ...invalid-unknown-component.architecture.yaml
-- /relationships/0/to: Unknown component 'missing-database'
-[ELIFECYCLE] Command failed with exit code 1.
+RESULT: INVALID
+FILE: ...invalid-unknown-component.architecture.yaml
+
+PROBLEMS (1)
+1. Unknown component 'missing-database'
+   Location: relationships[0].to (/relationships/0/to)
+   Fix: Add 'missing-database' under components, or change this reference to an existing component.
+
+NEXT STEP: Fix the listed problems, then run validation again.
+EXIT CODE: 1 (INVALID)
 ```
 
 Giải thích:
 
-> Relationship đang trỏ đến `missing-database`, nhưng component này không tồn tại. ArchSync chỉ rõ vị trí `/relationships/0/to` và trả exit code 1 để CI/CD có thể chặn thay đổi.
-
-`ELIFECYCLE` trong trường hợp này là kết quả mong đợi, không phải lỗi của buổi demo.
+> Relationship đang trỏ đến `missing-database`, nhưng component này không tồn tại. ArchSync chỉ rõ cả vị trí dễ đọc `relationships[0].to`, JSON Pointer `/relationships/0/to`, cách sửa và exit code 1 để CI/CD có thể chặn thay đổi.
 
 ## 4A. Demo lỗi kiến trúc thực sự
 
 Fixture tiếp theo **đúng schema** và có đầy đủ component hợp lệ, nhưng topology của nó vi phạm contract mong muốn:
 
 ```powershell
-pnpm arch:model check `
+node dist/bin.js check `
   test/fixtures/order-platform.architecture.yaml `
   test/fixtures/order-platform.violation.architecture.yaml
 ```
@@ -129,10 +141,23 @@ pnpm arch:model check `
 Kết quả mong đợi:
 
 ```text
-VIOLATION (2 violations, 2 architecture changes)
-- [ARCH-001] ERROR deny-rule ... frontend|http|payment-service
-- [ARCH-004] ERROR required-edge ... order-service|http|payment-service ... missing
-DELTA nodes +0/-0/~0, edges +1/-1
+DECISION: BLOCK
+REASON: 2 architecture rules are violated. Fix the violations before merging.
+
+RULE VIOLATIONS (2)
+1. [ARCH-001] Forbidden dependency detected
+   Relationship: frontend --http--> payment-service
+   Fix: Remove or reroute this dependency.
+2. [ARCH-004] Required dependency is missing
+   Relationship: order-service --http--> payment-service
+   Fix: Restore the required dependency.
+
+ARCHITECTURE CHANGES (2)
+1. ADDED relationship: frontend --http--> payment-service
+2. REMOVED relationship: order-service --http--> payment-service
+
+NEXT STEP: Fix the rule violations, then run this check again.
+EXIT CODE: 1 (BLOCK)
 ```
 
 Giải thích:
@@ -144,7 +169,7 @@ Lệnh trả exit code 1 có chủ đích để CI có thể block.
 Sinh báo cáo draw.io tô đỏ lỗi:
 
 ```powershell
-pnpm arch:model report `
+node dist/bin.js report `
   test/fixtures/order-platform.architecture.yaml `
   test/fixtures/order-platform.violation.architecture.yaml `
   docs/demo/order-platform-violation-report.drawio
@@ -161,7 +186,7 @@ Màu sắc trong report:
 Demo evolution không vi phạm deterministic rule:
 
 ```powershell
-pnpm arch:model check `
+node dist/bin.js check `
   test/fixtures/order-platform.architecture.yaml `
   test/fixtures/order-platform.evolution.architecture.yaml
 ```
@@ -173,7 +198,7 @@ Kết quả là `EVOLUTION`, exit code 3: Redis và cạnh mới được phát 
 Chạy:
 
 ```powershell
-pnpm arch:model validate test/fixtures/invalid-schema.architecture.yaml
+node dist/bin.js validate test/fixtures/invalid-schema.architecture.yaml
 ```
 
 Kết quả mong đợi bao gồm các lỗi tại:
@@ -195,7 +220,7 @@ Giải thích:
 Chạy:
 
 ```powershell
-pnpm arch:model graph test/fixtures/order-platform.architecture.yaml
+node dist/bin.js graph test/fixtures/order-platform.architecture.yaml
 ```
 
 Kết quả trả về gồm:
@@ -210,7 +235,7 @@ Giải thích:
 ### Demo Graph Diff bằng input giả lập
 
 ```powershell
-pnpm arch:model diff `
+node dist/bin.js diff `
   test/fixtures/minimal.architecture.yaml `
   test/fixtures/minimal-evolution.architecture.yaml
 ```
@@ -222,7 +247,7 @@ Kết quả mong đợi cho thấy `redis` và edge `api|data|redis` được th
 ### Mermaid
 
 ```powershell
-pnpm arch:model mermaid `
+node dist/bin.js mermaid `
   test/fixtures/order-platform.architecture.yaml `
   order-platform-demo.mmd
 ```
@@ -238,7 +263,7 @@ Không mở file `.mmd` bằng `File > Open` trong draw.io. `.mmd` là mã ngu�
 ### draw.io chỉnh sửa trực tiếp
 
 ```powershell
-pnpm arch:model drawio `
+node dist/bin.js drawio `
   test/fixtures/order-platform.architecture.yaml `
   order-platform-demo.drawio
 ```
@@ -487,7 +512,7 @@ Bạn đã mở nhầm file `.mmd`. Hãy tạo và mở file `.drawio`:
 
 ```powershell
 cd "D:\Little Boys\ArchSync\archsync-core"
-pnpm arch:model drawio test/fixtures/order-platform.architecture.yaml order-platform-demo.drawio
+node dist/bin.js drawio test/fixtures/order-platform.architecture.yaml order-platform-demo.drawio
 Invoke-Item .\order-platform-demo.drawio
 ```
 

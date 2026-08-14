@@ -20,6 +20,28 @@ import {
   formatValidationIssues,
   loadArchitecture,
 } from "./validation.js";
+import type { ValidationIssue } from "./model.js";
+
+function counted(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+
+function formatInvalidArchitecture(
+  filePath: string,
+  issues: ValidationIssue[],
+  role?: "EXPECTED" | "OBSERVED",
+): string {
+  return [
+    "RESULT: INVALID",
+    ...(role ? [`MODEL: ${role}`] : []),
+    `FILE: ${filePath}`,
+    "",
+    formatValidationIssues(issues),
+    "",
+    "NEXT STEP: Fix the listed problems, then run validation again.",
+    "EXIT CODE: 1 (INVALID)",
+  ].join("\n");
+}
 
 function usage(): never {
   console.error(`Usage:
@@ -39,15 +61,16 @@ function usage(): never {
 async function validateFile(filePath: string): Promise<boolean> {
   const result = await loadArchitecture(filePath);
   if (!result.valid || !result.value) {
-    console.error(`INVALID ${filePath}`);
-    console.error(formatValidationIssues(result.issues));
+    console.error(formatInvalidArchitecture(filePath, result.issues));
     return false;
   }
 
   const graph = buildGraph(result.value);
-  console.log(
-    `VALID ${filePath} (${graph.nodes.size} components, ${graph.edges.length} relationships)`,
-  );
+  console.log([
+    "RESULT: VALID",
+    `FILE: ${filePath}`,
+    `SUMMARY: ${counted(graph.nodes.size, "component")}, ${counted(graph.edges.length, "relationship")}`,
+  ].join("\n"));
   return true;
 }
 
@@ -114,14 +137,12 @@ async function main(): Promise<void> {
     ]);
 
     if (!expected.valid || !expected.value) {
-      console.error(`INVALID EXPECTED ${expectedPath}`);
-      console.error(formatValidationIssues(expected.issues));
+      console.error(formatInvalidArchitecture(expectedPath, expected.issues, "EXPECTED"));
       process.exitCode = 1;
       return;
     }
     if (!observed.valid || !observed.value) {
-      console.error(`INVALID OBSERVED ${observedPath}`);
-      console.error(formatValidationIssues(observed.issues));
+      console.error(formatInvalidArchitecture(observedPath, observed.issues, "OBSERVED"));
       process.exitCode = 1;
       return;
     }
@@ -180,7 +201,7 @@ async function main(): Promise<void> {
     const filePath = resolve(input);
     const result = await loadArchitecture(filePath);
     if (!result.valid || !result.value) {
-      console.error(formatValidationIssues(result.issues));
+      console.error(formatInvalidArchitecture(filePath, result.issues));
       process.exitCode = 1;
       return;
     }

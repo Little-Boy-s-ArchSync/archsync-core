@@ -8,6 +8,21 @@ import { generateDrawio } from "./drawio.js";
 import { buildGraph, diffGraphs } from "./graph.js";
 import { generateMermaid } from "./mermaid.js";
 import { formatValidationIssues, loadArchitecture, } from "./validation.js";
+function counted(count, noun) {
+    return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+function formatInvalidArchitecture(filePath, issues, role) {
+    return [
+        "RESULT: INVALID",
+        ...(role ? [`MODEL: ${role}`] : []),
+        `FILE: ${filePath}`,
+        "",
+        formatValidationIssues(issues),
+        "",
+        "NEXT STEP: Fix the listed problems, then run validation again.",
+        "EXIT CODE: 1 (INVALID)",
+    ].join("\n");
+}
 function usage() {
     console.error(`Usage:
   archsync validate <architecture.yaml>
@@ -25,12 +40,15 @@ function usage() {
 async function validateFile(filePath) {
     const result = await loadArchitecture(filePath);
     if (!result.valid || !result.value) {
-        console.error(`INVALID ${filePath}`);
-        console.error(formatValidationIssues(result.issues));
+        console.error(formatInvalidArchitecture(filePath, result.issues));
         return false;
     }
     const graph = buildGraph(result.value);
-    console.log(`VALID ${filePath} (${graph.nodes.size} components, ${graph.edges.length} relationships)`);
+    console.log([
+        "RESULT: VALID",
+        `FILE: ${filePath}`,
+        `SUMMARY: ${counted(graph.nodes.size, "component")}, ${counted(graph.edges.length, "relationship")}`,
+    ].join("\n"));
     return true;
 }
 function serializeConformance(result) {
@@ -95,14 +113,12 @@ async function main() {
             loadArchitecture(observedPath),
         ]);
         if (!expected.valid || !expected.value) {
-            console.error(`INVALID EXPECTED ${expectedPath}`);
-            console.error(formatValidationIssues(expected.issues));
+            console.error(formatInvalidArchitecture(expectedPath, expected.issues, "EXPECTED"));
             process.exitCode = 1;
             return;
         }
         if (!observed.valid || !observed.value) {
-            console.error(`INVALID OBSERVED ${observedPath}`);
-            console.error(formatValidationIssues(observed.issues));
+            console.error(formatInvalidArchitecture(observedPath, observed.issues, "OBSERVED"));
             process.exitCode = 1;
             return;
         }
@@ -159,7 +175,7 @@ async function main() {
         const filePath = resolve(input);
         const result = await loadArchitecture(filePath);
         if (!result.valid || !result.value) {
-            console.error(formatValidationIssues(result.issues));
+            console.error(formatInvalidArchitecture(filePath, result.issues));
             process.exitCode = 1;
             return;
         }

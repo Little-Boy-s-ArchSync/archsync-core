@@ -26,12 +26,19 @@ function pass(name) {
 try {
   const valid = run(["validate", fixture("order-platform.architecture.yaml")]);
   assert.equal(valid.status, 0, valid.stderr);
-  assert.match(valid.stdout, /VALID .+ \(5 components, 5 relationships\)/);
+  assert.match(valid.stdout, /^RESULT: VALID/m);
+  assert.match(valid.stdout, /SUMMARY: 5 components, 5 relationships/);
   pass("valid model");
+
+  const minimal = run(["validate", fixture("minimal.architecture.yaml")]);
+  assert.equal(minimal.status, 0, minimal.stderr);
+  assert.match(minimal.stdout, /SUMMARY: 2 components, 1 relationship$/m);
 
   const invalid = run(["validate", fixture("invalid-unknown-component.architecture.yaml")]);
   assert.equal(invalid.status, 1);
-  assert.match(invalid.stderr, /\/relationships\/0\/to: Unknown component 'missing-database'/);
+  assert.match(invalid.stderr, /^RESULT: INVALID/m);
+  assert.match(invalid.stderr, /relationships\[0\]\.to \(\/relationships\/0\/to\)/);
+  assert.match(invalid.stderr, /Fix: Add 'missing-database' under components/);
   pass("invalid model exit code");
 
   const graph = run(["graph", fixture("order-platform.architecture.yaml")]);
@@ -58,7 +65,8 @@ try {
     fixture("order-platform.architecture.yaml"),
   ]);
   assert.equal(cleanCheck.status, 0, cleanCheck.stderr);
-  assert.match(cleanCheck.stdout, /^NO-IMPACT \(0 violations, 0 architecture changes\)/);
+  assert.match(cleanCheck.stdout, /^DECISION: PASS/);
+  assert.match(cleanCheck.stdout, /EXIT CODE: 0 \(PASS\)/);
   pass("clean conformance exit code");
 
   const violationCheck = run([
@@ -67,8 +75,11 @@ try {
     fixture("order-platform.violation.architecture.yaml"),
   ]);
   assert.equal(violationCheck.status, 1);
-  assert.match(violationCheck.stdout, /\[ARCH-001\].+frontend\|http\|payment-service/);
-  assert.match(violationCheck.stdout, /\[ARCH-004\].+is missing/);
+  assert.match(violationCheck.stdout, /^DECISION: BLOCK/);
+  assert.match(violationCheck.stdout, /\[ARCH-001\] Forbidden dependency detected/);
+  assert.match(violationCheck.stdout, /frontend --http--> payment-service/);
+  assert.match(violationCheck.stdout, /\[ARCH-004\] Required dependency is missing/);
+  assert.match(violationCheck.stdout, /EXIT CODE: 1 \(BLOCK\)/);
   pass("violation conformance exit code");
 
   const violationJson = run([
@@ -91,7 +102,9 @@ try {
     fixture("order-platform.evolution.architecture.yaml"),
   ]);
   assert.equal(evolutionCheck.status, 3);
-  assert.match(evolutionCheck.stdout, /^EVOLUTION \(0 violations, 2 architecture changes\)/);
+  assert.match(evolutionCheck.stdout, /^DECISION: REVIEW/);
+  assert.match(evolutionCheck.stdout, /ARCHITECTURE CHANGES \(2\)/);
+  assert.match(evolutionCheck.stdout, /EXIT CODE: 3 \(REVIEW\)/);
   pass("evolution approval exit code");
 
   for (const format of ["mermaid", "drawio"]) {

@@ -253,19 +253,107 @@ export function analyzeConformance(expected, observed) {
     };
 }
 export function formatConformanceResult(result) {
-    const violationLabel = `${result.summary.violations} violation${result.summary.violations === 1 ? "" : "s"}`;
-    const changeLabel = `${result.summary.evolutions} architecture change${result.summary.evolutions === 1 ? "" : "s"}`;
+    const violations = result.findings.filter((finding) => finding.kind !== "architecture-evolution");
+    const changes = result.findings.filter((finding) => finding.kind === "architecture-evolution");
+    const decision = result.classification === "no-impact"
+        ? "PASS"
+        : result.classification === "violation"
+            ? "BLOCK"
+            : "REVIEW";
+    const exitCode = result.classification === "no-impact"
+        ? 0
+        : result.classification === "violation"
+            ? 1
+            : 3;
+    const reason = result.classification === "no-impact"
+        ? "No rule violations or architecture topology changes were detected."
+        : result.classification === "violation"
+            ? `${violations.length} architecture rule${violations.length === 1 ? " is" : "s are"} violated. Fix the violations before merging.`
+            : `${changes.length} architecture ${changes.length === 1 ? "change requires" : "changes require"} human approval.`;
+    const nextStep = result.classification === "no-impact"
+        ? "No action required."
+        : result.classification === "violation"
+            ? "Fix the rule violations, then run this check again."
+            : "Review the changes and update the expected architecture only after approval.";
     const lines = [
-        `${result.classification.toUpperCase()} (${violationLabel}, ${changeLabel})`,
+        `DECISION: ${decision}`,
+        `REASON: ${reason}`,
     ];
-    for (const finding of result.findings) {
-        const location = `${finding.evidence.document}:${finding.evidence.path}`;
-        lines.push(`- [${finding.id}] ${finding.severity.toUpperCase()} ${finding.kind} at ${location}: ${finding.message}`);
+    if (violations.length > 0) {
+        lines.push("", `RULE VIOLATIONS (${violations.length})`);
+        violations.forEach((finding, index) => {
+            lines.push(`${index + 1}. [${finding.id}] ${violationTitle(finding)}`, `   Severity: ${finding.severity.toUpperCase()}`);
+            const relationship = formatFindingRelationship(finding);
+            if (relationship)
+                lines.push(`   Relationship: ${relationship}`);
+            lines.push(`   Evidence: ${formatConformanceEvidence(finding.evidence)}`, `   Fix: ${violationFix(finding)}`);
+        });
     }
-    if (result.findings.length === 0) {
-        lines.push("- No rule violations or architecture topology changes detected");
+    if (changes.length > 0) {
+        lines.push("", `ARCHITECTURE CHANGES (${changes.length})`);
+        changes.forEach((finding, index) => {
+            lines.push(`${index + 1}. ${formatArchitectureChange(finding)}`, `   Evidence: ${formatConformanceEvidence(finding.evidence)}`);
+        });
     }
-    lines.push(`DELTA nodes +${result.summary.added_nodes}/-${result.summary.removed_nodes}/~${result.summary.changed_nodes}, edges +${result.summary.added_edges}/-${result.summary.removed_edges}`);
+    lines.push("", "SUMMARY", `Components: +${result.summary.added_nodes} added, -${result.summary.removed_nodes} removed, ${result.summary.changed_nodes} changed`, `Relationships: +${result.summary.added_edges} added, -${result.summary.removed_edges} removed`, "", `NEXT STEP: ${nextStep}`, `EXIT CODE: ${exitCode} (${decision})`);
     return lines.join("\n");
+}
+function formatFindingRelationship(finding) {
+    if (!finding.from || !finding.to)
+        return undefined;
+    const type = finding.relationship_type ?? "any";
+    const readable = `${finding.from} --${type}--> ${finding.to}`;
+    return finding.edge_key ? `${readable} (${finding.edge_key})` : readable;
+}
+function formatConformanceEvidence(evidence) {
+    const document = `${evidence.document} architecture`;
+    const relationship = evidence.path.match(/^\/relationships\/(\d+)$/);
+    if (relationship) {
+        return `${document}, relationship #${Number(relationship[1]) + 1} (${evidence.path})`;
+    }
+    const rule = evidence.path.match(/^\/rules\/(\d+)$/);
+    if (rule) {
+        return `${document}, rule #${Number(rule[1]) + 1} (${evidence.path})`;
+    }
+    const component = evidence.path.match(/^\/components\/(.+)$/);
+    if (component) {
+        return `${document}, component '${component[1]}' (${evidence.path})`;
+    }
+    return `${document} (${evidence.path})`;
+}
+function violationTitle(finding) {
+    if (finding.kind === "deny-rule")
+        return "Forbidden dependency detected";
+    if (finding.kind === "allow-rule")
+        return "Dependency is outside the approved allow-list";
+    if (finding.kind === "required-edge")
+        return "Required dependency is missing";
+    if (finding.kind === "required-path")
+        return "Required architecture path is missing";
+    return finding.message;
+}
+function violationFix(finding) {
+    if (finding.kind === "deny-rule") {
+        return "Remove or reroute this dependency. Change the deny rule only after architecture approval.";
+    }
+    if (finding.kind === "allow-rule") {
+        return "Route the dependency to an allowed target, or update the allow-list after approval.";
+    }
+    if (finding.kind === "required-edge") {
+        return "Restore the required dependency, or update the requirement after architecture approval.";
+    }
+    if (finding.kind === "required-path") {
+        return "Restore an approved path to the target, or update the path requirement after approval.";
+    }
+    return "Review the architecture rule and the observed topology.";
+}
+function formatArchitectureChange(finding) {
+    const change = (finding.change ?? "changed").toUpperCase();
+    if (finding.component)
+        return `${change} component: ${finding.component}`;
+    const relationship = formatFindingRelationship(finding);
+    if (relationship)
+        return `${change} relationship: ${relationship}`;
+    return finding.message;
 }
 //# sourceMappingURL=conformance.js.map

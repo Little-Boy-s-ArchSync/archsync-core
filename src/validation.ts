@@ -184,5 +184,52 @@ export async function loadArchitecture(
 }
 
 export function formatValidationIssues(issues: ValidationIssue[]): string {
-  return issues.map((issue) => `- ${issue.path}: ${issue.message}`).join("\n");
+  const lines = [`PROBLEMS (${issues.length})`];
+  issues.forEach((issue, index) => {
+    lines.push(
+      `${index + 1}. ${issue.message}`,
+      `   Location: ${formatValidationPath(issue.path)}`,
+      `   Fix: ${validationFix(issue)}`,
+    );
+  });
+  return lines.join("\n");
+}
+
+function formatValidationPath(path: string): string {
+  if (path === "/") return "document root (/)";
+  const segments = path.split("/").filter(Boolean);
+  const readable = segments.reduce((current, segment) =>
+    /^\d+$/.test(segment)
+      ? `${current}[${segment}]`
+      : current.length === 0
+        ? segment
+        : `${current}.${segment}`,
+  "");
+  return `${readable} (${path})`;
+}
+
+function validationFix(issue: ValidationIssue): string {
+  const unknownComponent = issue.message.match(/Unknown component '([^']+)'/);
+  if (unknownComponent) {
+    return `Add '${unknownComponent[1]}' under components, or change this reference to an existing component.`;
+  }
+  if (issue.message.includes("Map keys must be unique")) {
+    return "Remove or rename the duplicate YAML key.";
+  }
+  if (issue.message.includes("required property")) {
+    return "Add the required field at this location.";
+  }
+  if (issue.message.includes("equal to one of the allowed values")) {
+    return "Use one of the values allowed by the architecture schema.";
+  }
+  if (/^must be (array|boolean|integer|null|number|object|string)$/.test(issue.message)) {
+    return "Change the value to the type required by the architecture schema.";
+  }
+  if (issue.message.includes("must match pattern") || issue.message.includes("property name")) {
+    return "Rename or rewrite this value so it matches the architecture schema.";
+  }
+  if (issue.message.includes("additional properties")) {
+    return "Remove the unsupported field or add it to the schema before using it.";
+  }
+  return "Update this value so it satisfies the architecture schema and semantic rules.";
 }

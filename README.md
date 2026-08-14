@@ -25,6 +25,7 @@ This repository contains the deterministic foundation completed in **Phase 1: Ar
 
 ```bash
 pnpm install --frozen-lockfile
+pnpm build
 pnpm phase1:verify
 ```
 
@@ -32,25 +33,25 @@ pnpm phase1:verify
 
 ```bash
 # Validate one model
-pnpm arch:model validate test/fixtures/order-platform.architecture.yaml
+node dist/bin.js validate test/fixtures/order-platform.architecture.yaml
 
 # Print the normalized graph
-pnpm arch:model graph test/fixtures/order-platform.architecture.yaml
+node dist/bin.js graph test/fixtures/order-platform.architecture.yaml
 
 # Compare an expected and observed graph
-pnpm arch:model diff test/fixtures/minimal.architecture.yaml test/fixtures/minimal-evolution.architecture.yaml
+node dist/bin.js diff test/fixtures/minimal.architecture.yaml test/fixtures/minimal-evolution.architecture.yaml
 
 # Check a schema-valid observed model against expected rules
-pnpm arch:model check test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml
+node dist/bin.js check test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml
 
 # Generate an editable report with violations highlighted
-pnpm arch:model report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml output.drawio
+node dist/bin.js report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml output.drawio
 
 # Generate a Mermaid diagram
-pnpm arch:model mermaid test/fixtures/order-platform.architecture.yaml output.mmd
+node dist/bin.js mermaid test/fixtures/order-platform.architecture.yaml output.mmd
 
 # Generate an editable draw.io diagram
-pnpm arch:model drawio test/fixtures/order-platform.architecture.yaml output.drawio
+node dist/bin.js drawio test/fixtures/order-platform.architecture.yaml output.drawio
 
 # Validate all Phase 1 artifacts
 pnpm phase1:verify

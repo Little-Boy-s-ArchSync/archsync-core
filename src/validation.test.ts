@@ -73,8 +73,14 @@ rules:
         keyword: "reference",
       }),
     );
-    expect(formatValidationIssues(result.issues)).toContain(
-      "- /relationships/0/to: Unknown component 'missing-database'",
+    const formatted = formatValidationIssues(result.issues);
+    expect(formatted).toContain("PROBLEMS (1)");
+    expect(formatted).toContain("1. Unknown component 'missing-database'");
+    expect(formatted).toContain(
+      "Location: relationships[0].to (/relationships/0/to)",
+    );
+    expect(formatted).toContain(
+      "Fix: Add 'missing-database' under components",
     );
   });
 
@@ -86,7 +92,7 @@ rules:
     expect(result.valid).toBe(false);
     expect(result.issues.some((issue) => issue.keyword === "schema")).toBe(true);
     expect(formatValidationIssues(result.issues)).toMatch(
-      /- \/(components|relationships)/,
+      /Location: (components|relationships)/,
     );
   });
 
@@ -132,5 +138,21 @@ relationships: []
     expect(malformed.issues[0]?.path).toBe("/");
     expect(duplicate.valid).toBe(false);
     expect(formatValidationIssues(duplicate.issues)).toMatch(/Map keys must be unique/);
+    expect(formatValidationIssues(duplicate.issues)).toContain(
+      "Fix: Remove or rename the duplicate YAML key.",
+    );
+  });
+
+  it("formats actionable fixes for common schema failures", () => {
+    const formatted = formatValidationIssues([
+      { path: "/", message: "must have required property 'metadata'", keyword: "schema" },
+      { path: "/metadata/extra", message: "must NOT have additional properties", keyword: "schema" },
+      { path: "/metadata/name", message: "custom semantic failure", keyword: "semantic" },
+    ]);
+
+    expect(formatted).toContain("Location: document root (/)");
+    expect(formatted).toContain("Fix: Add the required field at this location.");
+    expect(formatted).toContain("Fix: Remove the unsupported field");
+    expect(formatted).toContain("Fix: Update this value so it satisfies");
   });
 });

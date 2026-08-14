@@ -65,6 +65,9 @@ describe("architecture conformance", () => {
       from: "gateway",
       to: "service",
     }));
+    expect(formatConformanceResult(result)).toContain(
+      "Fix: Restore the required dependency",
+    );
   });
 
   it("supports wildcard deny selectors", () => {
@@ -101,6 +104,12 @@ describe("architecture conformance", () => {
         evidence: { document: "observed", path: "/relationships/3" },
       }),
     ]);
+    expect(formatConformanceResult(result)).toContain(
+      "Dependency is outside the approved allow-list",
+    );
+    expect(formatConformanceResult(result)).toContain(
+      "Fix: Route the dependency to an allowed target",
+    );
   });
 
   it("supports wildcard targets in allow rules", () => {
@@ -150,6 +159,12 @@ describe("architecture conformance", () => {
       to: "database",
       evidence: { document: "expected", path: "/rules/0" },
     }));
+    expect(formatConformanceResult(failing)).toContain(
+      "Required architecture path is missing",
+    );
+    expect(formatConformanceResult(failing)).toContain(
+      "Fix: Restore an approved path to the target",
+    );
   });
 
   it("can constrain every edge in a required path by relationship type", () => {
@@ -178,6 +193,14 @@ describe("architecture conformance", () => {
     expect(result.classification).toBe("evolution");
     expect(result.summary).toMatchObject({ violations: 0, added_nodes: 1, added_edges: 1 });
     expect(result.findings.filter((finding) => finding.kind === "architecture-evolution")).toHaveLength(2);
+    const formatted = formatConformanceResult(result);
+    expect(formatted).toMatch(/^DECISION: REVIEW/);
+    expect(formatted).toContain("2 architecture changes require human approval");
+    expect(formatted).toContain("ADDED component: redis");
+    expect(formatted).toContain(
+      "Evidence: observed architecture, component 'redis' (/components/redis)",
+    );
+    expect(formatted).toContain("EXIT CODE: 3 (REVIEW)");
   });
 
   it("reports removed components and their relationships as evolution", () => {
@@ -200,6 +223,7 @@ describe("architecture conformance", () => {
       change: "removed",
       evidence: { document: "expected", path: "/relationships/2" },
     }));
+    expect(formatConformanceResult(result)).toContain("REMOVED component: database");
   });
 
   it("detects architecture metadata changes on an existing component", () => {
@@ -211,6 +235,7 @@ describe("architecture conformance", () => {
 
     expect(result.classification).toBe("evolution");
     expect(result.diff.changedNodes.map(({ id }) => id)).toEqual(["service"]);
+    expect(formatConformanceResult(result)).toContain("CHANGED component: service");
   });
 
   it("prioritizes violation when a change also evolves topology", () => {
@@ -222,20 +247,29 @@ describe("architecture conformance", () => {
 
     expect(result.classification).toBe("violation");
     expect(result.summary).toMatchObject({ violations: 1, evolutions: 1 });
-    expect(formatConformanceResult(result)).toContain(
-      "VIOLATION (1 violation, 1 architecture change)",
+    const formatted = formatConformanceResult(result);
+    expect(formatted).toMatch(/^DECISION: BLOCK/);
+    expect(formatted).toContain("RULE VIOLATIONS (1)");
+    expect(formatted).toContain(
+      "Relationship: frontend --data--> database (frontend|data|database)",
     );
-    expect(formatConformanceResult(result)).toContain(
-      "observed:/relationships/3",
+    expect(formatted).toContain(
+      "Evidence: observed architecture, relationship #4 (/relationships/3)",
     );
+    expect(formatted).toContain("ARCHITECTURE CHANGES (1)");
+    expect(formatted).toContain("EXIT CODE: 1 (BLOCK)");
   });
 
   it("formats a clean result with an explicit no-findings message", () => {
     const expected = expectedModel();
     const result = analyzeConformance(expected, structuredClone(expected));
 
-    expect(formatConformanceResult(result)).toContain(
-      "No rule violations or architecture topology changes detected",
+    const formatted = formatConformanceResult(result);
+    expect(formatted).toMatch(/^DECISION: PASS/);
+    expect(formatted).toContain(
+      "No rule violations or architecture topology changes were detected.",
     );
+    expect(formatted).toContain("NEXT STEP: No action required.");
+    expect(formatted).toContain("EXIT CODE: 0 (PASS)");
   });
 });
