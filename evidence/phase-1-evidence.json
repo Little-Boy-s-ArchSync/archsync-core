@@ -2,6 +2,153 @@
   "phase": 1,
   "release": "v0.1",
   "objective": "Machine-readable architecture contract and deterministic conformance foundation",
+  "provenance": {
+    "implementation_source": [
+      {
+        "file": "src/benchmark.ts",
+        "sha256": "cb463c37f5776c141efd848b8ee9bd8a132471a342fd44505952755a1e13bf5b"
+      },
+      {
+        "file": "src/bin.ts",
+        "sha256": "a693a651b94a05ea79e85d898e53194d3e89b53d4aeb96e6cd7f19570cd49288"
+      },
+      {
+        "file": "src/conformance-report.ts",
+        "sha256": "b13f9ae0b64593eef7c0cecec4f97ee1a4653d6b5df770660724399065066a12"
+      },
+      {
+        "file": "src/conformance.ts",
+        "sha256": "fb97313609ebb44f66d468703f3f334c4df7bb7af8c0c4b91f2ffabf36442c54"
+      },
+      {
+        "file": "src/drawio.ts",
+        "sha256": "199de8bea6547d496686f57f304eed7cf8f7815fa331ac5fa4e68a315d1df86f"
+      },
+      {
+        "file": "src/graph.ts",
+        "sha256": "fce741ffb5b38aef25533afc0d521cd46472bcbbf8f21adbb7ee252b141ec291"
+      },
+      {
+        "file": "src/index.ts",
+        "sha256": "361ce71c69dc3d101d1f0c31de5b5e33ba8fdb04341b08260451a6d23109b4e3"
+      },
+      {
+        "file": "src/mermaid.ts",
+        "sha256": "b45d299586b660aff6994b6d8250f37d9c2b076739387f04599a1597fbe112df"
+      },
+      {
+        "file": "src/model.ts",
+        "sha256": "5a138fee8651157a8728ab61d40c34a5369252423aeeae4872e49989586bf9c6"
+      },
+      {
+        "file": "src/validation.ts",
+        "sha256": "d3fec5bdaa179b863a039296e277c6c15ab84035f8a9a8b21d18e87d4fe4e372"
+      }
+    ],
+    "implementation_source_sha256": "78ed5eefa05efc7e0be9c0c7b94d540ccbfba9021ed5c5f420323d0b6847cfd2",
+    "unit_test_source": [
+      {
+        "file": "src/benchmark.test.ts",
+        "sha256": "707661ff2407d55816a5e1ff4ccdefec7857f79d2233421b7207d1fa2eae3102"
+      },
+      {
+        "file": "src/conformance-report.test.ts",
+        "sha256": "32cbde5f10233a63c25e830659e2f59660bfa99239f50d657d95fa3a28c42995"
+      },
+      {
+        "file": "src/conformance.test.ts",
+        "sha256": "938873cd32bd35aa135f7647432ae9fd3402fe573c129dc7dc0d1ae716c8dfe2"
+      },
+      {
+        "file": "src/drawio.test.ts",
+        "sha256": "232de000b347ae6caf23f33accbde71a138d20969a57232ef696a6e1080eae08"
+      },
+      {
+        "file": "src/graph.test.ts",
+        "sha256": "c3a495f6b57a43e0a14ab14777837d162702e5e7071ebaa93d9b60b62363ecae"
+      },
+      {
+        "file": "src/mermaid.test.ts",
+        "sha256": "a0cc670facab0f2d11b2bd5efc6abe915f006178d8859216833017b2144be1af"
+      },
+      {
+        "file": "src/validation.test.ts",
+        "sha256": "f76061786cf971da980b0499b418064dfbd026c30a57fdf1269a8413074e17d0"
+      },
+      {
+        "file": "src/validation.topology.test.ts",
+        "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
+      }
+    ],
+    "unit_test_source_sha256": "33852f2af8b176a6110721d2682cf7eca82da89430d1041354fe8d7e15236cff",
+    "fixture_tree": {
+      "files": [
+        {
+          "file": "test/fixtures/invalid-schema.architecture.yaml",
+          "sha256": "18f66dc911cae28965272c67e1ea9067bfa1f8899894eb023e3ec28047d97c86"
+        },
+        {
+          "file": "test/fixtures/invalid-unknown-component.architecture.yaml",
+          "sha256": "3bea60f332aafbdf5d19490284e39cf29da8ae86f31e372a660a13a877047d06"
+        },
+        {
+          "file": "test/fixtures/minimal-evolution.architecture.yaml",
+          "sha256": "a9b41d5df33a1334b08470db050e26a4ea8ccf97ae61e407c4703fbc0f5a99a9"
+        },
+        {
+          "file": "test/fixtures/minimal.architecture.yaml",
+          "sha256": "15619c737a351d67b3aafa4cf19a4979732f1aad0e85e2a1f9d38cc66cb5bacb"
+        },
+        {
+          "file": "test/fixtures/order-platform.architecture.yaml",
+          "sha256": "967b0498af330f392ea67d1d0e7b5054c293fb591a9c41ed5da15e2b3bd85e72"
+        },
+        {
+          "file": "test/fixtures/order-platform.evolution.architecture.yaml",
+          "sha256": "20f4f1898bc715cd3eeee54e2cf198723fa73e2865161bcf54bcb18ac2b20765"
+        },
+        {
+          "file": "test/fixtures/order-platform.violation.architecture.yaml",
+          "sha256": "9b05d32bac86a754e48e6df60457c6b78db9aba33be96bdddac7de06d5ba6472"
+        }
+      ],
+      "sha256": "9a3387bfed8324bed0a744b2efe3ebb5bd206bcb8f04080d091bf355200d3b08"
+    },
+    "verification_source": [
+      {
+        "file": "scripts/cli-smoke.mjs",
+        "sha256": "dc4c92578d6b7aec19df02a567d8b7dfc13ef70b9a0d60e8c7efadfa22f2b3d9"
+      },
+      {
+        "file": "scripts/phase1-evidence.mjs",
+        "sha256": "3156d5f19c18da08f388d0f2e025dea1cc469b6a0c558780d41755645546e8a7"
+      },
+      {
+        "file": "tsconfig.json",
+        "sha256": "2c900468a86fa396c4161698754bb11dff2daf75fd79e12aba3c7ec61d9cec03"
+      },
+      {
+        "file": "tsconfig.test.json",
+        "sha256": "04910a31dc7be48c03671a814ed81ebc5095f21d4150cf08f613f0c8f1b8ce13"
+      },
+      {
+        "file": "vitest.config.ts",
+        "sha256": "33c5429c49911e83a968941a25748248ff3d1f46d4e7ac92b4997afddbd87945"
+      }
+    ],
+    "verification_source_sha256": "7f091ab75083a7441ea8b7811866ddf7a7d49488fc0b26cb2bda8fc10c30a12e",
+    "dependency_source": [
+      {
+        "file": "package.json",
+        "sha256": "30f78fa5ffb70aeeccc9f0872b5a287116528ebdadefc21dd51087f436ccf880"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
+      }
+    ],
+    "dependency_source_sha256": "b66fa59d57173e65365d32c4ae9d3333252eb5f3ef28eac076c3725354d84d79"
+  },
   "schema": {
     "file": "specs/architecture.schema.json",
     "id": "https://archsync.dev/schemas/architecture-v0.1.json",

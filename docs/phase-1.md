@@ -49,7 +49,7 @@ Turn architecture into a machine-readable contract and create ground truth for t
 | Deterministic Mermaid view | Core engineer | [`src/mermaid.ts`](../src/mermaid.ts) and the generated example view |
 | Editable draw.io view | Core engineer | [`src/drawio.ts`](../src/drawio.ts), XML generation tests and CLI smoke checks |
 | Ten-scenario schema/topology review | Core engineer | [`src/validation.topology.test.ts`](../src/validation.topology.test.ts) |
-| Reproducible evidence and coverage gates | Core engineer | [`evidence/phase-1-evidence.json`](../evidence/phase-1-evidence.json), [`vitest.config.ts`](../vitest.config.ts) and cross-platform CI artifacts |
+| Reproducible evidence and coverage gates | Core engineer | [`evidence/phase-1-evidence.json`](../evidence/phase-1-evidence.json), which binds production source, tests, fixtures, verification configuration and dependencies by SHA-256; [`vitest.config.ts`](../vitest.config.ts); and cross-platform CI artifacts |
 | Graph Diff demo from synthetic input | Core engineer | `archsync diff` with `minimal.architecture.yaml` and `minimal-evolution.architecture.yaml` |
 | Architecture error demo | Core engineer | `archsync check` against `order-platform.violation.architecture.yaml`, proving ARCH-001 and ARCH-004 with model paths |
 | Visual conformance evidence | Core engineer | [`docs/demo`](demo/README.md), deterministic Mermaid/draw.io report hashes and PNG previews |
@@ -70,7 +70,7 @@ pnpm install --frozen-lockfile
 pnpm verify
 ```
 
-The benchmark verifier requires exactly 20 contiguous cases, checks every owner, acceptance criterion, expected source evidence and graph delta, applies every patch independently to a clean baseline, and runs the same conformance engine used by `archsync check`. It enforces the 9/7/4 classification split, matches violation rule IDs, binds declared evidence to patch contents and proves that all patches apply cleanly. Source-derived measurements remain owned by the Phase 2 Benchmark and Guardian gates instead of being duplicated inside Core evidence.
+The benchmark verifier requires exactly 20 contiguous cases, checks every owner, acceptance criterion, expected source evidence and graph delta, applies every patch independently to a clean baseline, and runs the same conformance engine used by `archsync check`. It enforces the 9/7/4 classification split, matches violation rule IDs, binds declared evidence to patch contents and proves that all patches apply cleanly. The original roadmap distribution remains present in cases 01--10 as five no-impact, three violation and two evolution cases. Source-derived measurements remain owned by the Phase 2 Benchmark and Guardian gates instead of being duplicated inside Core evidence.
 
 Phase 1 conformance uses an explicit observed architecture fixture so the deterministic rule engine and report contract can be demonstrated independently. Discovering that observed graph from TypeScript source files is intentionally still a Phase 2 analyzer responsibility.
 

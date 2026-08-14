@@ -28,6 +28,38 @@ function relativePath(filePath) {
   return relative(root, filePath).replaceAll("\\", "/");
 }
 
+async function hashFiles(filePaths) {
+  const entries = [];
+  for (const filePath of [...filePaths].sort()) {
+    entries.push({
+      file: relativePath(filePath),
+      sha256: sha256(await readFile(filePath)),
+    });
+  }
+  return entries;
+}
+
+async function treeSha256(directory) {
+  const files = [];
+  async function visit(currentDirectory) {
+    const entries = await readdir(currentDirectory, { withFileTypes: true });
+    for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
+      const entryPath = join(currentDirectory, entry.name);
+      if (entry.isDirectory()) {
+        await visit(entryPath);
+      } else if (entry.isFile()) {
+        files.push(entryPath);
+      }
+    }
+  }
+  await visit(directory);
+  const manifest = await hashFiles(files);
+  return {
+    files: manifest,
+    sha256: sha256(JSON.stringify(manifest)),
+  };
+}
+
 async function requiredModel(filePath) {
   const result = await loadArchitecture(filePath);
   assert.equal(result.valid, true, `${filePath} must be valid`);
@@ -38,6 +70,31 @@ async function requiredModel(filePath) {
 const schemaPath = join(root, "specs", "architecture.schema.json");
 const schemaSource = await readFile(schemaPath, "utf8");
 const schema = JSON.parse(schemaSource);
+const sourceDirectory = join(root, "src");
+const sourceNames = (await readdir(sourceDirectory))
+  .filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts"))
+  .sort();
+const unitTestNames = (await readdir(sourceDirectory))
+  .filter((name) => name.endsWith(".test.ts"))
+  .sort();
+const implementationSource = await hashFiles(
+  sourceNames.map((name) => join(sourceDirectory, name)),
+);
+const unitTestSource = await hashFiles(
+  unitTestNames.map((name) => join(sourceDirectory, name)),
+);
+const fixtureTree = await treeSha256(fixturesDirectory);
+const verificationSource = await hashFiles([
+  join(root, "scripts", "cli-smoke.mjs"),
+  join(root, "scripts", "phase1-evidence.mjs"),
+  join(root, "tsconfig.json"),
+  join(root, "tsconfig.test.json"),
+  join(root, "vitest.config.ts"),
+]);
+const dependencySource = await hashFiles([
+  join(root, "package.json"),
+  join(root, "pnpm-lock.yaml"),
+]);
 const fixtureNames = (await readdir(fixturesDirectory))
   .filter((name) => name.endsWith(".yaml") || name.endsWith(".yml"))
   .sort();
@@ -99,6 +156,17 @@ const evidence = {
   phase: 1,
   release: "v0.1",
   objective: "Machine-readable architecture contract and deterministic conformance foundation",
+  provenance: {
+    implementation_source: implementationSource,
+    implementation_source_sha256: sha256(JSON.stringify(implementationSource)),
+    unit_test_source: unitTestSource,
+    unit_test_source_sha256: sha256(JSON.stringify(unitTestSource)),
+    fixture_tree: fixtureTree,
+    verification_source: verificationSource,
+    verification_source_sha256: sha256(JSON.stringify(verificationSource)),
+    dependency_source: dependencySource,
+    dependency_source_sha256: sha256(JSON.stringify(dependencySource)),
+  },
   schema: {
     file: relativePath(schemaPath),
     id: schema.$id,
