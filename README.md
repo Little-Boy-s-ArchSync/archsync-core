@@ -57,7 +57,7 @@ node dist/bin.js drawio test/fixtures/order-platform.architecture.yaml output.dr
 pnpm phase1:verify
 ```
 
-`phase1:verify` enforces coverage thresholds, validates fixtures, builds the tracked distribution, smoke-tests the built CLI and verifies [`evidence/phase-1-evidence.json`](evidence/phase-1-evidence.json). CI runs the same gate on Ubuntu and Windows and uploads coverage/evidence artifacts.
+`phase1:verify` enforces coverage thresholds, validates fixtures, builds the tracked distribution, smoke-tests the built CLI and verifies [`evidence/phase-1-evidence.json`](evidence/phase-1-evidence.json). CI runs the same gate on Ubuntu, Windows and macOS and uploads coverage/evidence artifacts.
 
 See the [architecture conformance demo](docs/demo/README.md) for violation and evolution screenshots. `check` returns exit code `0` for no-impact, `1` for violation and `3` for evolution requiring approval. These Core commands compare declared models; Guardian adds source-code reconstruction in Phase 2 and Git-diff/PR gating in Phase 3.
 

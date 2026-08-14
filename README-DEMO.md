@@ -1,6 +1,6 @@
 # ArchSync Phase 1–3 — Demo Guide
 
-Tài liệu này hướng dẫn demo từ **Phase 1: Architecture Model and Benchmark Lab**, **Phase 2: Deterministic Guardian Core** đến **Phase 3: Git Diff and Pull-Request Gate** trên Windows PowerShell.
+Tài liệu này hướng dẫn demo từ **Phase 1: Architecture Model and Benchmark Lab**, **Phase 2: Deterministic Guardian Core** đến **Phase 3: Git Diff and Pull-Request Gate** trên Windows, macOS và Linux.
 
 Mục tiêu của demo là chứng minh ArchSync có thể:
 
@@ -25,8 +25,9 @@ Yêu cầu:
 
 - Node.js 22 trở lên.
 - pnpm 11 trở lên.
+- Git.
 - draw.io Desktop nếu muốn mở file `.drawio`.
-- Workspace nằm tại `D:\Little Boys\ArchSync`.
+- Workspace chứa ba repository cùng cấp; các ví dụ Windows bên dưới dùng `D:\Little Boys\ArchSync`.
 - Ba repository `archsync-core`, `archsync-guardian` và `archsync-benchmark` nằm cạnh nhau trong workspace.
 
 Mở PowerShell và cài dependency cho ba repository dùng trong demo:
@@ -50,9 +51,46 @@ node --version
 pnpm --version
 ```
 
-Các lệnh Core bên dưới gọi bản CLI đã build bằng `node dist/bin.js`. Cách này giữ
-nguyên exit code dành cho automation nhưng không thêm thông báo `ELIFECYCLE` của
-pnpm khi một fixture cố ý bị từ chối.
+Trên macOS/Linux, thay đường dẫn workspace bằng đường dẫn checkout của bạn và dùng
+`cd ../archsync-...`; mọi lệnh `pnpm` và `archsync` còn lại giữ nguyên.
+
+### Lối demo khuyến nghị: một CLI thống nhất
+
+Từ repository Guardian, chạy preflight và toàn bộ demo thật bằng hai lệnh ngắn:
+
+```text
+pnpm doctor
+pnpm demo
+```
+
+`pnpm doctor` xác nhận Node.js, Git, hệ điều hành và hai engine Core/Guardian.
+`pnpm demo` tự chạy ba patch Git thật đại diện cho `PASS`, `BLOCK` và `REVIEW`,
+kiểm tra ground truth, changed-file set, cache miss/hit và kết thúc thành công khi
+các quyết định thực tế đúng như mong đợi. Lệnh này không phụ thuộc Bash hoặc cú
+pháp PowerShell.
+
+Nếu dùng package đã cài, lệnh tương đương là:
+
+```text
+archsync doctor
+archsync demo --benchmark ../archsync-benchmark/order-platform --scenario all
+```
+
+CLI thống nhất vẫn cung cấp đầy đủ các nhóm chức năng hiện có:
+
+```text
+archsync model validate architecture.yaml
+archsync model graph architecture.yaml
+archsync model check expected.yaml observed.yaml
+archsync scan architecture.yaml repository observed.json
+archsync check architecture.yaml repository --diff main --report archsync-pr-report.md
+archsync benchmark ground-truth.json
+```
+
+Các phần chi tiết bên dưới gọi Core bằng `node dist/bin.js` để minh họa chính xác
+từng primitive và giữ nguyên exit code automation mà không thêm thông báo
+`ELIFECYCLE` khi một fixture cố ý bị từ chối. Trong sản phẩm hợp nhất, có thể thay
+`node dist/bin.js <command>` bằng `archsync model <command>`.
 
 ## 2. Câu mở đầu
 
@@ -409,6 +447,21 @@ Mỗi patch được áp lên một bản sao sạch của baseline. Guardian ph
 
 ## 12. Demo Phase 3 — Git diff và pull-request gate
 
+Cách trình bày khuyến nghị chỉ cần một lệnh:
+
+```text
+cd archsync-guardian
+pnpm demo
+```
+
+CLI hiển thị ba kết quả gọn: refactor nội bộ thành `PASS`, dependency bị cấm thành
+`BLOCK`, và Redis topology mới thành `REVIEW`. Thêm `--verbose` khi cần giải thích
+toàn bộ finding kỹ thuật; dùng `pnpm cli demo --scenario block --verbose` để chỉ
+chạy một tình huống.
+
+Các lệnh benchmark riêng bên dưới vẫn được giữ để kiểm tra tương thích và tái lập
+từng case từ repository benchmark.
+
 Ba lệnh sau tạo repository Git tạm từ cùng baseline, áp patch thật, chạy một lần cache miss và một lần cache hit, rồi tự xóa thư mục tạm:
 
 ```powershell
@@ -522,22 +575,17 @@ Các khả năng này nằm ngoài deterministic Phase 3 hiện tại.
 
 ## 15. Kịch bản demo nhanh trong 2–3 phút
 
-Nếu thời gian ngắn, chạy bốn lệnh sau:
+Nếu thời gian ngắn, chỉ cần chạy:
 
-```powershell
-# 1. Git diff chỉ refactor nội bộ -> PASS
-cd "D:\Little Boys\ArchSync\archsync-benchmark"
-pnpm demo:phase3:pass
-
-# 2. Git diff làm Frontend gọi tắt Payment Service -> BLOCK + file:line
-pnpm demo:phase3:block
-
-# 3. Git diff thêm Redis -> REVIEW
-pnpm demo:phase3:review
-
-# 4. Chứng minh trên toàn bộ 20 Git-diff case
-pnpm phase3:verify
+```text
+cd archsync-guardian
+pnpm doctor
+pnpm demo
 ```
+
+Sau ba quyết định, có thể chạy `pnpm phase3:verify` trong Guardian để chứng minh
+gate phát triển đầy đủ hoặc chạy `pnpm verify` trong Benchmark để tái lập toàn bộ
+20 Git-diff case. Không cần gõ riêng ba câu lệnh dài trong lúc thuyết trình.
 
 Ba câu cần nhấn mạnh:
 
@@ -583,6 +631,10 @@ cd "D:\Little Boys\ArchSync\archsync-core"
 node dist/bin.js drawio test/fixtures/order-platform.architecture.yaml order-platform-demo.drawio
 Invoke-Item .\order-platform-demo.drawio
 ```
+
+Trên macOS, tạo file bằng lệnh tương đương
+`archsync model drawio architecture.yaml output.drawio`, sau đó mở bằng
+`open output.drawio`.
 
 ### Fixture `invalid-*` hoặc demo violation hiển thị exit code khác 0
 
