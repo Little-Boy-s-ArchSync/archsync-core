@@ -449,11 +449,13 @@ Kết quả benchmark Phase 3 trên 20 patch:
 
 - `20/20` classification và merge decision đúng.
 - `20/20` changed-file set đúng.
+- `20/20` architecture delta đúng với ground truth.
+- `20/20` kết quả incremental tương đương với full scan độc lập trên cùng head repository.
 - `7/7` violation rule-set đúng.
 - `11/11` finding-bearing case đúng file và dòng evidence.
 - `20/20` lần chạy lặp lại dùng cache và giữ nguyên normalized result.
 - Incremental analyzer parse `57/189` lượt file TypeScript (`0.3016`).
-- Trên máy evidence Windows đã ghi nhận: cold median/p95 `549.30/561.91 ms`; warm median/p95 `255.89/262.68 ms`.
+- Trên máy evidence Windows đã ghi nhận: cold median/p95 `540.00/571.60 ms`; warm median/p95 `249.75/278.27 ms`.
 
 Các latency trên chỉ là phép đo của máy và corpus đã ghi trong evidence, không phải tuyên bố performance tổng quát.
 
@@ -493,7 +495,7 @@ cd "D:\Little Boys\ArchSync\archsync-benchmark"
 pnpm verify
 ```
 
-Gate kiểm tra model, ground truth, 20 patch, 40 tín hiệu detector, SHA-256 integrity, mutation tests, Phase 2 full scans và 40 lần Phase 3 cold/warm Git-diff execution.
+Gate kiểm tra model, ground truth, 20 patch, 40 tín hiệu detector, SHA-256 integrity, mutation tests, Phase 2 full scans, 40 Phase 3 cold/warm Git-diff checks và 20 full-scan oracle. Tổng cộng Phase 3 thực hiện 80 analyzer calls để chứng minh incremental result không chỉ ổn định mà còn tương đương full scan.
 
 ## 14. Câu kết thúc
 
