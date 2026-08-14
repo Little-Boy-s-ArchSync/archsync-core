@@ -13,7 +13,7 @@ Mục tiêu của demo là chứng minh ArchSync có thể:
 7. Phân biệt model sai schema với kiến trúc đúng schema nhưng vi phạm rule.
 8. Phân tích source TypeScript để tự động tạo Observed Graph.
 9. Trả về quyết định `PASS`, `BLOCK` hoặc `REVIEW` kèm đúng file và dòng code.
-10. Đo analyzer trên 10 thay đổi code bằng precision, recall, classification và determinism.
+10. Đo analyzer trên 20 thay đổi code và 40 tín hiệu detector bằng precision, recall, specificity, classification và determinism.
 
 > **Phạm vi hiện tại:** Phase 1 và Phase 2 đã hoàn thành. Guardian có thể phân tích toàn bộ repository TypeScript/Node.js để tạo Observed Graph và phát hiện drift. Phân tích riêng Git diff, comment pull request và merge gate thuộc Phase 3.
 
@@ -442,7 +442,7 @@ pnpm demo:case06
 # 3. Thêm Redis -> REVIEW
 pnpm demo:case09
 
-# 4. Chứng minh trên toàn bộ 10 case
+# 4. Chứng minh trên toàn bộ 20 case
 cd "D:\Little Boys\ArchSync\archsync-guardian"
 pnpm guardian benchmark "..\archsync-benchmark\order-platform\ground-truth.json"
 ```
