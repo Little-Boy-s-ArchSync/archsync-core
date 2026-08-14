@@ -42,6 +42,9 @@ pnpm install --frozen-lockfile
 
 cd "D:\Little Boys\ArchSync\archsync-benchmark"
 pnpm install --frozen-lockfile
+
+# Quay lại Guardian trước khi chạy CLI ArchSync
+cd "D:\Little Boys\ArchSync\archsync-guardian"
 ```
 
 Kiểm tra phiên bản công cụ nếu cần:
@@ -54,20 +57,55 @@ pnpm --version
 Trên macOS/Linux, thay đường dẫn workspace bằng đường dẫn checkout của bạn và dùng
 `cd ../archsync-...`; mọi lệnh `pnpm` và `archsync` còn lại giữ nguyên.
 
-### Lối demo khuyến nghị: một CLI thống nhất
+### Lối demo khuyến nghị: chạy CLI từ Guardian
 
-Từ repository Guardian, chạy preflight và toàn bộ demo thật bằng hai lệnh ngắn:
+Từ repository Guardian, chạy preflight và toàn bộ demo thật bằng hai lệnh ngắn.
+Hai lệnh này không yêu cầu cài CLI global:
 
 ```text
-pnpm doctor
-pnpm demo
+pnpm run doctor
+pnpm run demo
 ```
 
-`pnpm doctor` xác nhận Node.js, Git, hệ điều hành và hai engine Core/Guardian.
-`pnpm demo` tự chạy ba patch Git thật đại diện cho `PASS`, `BLOCK` và `REVIEW`,
+`pnpm run doctor` xác nhận Node.js, Git, hệ điều hành và hai engine Core/Guardian.
+`pnpm run demo` tự chạy ba patch Git thật đại diện cho `PASS`, `BLOCK` và `REVIEW`,
 kiểm tra ground truth, changed-file set, cache miss/hit và kết thúc thành công khi
 các quyết định thực tế đúng như mong đợi. Lệnh này không phụ thuộc Bash hoặc cú
 pháp PowerShell.
+
+Phải dùng đầy đủ `pnpm run doctor`. Vì `doctor` cũng là một lệnh tích hợp của
+pnpm, câu lệnh `pnpm doctor` sẽ gọi công cụ chẩn đoán của package manager thay vì
+script ArchSync. Hai script trên phải được chạy trong `archsync-guardian`.
+
+Có thể gọi chắc chắn từ bất kỳ thư mục nào mà không cần đổi thư mục:
+
+```powershell
+pnpm --dir "D:\Little Boys\ArchSync\archsync-guardian" run doctor
+pnpm --dir "D:\Little Boys\ArchSync\archsync-guardian" run demo
+```
+
+### Tùy chọn: cài lệnh `archsync` toàn cục
+
+Chỉ cần bước này nếu muốn gõ trực tiếp `archsync ...` từ mọi thư mục. Chạy một
+lần:
+
+```powershell
+pnpm setup
+```
+
+Đóng PowerShell, mở lại, rồi chạy:
+
+```powershell
+cd "D:\Little Boys\ArchSync\archsync-guardian"
+pnpm build
+pnpm add --global .
+
+Get-Command archsync
+archsync doctor
+```
+
+Nếu `pnpm add --global .` chưa hoàn tất thì `archsync` chưa tồn tại trong `PATH`;
+việc `pnpm run demo` chạy được không tự động cài lệnh global.
 
 Nếu dùng package đã cài, lệnh tương đương là:
 
