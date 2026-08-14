@@ -22,6 +22,7 @@ describe("Mermaid generation", () => {
       },
       relationships: [
         { from: "frontend", to: "order-service", type: "http" },
+        { from: "order-service", to: "frontend", type: "event" },
       ],
     };
 
@@ -29,7 +30,20 @@ describe("Mermaid generation", () => {
 
     expect(result).toContain('order_service["Order Service"]');
     expect(result).toContain("frontend -->|http| order_service");
+    expect(result).toContain("order_service -->|event| frontend");
     expect(result).toBe(generateMermaid(document));
   });
-});
 
+  it("uses the component id when no display name is declared", () => {
+    const document: ArchitectureDocument = {
+      version: "0.1",
+      metadata: { name: "fallback-label" },
+      components: {
+        worker: { type: "worker", layer: "application" },
+      },
+      relationships: [],
+    };
+
+    expect(generateMermaid(document)).toContain('worker["worker"]:::service');
+  });
+});

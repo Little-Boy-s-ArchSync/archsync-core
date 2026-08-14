@@ -33,7 +33,7 @@ Turn architecture into a machine-readable contract and create ground truth for t
 5. Mermaid output can be generated deterministically from any valid model.
 6. `pnpm phase1:verify` passes from a clean checkout of `archsync-core`.
 7. At least ten topology-review scenarios and the built CLI contract are enforced automatically.
-8. Statement, line and function coverage remain at or above 90%; branch coverage remains at or above 85%.
+8. Statement, branch, function and line coverage remain exactly 100% for every deterministic engine module; built CLI behavior is additionally protected by 13/13 command-contract checks.
 9. A schema-valid observed model can be classified as no-impact, violation or evolution with actionable rule evidence.
 10. Violation and evolution reports can be generated as deterministic Mermaid and editable draw.io views.
 

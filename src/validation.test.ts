@@ -2,7 +2,11 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
-import { formatValidationIssues, parseArchitecture } from "./validation.js";
+import {
+  formatSchemaIssue,
+  formatValidationIssues,
+  parseArchitecture,
+} from "./validation.js";
 
 const examplesDirectory = new URL("../test/fixtures/", import.meta.url);
 
@@ -154,5 +158,20 @@ relationships: []
     expect(formatted).toContain("Fix: Add the required field at this location.");
     expect(formatted).toContain("Fix: Remove the unsupported field");
     expect(formatted).toContain("Fix: Update this value so it satisfies");
+  });
+
+  it("provides a deterministic fallback when a schema engine omits its message", () => {
+    const issue = formatSchemaIssue({
+      instancePath: "/metadata/name",
+      schemaPath: "#/properties/metadata/properties/name/type",
+      keyword: "type",
+      params: { type: "string" },
+    });
+
+    expect(issue).toEqual({
+      path: "/metadata/name",
+      message: "Schema validation failed",
+      keyword: "schema",
+    });
   });
 });

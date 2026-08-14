@@ -112,7 +112,7 @@ function hasRequiredPath(graph, source, targetSelector, relationshipType) {
     const queue = [source];
     while (queue.length > 0) {
         const current = queue.shift();
-        for (const edge of graph.outgoing.get(current) ?? []) {
+        for (const edge of graph.outgoing.get(current)) {
             if (relationshipType && edge.type !== relationshipType)
                 continue;
             if (matchesSelector(targetSelector, edge.to))

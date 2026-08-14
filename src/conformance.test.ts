@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { analyzeConformance, formatConformanceResult } from "./conformance.js";
+import {
+  analyzeConformance,
+  formatConformanceResult,
+  type ConformanceResult,
+} from "./conformance.js";
 import type { ArchitectureDocument } from "./model.js";
 
 function expectedModel(): ArchitectureDocument {
@@ -271,5 +275,67 @@ describe("architecture conformance", () => {
     );
     expect(formatted).toContain("NEXT STEP: No action required.");
     expect(formatted).toContain("EXIT CODE: 0 (PASS)");
+  });
+
+  it("supports documents without rules and rules without a relationship type", () => {
+    const unruled = expectedModel();
+    delete unruled.rules;
+    expect(analyzeConformance(unruled, structuredClone(unruled)).classification).toBe("no-impact");
+
+    const expected = expectedModel();
+    expected.components.orphan = { type: "service", layer: "domain" };
+    expected.rules = [
+      { id: "EDGE-ANY", type: "require", from: "orphan", to: "database", severity: "error" },
+      { id: "PATH-ANY", type: "require-path", from: "orphan", to: "database", severity: "error" },
+    ];
+    const result = analyzeConformance(expected, structuredClone(expected));
+
+    expect(result.findings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: "EDGE-ANY", edge_key: "orphan|other|database" }),
+      expect.objectContaining({ id: "PATH-ANY", kind: "required-path" }),
+    ]));
+  });
+
+  it("formats plural violations and defensive finding fallbacks deterministically", () => {
+    const base = analyzeConformance(expectedModel(), structuredClone(expectedModel()));
+    const result: ConformanceResult = {
+      ...base,
+      classification: "violation",
+      findings: [
+        {
+          id: "CUSTOM-001",
+          kind: "unsupported" as "deny-rule",
+          severity: "error",
+          message: "Custom violation message",
+          evidence: { document: "observed", path: "/custom/path" },
+        },
+        {
+          id: "CUSTOM-002",
+          kind: "unsupported" as "deny-rule",
+          severity: "warning",
+          message: "Second custom violation",
+          from: "frontend",
+          to: "service",
+          evidence: { document: "observed", path: "/custom/second" },
+        },
+        {
+          id: "EVOLUTION-CUSTOM",
+          kind: "architecture-evolution",
+          severity: "warning",
+          message: "Topology changed without structured fields",
+          evidence: { document: "observed", path: "/custom/evolution" },
+        },
+      ],
+      summary: { ...base.summary, violations: 2, evolutions: 1 },
+    };
+
+    const formatted = formatConformanceResult(result);
+
+    expect(formatted).toContain("2 architecture rules are violated");
+    expect(formatted).toContain("Custom violation message");
+    expect(formatted).toContain("Review the architecture rule and the observed topology.");
+    expect(formatted).toContain("frontend --any--> service");
+    expect(formatted).toContain("Topology changed without structured fields");
+    expect(formatted).toContain("observed architecture (/custom/path)");
   });
 });

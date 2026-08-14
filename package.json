@@ -33,7 +33,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "cli:smoke": "node scripts/cli-smoke.mjs",
-    "evidence:update": "pnpm build && node scripts/phase1-evidence.mjs --write",
+    "evidence:update": "pnpm test:coverage && pnpm build && node scripts/phase1-evidence.mjs --write",
     "evidence:verify": "node scripts/phase1-evidence.mjs",
     "demo:reports": "tsx src/bin.ts report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml docs/demo/order-platform-violation-report.mmd && tsx src/bin.ts report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.violation.architecture.yaml docs/demo/order-platform-violation-report.drawio && tsx src/bin.ts report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.evolution.architecture.yaml docs/demo/order-platform-evolution-report.mmd && tsx src/bin.ts report test/fixtures/order-platform.architecture.yaml test/fixtures/order-platform.evolution.architecture.yaml docs/demo/order-platform-evolution-report.drawio",
     "arch:model": "tsx src/bin.ts",

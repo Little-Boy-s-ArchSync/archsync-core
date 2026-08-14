@@ -4,7 +4,7 @@ import { Ajv2020, } from "ajv/dist/2020.js";
 import { parseDocument } from "yaml";
 const schemaUrl = new URL("../specs/architecture.schema.json", import.meta.url);
 let validatorPromise;
-function formatSchemaIssue(error) {
+export function formatSchemaIssue(error) {
     const suffix = error.params && "missingProperty" in error.params
         ? `/${String(error.params.missingProperty)}`
         : "";
@@ -121,7 +121,7 @@ export async function parseArchitecture(source) {
     if (!validate(value)) {
         return {
             valid: false,
-            issues: (validate.errors ?? []).map(formatSchemaIssue),
+            issues: validate.errors.map(formatSchemaIssue),
         };
     }
     const semanticIssues = validateArchitectureSemantics(value);

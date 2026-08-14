@@ -16,7 +16,7 @@ import type {
 const schemaUrl = new URL("../specs/architecture.schema.json", import.meta.url);
 let validatorPromise: Promise<ValidateFunction<ArchitectureDocument>> | undefined;
 
-function formatSchemaIssue(error: ErrorObject): ValidationIssue {
+export function formatSchemaIssue(error: ErrorObject): ValidationIssue {
   const suffix = error.params && "missingProperty" in error.params
     ? `/${String(error.params.missingProperty)}`
     : "";
@@ -165,7 +165,7 @@ export async function parseArchitecture(
   if (!validate(value)) {
     return {
       valid: false,
-      issues: (validate.errors ?? []).map(formatSchemaIssue),
+      issues: validate.errors!.map(formatSchemaIssue),
     };
   }
 

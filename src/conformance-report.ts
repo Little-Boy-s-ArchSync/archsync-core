@@ -37,8 +37,8 @@ function escapeMermaidLabel(label: string): string {
   return label.replaceAll('"', "&quot;");
 }
 
-function hasWildcard(value: string | undefined): boolean {
-  return value?.includes("*") ?? false;
+function hasWildcard(value: string): boolean {
+  return value.includes("*");
 }
 
 function statePriority(state: DiagramState | undefined): number {

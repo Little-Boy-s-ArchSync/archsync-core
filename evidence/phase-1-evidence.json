@@ -14,11 +14,11 @@
       },
       {
         "file": "src/conformance-report.ts",
-        "sha256": "b13f9ae0b64593eef7c0cecec4f97ee1a4653d6b5df770660724399065066a12"
+        "sha256": "db67502a185ee272eb8090eb194b1ea15fd3eb843939c74b310c3011cf814196"
       },
       {
         "file": "src/conformance.ts",
-        "sha256": "fb97313609ebb44f66d468703f3f334c4df7bb7af8c0c4b91f2ffabf36442c54"
+        "sha256": "b6de1474c3495f022d7cdf3d641c32df9b661a97b9964ae14a6a180ef5f4fa9c"
       },
       {
         "file": "src/drawio.ts",
@@ -42,26 +42,26 @@
       },
       {
         "file": "src/validation.ts",
-        "sha256": "d3fec5bdaa179b863a039296e277c6c15ab84035f8a9a8b21d18e87d4fe4e372"
+        "sha256": "46613bee7707b56ec7dac1e5cdd7142f5c824b5ba6849d217f878326ce80f453"
       }
     ],
-    "implementation_source_sha256": "78ed5eefa05efc7e0be9c0c7b94d540ccbfba9021ed5c5f420323d0b6847cfd2",
+    "implementation_source_sha256": "d2bae9f65f33a61d6bde0475017aaddddf1ecde6dfe7e9db208058e750009dd3",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
-        "sha256": "707661ff2407d55816a5e1ff4ccdefec7857f79d2233421b7207d1fa2eae3102"
+        "sha256": "32b8d3b6b1f9cdcebab08d0ac00378e859ba2ad1d2bc5f1d5951350fbfd0348d"
       },
       {
         "file": "src/conformance-report.test.ts",
-        "sha256": "32cbde5f10233a63c25e830659e2f59660bfa99239f50d657d95fa3a28c42995"
+        "sha256": "172e0a1c34e7185435dec39441218145a17583a55aa0126ea3eff222549f3238"
       },
       {
         "file": "src/conformance.test.ts",
-        "sha256": "938873cd32bd35aa135f7647432ae9fd3402fe573c129dc7dc0d1ae716c8dfe2"
+        "sha256": "6a5fe95e8bf23ad14c4acc2dc89f474e5e7e29453e0c771bb6ac83ccd1c5081b"
       },
       {
         "file": "src/drawio.test.ts",
-        "sha256": "232de000b347ae6caf23f33accbde71a138d20969a57232ef696a6e1080eae08"
+        "sha256": "7dcdf22166d93987342166c513ebbf439b3d087d35d5302b7a263f6afd3cd8df"
       },
       {
         "file": "src/graph.test.ts",
@@ -69,18 +69,18 @@
       },
       {
         "file": "src/mermaid.test.ts",
-        "sha256": "a0cc670facab0f2d11b2bd5efc6abe915f006178d8859216833017b2144be1af"
+        "sha256": "5bf753693a1eba80d06bd7c0d69cedd666bdd5117d2a0c2a0d3329c417991e68"
       },
       {
         "file": "src/validation.test.ts",
-        "sha256": "f76061786cf971da980b0499b418064dfbd026c30a57fdf1269a8413074e17d0"
+        "sha256": "9f106473413d7d7ca8671a4d77f95bc8263b31b36273c6dd803a9f6ac32f65e7"
       },
       {
         "file": "src/validation.topology.test.ts",
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "33852f2af8b176a6110721d2682cf7eca82da89430d1041354fe8d7e15236cff",
+    "unit_test_source_sha256": "44328b25ef3036a49a216f5148bf46ea9cea3fee0f613fe2eec967ba00a81769",
     "fixture_tree": {
       "files": [
         {
@@ -121,7 +121,7 @@
       },
       {
         "file": "scripts/phase1-evidence.mjs",
-        "sha256": "3156d5f19c18da08f388d0f2e025dea1cc469b6a0c558780d41755645546e8a7"
+        "sha256": "50ec3851d0d56cf8b879b07ef713a1b62c51b7341ec4b43e643f142c556f484d"
       },
       {
         "file": "tsconfig.json",
@@ -133,21 +133,21 @@
       },
       {
         "file": "vitest.config.ts",
-        "sha256": "33c5429c49911e83a968941a25748248ff3d1f46d4e7ac92b4997afddbd87945"
+        "sha256": "1b485eeec7fd741e284a1439cde221ac1a4e17f89559b326a208fc9305b639f3"
       }
     ],
-    "verification_source_sha256": "7f091ab75083a7441ea8b7811866ddf7a7d49488fc0b26cb2bda8fc10c30a12e",
+    "verification_source_sha256": "fbcc3edbe6447cae51ef1a1aedaaaee8f2bee7ac42719c937e8720a283649861",
     "dependency_source": [
       {
         "file": "package.json",
-        "sha256": "30f78fa5ffb70aeeccc9f0872b5a287116528ebdadefc21dd51087f436ccf880"
+        "sha256": "c5977b47b4e3cea65bdc31145ab8609cc42f6569aa0e5751b21b40a9f1158186"
       },
       {
         "file": "pnpm-lock.yaml",
         "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
       }
     ],
-    "dependency_source_sha256": "b66fa59d57173e65365d32c4ae9d3333252eb5f3ef28eac076c3725354d84d79"
+    "dependency_source_sha256": "5d6cb42681ce64c4f794f8e36fd6bfb321fe9e64e41162591ab0921ab9684df7"
   },
   "schema": {
     "file": "specs/architecture.schema.json",
@@ -299,11 +299,37 @@
   },
   "enforced_gates": {
     "topology_scenarios_minimum": 10,
+    "measured_engine_coverage": {
+      "statements": {
+        "total": 1322,
+        "covered": 1322,
+        "skipped": 0,
+        "pct": 100
+      },
+      "branches": {
+        "total": 502,
+        "covered": 502,
+        "skipped": 0,
+        "pct": 100
+      },
+      "functions": {
+        "total": 54,
+        "covered": 54,
+        "skipped": 0,
+        "pct": 100
+      },
+      "lines": {
+        "total": 1322,
+        "covered": 1322,
+        "skipped": 0,
+        "pct": 100
+      }
+    },
     "coverage_thresholds_percent": {
-      "statements": 90,
-      "branches": 85,
-      "functions": 90,
-      "lines": 90
+      "statements": 100,
+      "branches": 100,
+      "functions": 100,
+      "lines": 100
     },
     "cli_smoke_checks": [
       "valid model exits 0",

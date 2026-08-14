@@ -18,6 +18,7 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const fixturesDirectory = join(root, "test", "fixtures");
 const evidencePath = join(root, "evidence", "phase-1-evidence.json");
+const coverageSummaryPath = join(root, "coverage", "coverage-summary.json");
 const writeMode = process.argv.includes("--write");
 
 function sha256(value) {
@@ -95,6 +96,15 @@ const dependencySource = await hashFiles([
   join(root, "package.json"),
   join(root, "pnpm-lock.yaml"),
 ]);
+const coverageSummary = JSON.parse(await readFile(coverageSummaryPath, "utf8"));
+const measuredCoverage = Object.fromEntries(
+  ["statements", "branches", "functions", "lines"].map((metric) => {
+    const measurement = coverageSummary.total[metric];
+    assert.equal(measurement.pct, 100, `${metric} coverage must remain at 100%`);
+    assert.equal(measurement.covered, measurement.total, `${metric} coverage must have no uncovered items`);
+    return [metric, measurement];
+  }),
+);
 const fixtureNames = (await readdir(fixturesDirectory))
   .filter((name) => name.endsWith(".yaml") || name.endsWith(".yml"))
   .sort();
@@ -225,11 +235,12 @@ const evidence = {
   },
   enforced_gates: {
     topology_scenarios_minimum: 10,
+    measured_engine_coverage: measuredCoverage,
     coverage_thresholds_percent: {
-      statements: 90,
-      branches: 85,
-      functions: 90,
-      lines: 90,
+      statements: 100,
+      branches: 100,
+      functions: 100,
+      lines: 100,
     },
     cli_smoke_checks: [
       "valid model exits 0",

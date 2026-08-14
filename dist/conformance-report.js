@@ -19,7 +19,7 @@ function escapeMermaidLabel(label) {
     return label.replaceAll('"', "&quot;");
 }
 function hasWildcard(value) {
-    return value?.includes("*") ?? false;
+    return value.includes("*");
 }
 function statePriority(state) {
     if (state === "violation")

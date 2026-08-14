@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { analyzeConformance } from "./conformance.js";
+import {
+  analyzeConformance,
+  type ConformanceResult,
+} from "./conformance.js";
 import {
   generateConformanceDrawio,
   generateConformanceMermaid,
@@ -84,5 +87,107 @@ describe("conformance report rendering", () => {
     expect(drawio).toContain("REMOVED http");
     expect(drawio).toContain("strokeColor=#94a3b8;strokeWidth=1");
     expect(drawio).toContain("dashed=1;dashPattern=6 4;opacity=70");
+  });
+
+  it("renders changed and removed nodes, singular labels, id fallbacks and relationship fallbacks", () => {
+    const { expected, observed } = models();
+    expected.rules = [];
+    observed.rules = [];
+    delete observed.components.frontend!.name;
+    observed.components.service!.technology = "Bun";
+    delete observed.components.database;
+    observed.relationships = [{ from: "frontend", to: "service", type: "http" }];
+    const result = analyzeConformance(expected, observed);
+
+    const mermaid = generateConformanceMermaid(expected, observed, result);
+    const drawio = generateConformanceDrawio(expected, observed, result);
+
+    expect(mermaid).toContain('frontend["frontend · EVOLUTION"]');
+    expect(mermaid).toContain("Service · EVOLUTION");
+    expect(mermaid).toContain("Database · REMOVED");
+    expect(drawio).toContain("service · domain · EVOLUTION");
+    expect(drawio).toContain("database · data · REMOVED");
+  });
+
+  it("handles a synthetic singular violation without endpoints or relationship type", () => {
+    const { expected, observed } = models();
+    const clean = analyzeConformance(expected, structuredClone(expected));
+    const result: ConformanceResult = {
+      ...clean,
+      classification: "violation",
+      findings: [{
+        id: "SYNTHETIC-001",
+        kind: "required-edge",
+        severity: "error",
+        message: "Synthetic missing relationship",
+        evidence: { document: "expected", path: "/rules/0" },
+      }],
+      summary: { ...clean.summary, violations: 1 },
+    };
+
+    const mermaid = generateConformanceMermaid(expected, observed, result);
+
+    expect(mermaid).toContain("1 violation · 0 changes");
+  });
+
+  it("uses a generic edge label when a finding has an edge key but no relationship type", () => {
+    const { expected, observed } = models();
+    const clean = analyzeConformance(expected, structuredClone(expected));
+    const result: ConformanceResult = {
+      ...clean,
+      classification: "violation",
+      findings: [{
+        id: "SYNTHETIC-LABEL",
+        kind: "deny-rule",
+        severity: "error",
+        message: "Synthetic label fallback",
+        from: "frontend",
+        to: "service",
+        edge_key: "frontend|http|service",
+        evidence: { document: "observed", path: "/relationships/0" },
+      }],
+      summary: { ...clean.summary, violations: 1 },
+    };
+
+    expect(generateConformanceMermaid(expected, observed, result)).toContain(
+      "relationship · SYNTHETIC-LABEL",
+    );
+  });
+
+  it("adds a default-typed missing edge but does not duplicate a matching typed edge", () => {
+    const { expected, observed } = models();
+    observed.relationships = structuredClone(expected.relationships);
+    const clean = analyzeConformance(expected, observed);
+    const result: ConformanceResult = {
+      ...clean,
+      classification: "violation",
+      findings: [
+        {
+          id: "SYNTHETIC-DEFAULT",
+          kind: "required-edge",
+          severity: "error",
+          message: "Synthetic default edge",
+          from: "frontend",
+          to: "service",
+          evidence: { document: "expected", path: "/rules/0" },
+        },
+        {
+          id: "SYNTHETIC-TYPED",
+          kind: "required-edge",
+          severity: "error",
+          message: "Synthetic existing edge",
+          from: "frontend",
+          to: "service",
+          relationship_type: "http",
+          evidence: { document: "expected", path: "/rules/0" },
+        },
+      ],
+      summary: { ...clean.summary, violations: 2 },
+    };
+
+    const report = generateConformanceDrawio(expected, observed, result);
+    expect(report.match(/source="node-frontend" target="node-service"/g)).toHaveLength(2);
+    expect(report).toContain("MISSING other · SYNTHETIC-DEFAULT");
+    expect(report).toContain("MISSING http · SYNTHETIC-TYPED");
   });
 });

@@ -268,6 +268,147 @@ rules:
     expect(result.valid).toBe(true);
   });
 
+  it("validates a no-impact manifest against an architecture without rules", async () => {
+    const value = groundTruth();
+    value.cases = [value.cases[0]!];
+    value.benchmark.expected_distribution = { "no-impact": 1, violation: 0, evolution: 0 };
+    const architecture = `
+version: "0.1"
+metadata:
+  name: rule-free-benchmark
+components:
+  service:
+    type: service
+    layer: domain
+  database:
+    type: database
+    layer: data
+relationships:
+  - from: service
+    to: database
+    type: data
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid, result.issues.join("\n")).toBe(true);
+  });
+
+  it("rejects an allow-rule finding whose target is actually inside the allow selector", async () => {
+    const value = groundTruth();
+    value.cases[1]!.delta = {
+      relationships_added: [{ from: "service", to: "database", type: "http" }],
+    };
+    value.cases[1]!.expected.findings = [
+      { id: "ARCH-001", kind: "allow-rule", severity: "error", from: "service", to: "database" },
+    ];
+    const architecture = `
+version: "0.1"
+metadata:
+  name: allow-selector-check
+components:
+  service:
+    type: service
+    layer: domain
+  database:
+    type: database
+    layer: data
+relationships:
+  - from: service
+    to: database
+    type: data
+rules:
+  - id: ARCH-001
+    type: allow
+    from: service
+    to: database
+    relationship_type: http
+    severity: error
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toContain("allow-rule finding target is inside rule 'ARCH-001'");
+  });
+
+  it("validates a required path broken only by removal of its intermediate component", async () => {
+    const value = groundTruth();
+    value.cases = [value.cases[1]!];
+    value.cases[0]!.delta = { components_removed: ["middleware"] };
+    value.cases[0]!.expected.findings = [
+      { id: "PATH-001", kind: "required-path", severity: "error", from: "service", to: "database" },
+    ];
+    value.benchmark.expected_distribution = { "no-impact": 0, violation: 1, evolution: 0 };
+    const architecture = `
+version: "0.1"
+metadata:
+  name: component-path-removal
+components:
+  service:
+    type: service
+    layer: domain
+  middleware:
+    type: service
+    layer: application
+  database:
+    type: database
+    layer: data
+relationships:
+  - from: service
+    to: middleware
+    type: data
+  - from: middleware
+    to: database
+    type: data
+rules:
+  - id: PATH-001
+    type: require-path
+    from: service
+    to: database
+    relationship_type: data
+    severity: error
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid, result.issues.join("\n")).toBe(true);
+  });
+
+  it("rejects a required-path finding when both removal delta collections are omitted", async () => {
+    const value = groundTruth();
+    value.cases = [value.cases[1]!];
+    value.cases[0]!.delta = {};
+    value.cases[0]!.expected.findings = [
+      { id: "PATH-001", kind: "required-path", severity: "error", from: "service", to: "database" },
+    ];
+    value.benchmark.expected_distribution = { "no-impact": 0, violation: 1, evolution: 0 };
+    const architecture = `
+version: "0.1"
+metadata:
+  name: missing-path-delta
+components:
+  service:
+    type: service
+    layer: domain
+  database:
+    type: database
+    layer: data
+relationships: []
+rules:
+  - id: PATH-001
+    type: require-path
+    from: service
+    to: database
+    severity: error
+`;
+
+    const result = await validateBenchmark(await writeBenchmark(value, { architecture }));
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toContain("finding 'PATH-001' has no matching graph delta");
+  });
+
   it("rejects a ground-truth classification that disagrees with the conformance engine", async () => {
     const value = groundTruth();
     value.cases[2]!.category = "no-impact";
@@ -394,6 +535,15 @@ rules:
       issue: /no-impact case cannot contain a topology delta/,
     },
     {
+      name: "no-impact with only a removed relationship",
+      mutate: (value) => {
+        value.cases[0]!.delta.relationships_removed = [
+          { from: "service", to: "database", type: "data" },
+        ];
+      },
+      issue: /no-impact case cannot contain a topology delta/,
+    },
+    {
       name: "evolution without topology delta",
       mutate: (value) => { value.cases[2]!.delta = {}; },
       issue: /evolution must contain a topology delta/,
@@ -461,6 +611,11 @@ rules:
     {
       name: "finding without matching graph delta",
       mutate: (value) => { value.cases[1]!.delta.relationships_removed = []; },
+      issue: /finding 'ARCH-001' has no matching graph delta/,
+    },
+    {
+      name: "required-edge finding with an omitted graph delta",
+      mutate: (value) => { value.cases[1]!.delta = {}; },
       issue: /finding 'ARCH-001' has no matching graph delta/,
     },
     {
