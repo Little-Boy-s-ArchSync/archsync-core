@@ -97,8 +97,8 @@ assert.equal(committedEvolutionDrawio, evolutionDrawio, "Evolution draw.io demo 
 
 const evidence = {
   phase: 1,
-  release: "v0.0",
-  objective: "Machine-readable architecture contract and analyzer ground truth",
+  release: "v0.1",
+  objective: "Machine-readable architecture contract and deterministic conformance foundation",
   schema: {
     file: relativePath(schemaPath),
     id: schema.$id,
@@ -178,7 +178,6 @@ const evidence = {
       "annotated draw.io conformance report is deterministic",
       "invalid CLI usage exits 2",
     ],
-    benchmark_distribution: { "no-impact": 5, violation: 3, evolution: 2 },
   },
 };
 

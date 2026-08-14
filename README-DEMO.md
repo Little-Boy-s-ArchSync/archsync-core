@@ -365,14 +365,14 @@ VALID PHASE 2 BENCHMARK order-platform
 - changed edges: precision 1.000, recall 1.000, F1 1.000
 - classification accuracy: 1.000
 - source evidence: file 1.000, exact line 1.000
-- deterministic: 10/10 cases
+- deterministic: 20/20 cases
 ```
 
-Benchmark gồm 10 patch độc lập:
+Benchmark gồm 20 patch độc lập:
 
-- 5 `no-impact`.
-- 3 `violation`.
-- 2 `evolution`.
+- 9 `no-impact`.
+- 7 `violation`.
+- 4 `evolution`.
 
 Mỗi patch được áp lên một bản sao sạch của baseline. Guardian phân tích source sau patch và so sánh kết quả với ground truth. Vì vậy metric đo output thực tế của analyzer, không chỉ kiểm tra dữ liệu khai báo.
 
@@ -403,11 +403,11 @@ cd "D:\Little Boys\ArchSync\archsync-benchmark"
 pnpm verify
 ```
 
-Gate kiểm tra model, ground truth, 10 patch, SHA-256 integrity, mutation tests và chạy lại analyzer trên toàn bộ 10 case.
+Gate kiểm tra model, ground truth, 20 patch, 40 tín hiệu detector, SHA-256 integrity, mutation tests và chạy lại analyzer trên toàn bộ dữ liệu.
 
 ## 13. Câu kết thúc
 
-> Phase 1 biến `architecture.yaml` thành Expected Architecture Graph có thể validation, diff và trực quan hóa. Phase 2 biến source TypeScript thành Observed Graph, so sánh hai phía và trả Finding có bằng chứng tới đúng dòng code. Trên benchmark chuẩn, Guardian đạt 10/10 case và precision/recall bằng 1.000 cho cả node lẫn edge.
+> Phase 1 biến `architecture.yaml` thành Expected Architecture Graph có thể validation, diff và trực quan hóa. Phase 2 biến source TypeScript thành Observed Graph, so sánh hai phía và trả Finding có bằng chứng tới đúng dòng code. Trên 20 patch độc lập, Guardian khớp 20/20 phân loại và 11/11 vị trí evidence; trên corpus 40 tín hiệu, v0.2 đạt 20 TP, 0 FP, 0 FN và 20 TN. Đây là kết quả trong corpus kiểm soát, không phải tuyên bố hoàn hảo cho mọi repository TypeScript.
 
 Có thể tuyên bố ArchSync hiện đã:
 

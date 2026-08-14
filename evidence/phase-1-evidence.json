@@ -1,7 +1,7 @@
 {
   "phase": 1,
-  "release": "v0.0",
-  "objective": "Machine-readable architecture contract and analyzer ground truth",
+  "release": "v0.1",
+  "objective": "Machine-readable architecture contract and deterministic conformance foundation",
   "schema": {
     "file": "specs/architecture.schema.json",
     "id": "https://archsync.dev/schemas/architecture-v0.1.json",
@@ -172,11 +172,6 @@
       "annotated Mermaid conformance report is deterministic",
       "annotated draw.io conformance report is deterministic",
       "invalid CLI usage exits 2"
-    ],
-    "benchmark_distribution": {
-      "no-impact": 5,
-      "violation": 3,
-      "evolution": 2
-    }
+    ]
   }
 }

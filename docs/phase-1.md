@@ -1,6 +1,6 @@
 # Phase 1 - Architecture Model and Benchmark Lab
 
-**Status:** Completed on 2026-08-11 as ArchSync v0.0.
+**Status:** Baseline completed on 2026-08-11; evaluation foundation strengthened on 2026-08-14 as ArchSync v0.1.
 
 ## Objective
 
@@ -14,7 +14,7 @@ Turn architecture into a machine-readable contract and create ground truth for t
 - Deterministic conformance evaluation for schema-valid observed model fixtures.
 - Deterministic Mermaid and editable draw.io generation.
 - TypeScript/Node order-platform benchmark with five baseline components.
-- Ten labeled change cases: five no-impact, three violations and two valid evolutions.
+- Twenty labeled change cases: nine no-impact, seven violations and four valid evolutions.
 
 ## Out of scope
 
@@ -28,8 +28,8 @@ Turn architecture into a machine-readable contract and create ground truth for t
 
 1. Valid examples load into the expected graph.
 2. Invalid schema and unknown references fail with actionable errors.
-3. All ten benchmark cases have an explicit delta and expected classification.
-4. Benchmark distribution is exactly 5 no-impact / 3 violation / 2 evolution.
+3. All 20 benchmark cases have an explicit patch, graph delta and expected classification.
+4. Benchmark distribution is exactly 9 no-impact / 7 violation / 4 evolution.
 5. Mermaid output can be generated deterministically from any valid model.
 6. `pnpm phase1:verify` passes from a clean checkout of `archsync-core`.
 7. At least ten topology-review scenarios and the built CLI contract are enforced automatically.
@@ -45,7 +45,7 @@ Turn architecture into a machine-readable contract and create ground truth for t
 | Three example `architecture.yaml` models | Core engineer | Core fixtures plus [`archsync-examples/models`](https://github.com/Little-Boy-s-ArchSync/archsync-examples/tree/main/models) |
 | Graph domain model, graph diff and semantic validation | Core engineer | [`src/graph.ts`](../src/graph.ts), [`src/validation.ts`](../src/validation.ts) and their tests |
 | One-stack, five-component benchmark | Research engineer | [`archsync-benchmark/order-platform`](https://github.com/Little-Boy-s-ArchSync/archsync-benchmark/tree/main/order-platform) |
-| Ten owned cases with explicit graph deltas and expected classifications | Research engineer | [`ground-truth.json`](https://github.com/Little-Boy-s-ArchSync/archsync-benchmark/blob/main/order-platform/ground-truth.json) |
+| Twenty owned cases with explicit patches, graph deltas and expected classifications | Research engineer | [`ground-truth.json`](https://github.com/Little-Boy-s-ArchSync/archsync-benchmark/blob/main/order-platform/ground-truth.json) |
 | Deterministic Mermaid view | Core engineer | [`src/mermaid.ts`](../src/mermaid.ts) and the generated example view |
 | Editable draw.io view | Core engineer | [`src/drawio.ts`](../src/drawio.ts), XML generation tests and CLI smoke checks |
 | Ten-scenario schema/topology review | Core engineer | [`src/validation.topology.test.ts`](../src/validation.topology.test.ts) |
@@ -70,8 +70,8 @@ pnpm install --frozen-lockfile
 pnpm verify
 ```
 
-The benchmark verifier requires exactly ten cases, checks every owner, acceptance criterion, expected source evidence and graph delta, applies every delta to the baseline, and runs the same conformance engine used by `archsync check`. It enforces the 5/3/2 classification split, matches violation rule IDs, matches declared files to patch contents and proves that all patches apply cleanly to the baseline. Phase 2 work remains intentionally outside this gate.
+The benchmark verifier requires exactly 20 contiguous cases, checks every owner, acceptance criterion, expected source evidence and graph delta, applies every patch independently to a clean baseline, and runs the same conformance engine used by `archsync check`. It enforces the 9/7/4 classification split, matches violation rule IDs, binds declared evidence to patch contents and proves that all patches apply cleanly. Source-derived measurements remain owned by the Phase 2 Benchmark and Guardian gates instead of being duplicated inside Core evidence.
 
 Phase 1 conformance uses an explicit observed architecture fixture so the deterministic rule engine and report contract can be demonstrated independently. Discovering that observed graph from TypeScript source files is intentionally still a Phase 2 analyzer responsibility.
 
-Phase 1 scope changes require an ADR in `docs/adr/`. Phase 0 literature, research-question and experiment-protocol artifacts remain a separate research baseline and are not reclassified as Phase 1 deliverables.
+Phase 1 scope changes require an ADR in `docs/adr/`. Phase 0 literature, research-question and experiment-protocol artifacts remain a separate research baseline and are not reclassified as Phase 1 deliverables. See [ADR-0002](adr/0002-expanded-evaluation-foundation.md) for the expanded benchmark boundary.
