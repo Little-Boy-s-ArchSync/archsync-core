@@ -102,7 +102,10 @@ const measuredCoverage = Object.fromEntries(
     const measurement = coverageSummary.total[metric];
     assert.equal(measurement.pct, 100, `${metric} coverage must remain at 100%`);
     assert.equal(measurement.covered, measurement.total, `${metric} coverage must have no uncovered items`);
-    return [metric, measurement];
+    return [metric, {
+      percent: measurement.pct,
+      covered_equals_total: true,
+    }];
   }),
 );
 const fixtureNames = (await readdir(fixturesDirectory))

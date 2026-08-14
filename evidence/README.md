@@ -25,4 +25,4 @@ Any change to a bound implementation, input, verifier or dependency makes the co
 - the built CLI exit-code and output contract;
 - deterministic Mermaid and editable draw.io generation.
 
-CI uploads `coverage/coverage-summary.json`, the HTML coverage report and this manifest as downloadable evidence artifacts.
+CI uploads `coverage/coverage-summary.json`, the HTML coverage report and this manifest as downloadable evidence artifacts. The manifest stores platform-stable 100% and covered-equals-total assertions; the raw covered/total counts remain in the uploaded summary because V8 may instrument different absolute branch totals across operating systems.

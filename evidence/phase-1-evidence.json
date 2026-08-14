@@ -121,7 +121,7 @@
       },
       {
         "file": "scripts/phase1-evidence.mjs",
-        "sha256": "50ec3851d0d56cf8b879b07ef713a1b62c51b7341ec4b43e643f142c556f484d"
+        "sha256": "35b337ac6ce84a28804ecdea1da9879bdd201015504cc182f7db8c277a6fbb49"
       },
       {
         "file": "tsconfig.json",
@@ -136,7 +136,7 @@
         "sha256": "1b485eeec7fd741e284a1439cde221ac1a4e17f89559b326a208fc9305b639f3"
       }
     ],
-    "verification_source_sha256": "fbcc3edbe6447cae51ef1a1aedaaaee8f2bee7ac42719c937e8720a283649861",
+    "verification_source_sha256": "b7577f51124ef154c014e0c928623f3ba10c4913a2b23f927af6e15492a87c43",
     "dependency_source": [
       {
         "file": "package.json",
@@ -301,28 +301,20 @@
     "topology_scenarios_minimum": 10,
     "measured_engine_coverage": {
       "statements": {
-        "total": 1322,
-        "covered": 1322,
-        "skipped": 0,
-        "pct": 100
+        "percent": 100,
+        "covered_equals_total": true
       },
       "branches": {
-        "total": 502,
-        "covered": 502,
-        "skipped": 0,
-        "pct": 100
+        "percent": 100,
+        "covered_equals_total": true
       },
       "functions": {
-        "total": 54,
-        "covered": 54,
-        "skipped": 0,
-        "pct": 100
+        "percent": 100,
+        "covered_equals_total": true
       },
       "lines": {
-        "total": 1322,
-        "covered": 1322,
-        "skipped": 0,
-        "pct": 100
+        "percent": 100,
+        "covered_equals_total": true
       }
     },
     "coverage_thresholds_percent": {
