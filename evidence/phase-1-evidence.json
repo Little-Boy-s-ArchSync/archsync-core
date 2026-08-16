@@ -140,14 +140,14 @@
     "dependency_source": [
       {
         "file": "package.json",
-        "sha256": "6dfa47ea31668c7aa731ae0fce20ccfe6e3e2651b916df741658fac61a8245f8"
+        "sha256": "cea8fe916d18dd3b03318a059f44e09d4cee7e01c4bc8d67f2cc7c5f309a6e3c"
       },
       {
         "file": "pnpm-lock.yaml",
         "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
       }
     ],
-    "dependency_source_sha256": "7e8628b0bf053b033d01fa89d4257ae0f9f44f2c641ba9cf986fc5153c880084"
+    "dependency_source_sha256": "8f88b7982cbd4cc116b297331f7368b3e620c59348f33877d98c81bfd0aa5b74"
   },
   "schema": {
     "file": "specs/architecture.schema.json",
