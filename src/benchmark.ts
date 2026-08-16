@@ -1,5 +1,10 @@
 import { access, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  Ajv2020,
+  type ValidateFunction,
+} from "ajv/dist/2020.js";
 import { parseDocument } from "yaml";
 
 import { analyzeConformance } from "./conformance.js";
@@ -9,7 +14,28 @@ import type {
   ArchitectureDocument,
   ArchitectureRelationship,
 } from "./model.js";
-import { loadArchitecture } from "./validation.js";
+import {
+  formatSchemaIssue,
+  loadArchitecture,
+  validateArchitectureSemantics,
+} from "./validation.js";
+
+const benchmarkSchemaUrl = new URL(
+  "../specs/benchmark-ground-truth.schema.json",
+  import.meta.url,
+);
+let benchmarkValidatorPromise: Promise<ValidateFunction<BenchmarkGroundTruth>> | undefined;
+
+async function getBenchmarkValidator(): Promise<ValidateFunction<BenchmarkGroundTruth>> {
+  benchmarkValidatorPromise ??= (async () => {
+    const schema = JSON.parse(
+      await readFile(fileURLToPath(benchmarkSchemaUrl), "utf8"),
+    ) as object;
+    const ajv = new Ajv2020({ allErrors: true, strict: true });
+    return ajv.compile<BenchmarkGroundTruth>(schema);
+  })();
+  return benchmarkValidatorPromise;
+}
 
 export type BenchmarkCategory = "no-impact" | "violation" | "evolution";
 
@@ -164,6 +190,17 @@ export async function validateBenchmark(
     };
   }
   totalCases = groundTruth.cases.length;
+
+  const validateShape = await getBenchmarkValidator();
+  if (!validateShape(groundTruth)) {
+    issues.push(
+      ...validateShape.errors!.map((error) => {
+        const issue = formatSchemaIssue(error);
+        return `${issue.path}: ${issue.message}`;
+      }),
+    );
+    return { valid: false, issues, summary, evaluatedCases, totalCases };
+  }
 
   const architecturePath = resolve(baseDir, groundTruth.benchmark.architecture);
   const architectureResult = await loadArchitecture(architecturePath);
@@ -323,26 +360,35 @@ export async function validateBenchmark(
     }
 
     const observed = applyBenchmarkDelta(architectureResult.value, scenario.delta);
-    const conformance = analyzeConformance(architectureResult.value, observed);
-    evaluatedCases += 1;
-    if (conformance.classification !== scenario.expected.classification) {
+    const observedIssues = validateArchitectureSemantics(observed);
+    if (observedIssues.length > 0) {
       issues.push(
-        `cases/${index}: conformance engine classified '${conformance.classification}', expected '${scenario.expected.classification}'`,
+        ...observedIssues.map(
+          (issue) => `cases/${index}: observed architecture ${issue.path}: ${issue.message}`,
+        ),
       );
-    }
-    if (scenario.expected.classification === "violation") {
-      const actualRuleIds = conformance.findings
-        .filter((finding) => finding.kind !== "architecture-evolution")
-        .map((finding) => finding.id)
-        .sort();
-      const expectedRuleIds = scenario.expected.findings
-        .filter((finding) => finding.kind !== "architecture-evolution")
-        .map((finding) => finding.id)
-        .sort();
-      if (actualRuleIds.join("\0") !== expectedRuleIds.join("\0")) {
+    } else {
+      const conformance = analyzeConformance(architectureResult.value, observed);
+      evaluatedCases += 1;
+      if (conformance.classification !== scenario.expected.classification) {
         issues.push(
-          `cases/${index}: conformance engine rule findings [${actualRuleIds.join(", ")}] differ from expected [${expectedRuleIds.join(", ")}]`,
+          `cases/${index}: conformance engine classified '${conformance.classification}', expected '${scenario.expected.classification}'`,
         );
+      }
+      if (scenario.expected.classification === "violation") {
+        const actualRuleIds = conformance.findings
+          .filter((finding) => finding.kind !== "architecture-evolution")
+          .map((finding) => finding.id)
+          .sort();
+        const expectedRuleIds = scenario.expected.findings
+          .filter((finding) => finding.kind !== "architecture-evolution")
+          .map((finding) => finding.id)
+          .sort();
+        if (actualRuleIds.join("\0") !== expectedRuleIds.join("\0")) {
+          issues.push(
+            `cases/${index}: conformance engine rule findings [${actualRuleIds.join(", ")}] differ from expected [${expectedRuleIds.join(", ")}]`,
+          );
+        }
       }
     }
 

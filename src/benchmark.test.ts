@@ -695,4 +695,65 @@ rules:
     expect(result.valid).toBe(false);
     expect(result.issues).toContain("Ground truth must contain benchmark metadata and a cases array");
   });
+
+  it("rejects a null benchmark case without throwing", async () => {
+    const value = groundTruth();
+    value.cases = [null as unknown as BenchmarkGroundTruth["cases"][number]];
+    const filePath = await writeBenchmark(value, { patches: false });
+
+    const result = await validateBenchmark(filePath);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(/\/cases\/0: must be object/);
+  });
+
+  it("rejects a case without expected results without throwing", async () => {
+    const value = groundTruth();
+    delete (value.cases[0] as Partial<BenchmarkGroundTruth["cases"][number]>).expected;
+    const filePath = await writeBenchmark(value, { patches: false });
+
+    const result = await validateBenchmark(filePath);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(/\/cases\/0\/expected: must have required property 'expected'/);
+  });
+
+  it("rejects missing benchmark paths without throwing", async () => {
+    const value = groundTruth();
+    delete (value.benchmark as Partial<BenchmarkGroundTruth["benchmark"]>).architecture;
+    const filePath = await writeBenchmark(value, { patches: false });
+
+    const result = await validateBenchmark(filePath);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(
+      /\/benchmark\/architecture: must have required property 'architecture'/,
+    );
+  });
+
+  it("rejects an added edge that points to a component removed by the same delta", async () => {
+    const value = groundTruth();
+    value.cases[2]!.delta.components_removed = ["service"];
+    const result = await validateBenchmark(await writeBenchmark(value));
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(
+      /observed architecture \/relationships\/0\/from: Unknown component 'service'/,
+    );
+  });
+
+  it("rejects a delta that creates a duplicate relationship", async () => {
+    const value = groundTruth();
+    value.cases[2]!.delta.relationships_added!.push({
+      from: "service",
+      to: "database",
+      type: "data",
+    });
+    const result = await validateBenchmark(await writeBenchmark(value));
+
+    expect(result.valid).toBe(false);
+    expect(result.issues.join("\n")).toMatch(
+      /observed architecture \/relationships\/2: Duplicate relationship 'service\|data\|database'/,
+    );
+  });
 });

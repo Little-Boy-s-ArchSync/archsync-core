@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archsync.dev/schemas/benchmark-ground-truth-v0.1.json",
+  "title": "ArchSync Benchmark Ground Truth",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "benchmark", "cases"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^0\\.1(?:\\.[0-9]+)?$"
+    },
+    "benchmark": {
+      "type": "object",
+      "required": ["id", "architecture", "repository", "stack", "expected_distribution"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "architecture": { "type": "string", "minLength": 1 },
+        "repository": { "type": "string", "minLength": 1 },
+        "stack": { "type": "string", "minLength": 1 },
+        "expected_distribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["no-impact", "violation", "evolution"],
+          "properties": {
+            "no-impact": { "type": "integer", "minimum": 0 },
+            "violation": { "type": "integer", "minimum": 0 },
+            "evolution": { "type": "integer", "minimum": 0 }
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "cases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/case" }
+    }
+  },
+  "$defs": {
+    "componentId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "layer"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "type": {
+          "enum": ["frontend", "gateway", "service", "worker", "database", "cache", "queue", "external", "library", "other"]
+        },
+        "layer": {
+          "enum": ["experience", "edge", "application", "domain", "data", "integration", "external"]
+        },
+        "description": { "type": "string" },
+        "technology": { "type": "string" },
+        "owner": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "type"],
+      "properties": {
+        "id": { "$ref": "#/$defs/componentId" },
+        "from": { "$ref": "#/$defs/componentId" },
+        "to": { "$ref": "#/$defs/componentId" },
+        "type": {
+          "enum": ["http", "async", "data", "dependency", "event", "deployment", "other"]
+        },
+        "description": { "type": "string" },
+        "criticality": { "enum": ["low", "medium", "high", "critical"] }
+      }
+    },
+    "delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "components_added": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/componentId" },
+          "additionalProperties": { "$ref": "#/$defs/component" }
+        },
+        "components_removed": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/componentId" },
+          "uniqueItems": true
+        },
+        "relationships_added": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationship" },
+          "uniqueItems": true
+        },
+        "relationships_removed": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/relationship" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "severity"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 },
+        "severity": { "type": "string", "minLength": 1 },
+        "from": { "$ref": "#/$defs/componentId" },
+        "to": { "$ref": "#/$defs/componentId" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line", "kind"],
+      "properties": {
+        "file": { "type": "string", "minLength": 1 },
+        "line": { "type": "number" },
+        "kind": { "type": "string", "minLength": 1 }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "findings", "evidence", "approval_required"],
+      "properties": {
+        "classification": { "type": "string", "minLength": 1 },
+        "findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/finding" }
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "approval_required": { "type": "boolean" }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "owner",
+        "category",
+        "risk",
+        "description",
+        "patch",
+        "changed_files",
+        "delta",
+        "acceptance_criteria",
+        "expected"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 },
+        "risk": { "enum": ["low", "medium", "high"] },
+        "description": { "type": "string", "minLength": 1 },
+        "patch": { "type": "string", "minLength": 1 },
+        "changed_files": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "delta": { "$ref": "#/$defs/delta" },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "expected": { "$ref": "#/$defs/expected" }
+      }
+    }
+  }
+}

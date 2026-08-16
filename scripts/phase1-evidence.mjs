@@ -71,6 +71,9 @@ async function requiredModel(filePath) {
 const schemaPath = join(root, "specs", "architecture.schema.json");
 const schemaSource = await readFile(schemaPath, "utf8");
 const schema = JSON.parse(schemaSource);
+const benchmarkSchemaPath = join(root, "specs", "benchmark-ground-truth.schema.json");
+const benchmarkSchemaSource = await readFile(benchmarkSchemaPath, "utf8");
+const benchmarkSchema = JSON.parse(benchmarkSchemaSource);
 const sourceDirectory = join(root, "src");
 const sourceNames = (await readdir(sourceDirectory))
   .filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts"))
@@ -187,6 +190,13 @@ const evidence = {
     sha256: sha256(schemaSource),
     required_sections: schema.required,
     contract_sections: ["components", "relationships", "rules", "quality_goals"],
+  },
+  benchmark_schema: {
+    file: relativePath(benchmarkSchemaPath),
+    id: benchmarkSchema.$id,
+    title: benchmarkSchema.title,
+    sha256: sha256(benchmarkSchemaSource),
+    required_sections: benchmarkSchema.required,
   },
   fixtures: {
     valid: validFixtures,

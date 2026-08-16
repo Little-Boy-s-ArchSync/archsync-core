@@ -1,6 +1,6 @@
 # Phase 1 evidence
 
-`phase-1-evidence.json` is a deterministic, machine-readable evidence manifest generated from the current schema, fixtures, graph model and diagram renderers. Its provenance section SHA-256 binds the production TypeScript source, unit tests, complete fixture tree, verification scripts/configuration, `package.json` and `pnpm-lock.yaml` used to produce the result.
+`phase-1-evidence.json` is a deterministic, machine-readable evidence manifest generated from the current architecture and benchmark schemas, fixtures, graph model and diagram renderers. Its provenance section SHA-256 binds both schema files, the production TypeScript source, unit tests, complete fixture tree, verification scripts/configuration, `package.json` and `pnpm-lock.yaml` used to produce the result.
 
 Update it after an intentional model or renderer change:
 

@@ -6,7 +6,7 @@
     "implementation_source": [
       {
         "file": "src/benchmark.ts",
-        "sha256": "cb463c37f5776c141efd848b8ee9bd8a132471a342fd44505952755a1e13bf5b"
+        "sha256": "d8a974bed0fe2a9df2ec85d0a59df0f68d944d2c361d3c773b68fa854d067e10"
       },
       {
         "file": "src/bin.ts",
@@ -45,11 +45,11 @@
         "sha256": "46613bee7707b56ec7dac1e5cdd7142f5c824b5ba6849d217f878326ce80f453"
       }
     ],
-    "implementation_source_sha256": "6fa418dd371cbfc57db1dda84b6641094a44fb4e883cd4f6a4312470efeac868",
+    "implementation_source_sha256": "33e05183957b8eb0145f817670bcd1537d05fb1574f8b71be678a47f696a00ba",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
-        "sha256": "32b8d3b6b1f9cdcebab08d0ac00378e859ba2ad1d2bc5f1d5951350fbfd0348d"
+        "sha256": "11deeb9a098c7c68ca7ee19968fec8619d35c15049a9768eb318bff6f3f49474"
       },
       {
         "file": "src/conformance-report.test.ts",
@@ -80,7 +80,7 @@
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "30b9684bf4d48c4fc9079d6428ef88a082e03dd2d7bdbcb84a3933a4c0950f1b",
+    "unit_test_source_sha256": "6afc2f3df3f754df172d3f60340d037c0ae05ba42fa4b3b867f7e7a98ec43af7",
     "fixture_tree": {
       "files": [
         {
@@ -121,7 +121,7 @@
       },
       {
         "file": "scripts/phase1-evidence.mjs",
-        "sha256": "35b337ac6ce84a28804ecdea1da9879bdd201015504cc182f7db8c277a6fbb49"
+        "sha256": "68faff3c8fe90757411d6f52261699277309833d1881f1391e41002c413fcffc"
       },
       {
         "file": "tsconfig.json",
@@ -136,7 +136,7 @@
         "sha256": "1b485eeec7fd741e284a1439cde221ac1a4e17f89559b326a208fc9305b639f3"
       }
     ],
-    "verification_source_sha256": "c4b7b19f147dba52ee7d96f3aa6e65b677cb2b0a7f23bdcbca39006f92acfab4",
+    "verification_source_sha256": "ece41b2a6bf484d12afe65e217222514d61e409c2797f98f82d0bc79c25d3383",
     "dependency_source": [
       {
         "file": "package.json",
@@ -165,6 +165,17 @@
       "relationships",
       "rules",
       "quality_goals"
+    ]
+  },
+  "benchmark_schema": {
+    "file": "specs/benchmark-ground-truth.schema.json",
+    "id": "https://archsync.dev/schemas/benchmark-ground-truth-v0.1.json",
+    "title": "ArchSync Benchmark Ground Truth",
+    "sha256": "bc36aecee849b3dd9cce7ae47b0a4ecfaaa08756bf7d587c05ef0cdb4d095cf0",
+    "required_sections": [
+      "version",
+      "benchmark",
+      "cases"
     ]
   },
   "fixtures": {
