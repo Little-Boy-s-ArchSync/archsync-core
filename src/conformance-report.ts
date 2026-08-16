@@ -34,7 +34,9 @@ function mermaidId(id: string): string {
 }
 
 function escapeMermaidLabel(label: string): string {
-  return label.replaceAll('"', "&quot;");
+  return label
+    .replace(/[\u0000-\u001f\u007f]+/g, " ")
+    .replaceAll('"', "&quot;");
 }
 
 function hasWildcard(value: string): boolean {
@@ -64,6 +66,7 @@ function exactMissingRelationship(
     finding.kind !== "required-edge" ||
     !finding.from ||
     !finding.to ||
+    !finding.relationship_type ||
     hasWildcard(finding.from) ||
     hasWildcard(finding.to)
   ) {
@@ -72,7 +75,7 @@ function exactMissingRelationship(
   return {
     from: finding.from,
     to: finding.to,
-    type: finding.relationship_type ?? "other",
+    type: finding.relationship_type,
   };
 }
 

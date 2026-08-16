@@ -14,7 +14,9 @@ function mermaidId(id) {
     return id.replaceAll("-", "_");
 }
 function escapeLabel(label) {
-    return label.replaceAll('"', "&quot;");
+    return label
+        .replace(/[\u0000-\u001f\u007f]+/g, " ")
+        .replaceAll('"', "&quot;");
 }
 export function generateMermaid(document) {
     const lines = [

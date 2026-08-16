@@ -155,17 +155,23 @@ function requiredFindings(
         (!rule.relationship_type || rule.relationship_type === relationship.type),
       );
       if (matching) continue;
-      const relationshipType = rule.relationship_type ?? "other";
       const target = rule.to;
+      const requiredRelationship = rule.relationship_type
+        ? `'${source}|${rule.relationship_type}|${target}'`
+        : `from '${source}' to '${target}' (any relationship type)`;
       findings.push({
         id: rule.id,
         kind: "required-edge",
         severity: rule.severity,
-        message: `Required relationship '${source}|${relationshipType}|${target}' is missing for rule '${rule.id}'`,
+        message: `Required relationship ${requiredRelationship} is missing for rule '${rule.id}'`,
         from: source,
         to: target,
-        ...(rule.relationship_type ? { relationship_type: rule.relationship_type } : {}),
-        edge_key: `${source}|${relationshipType}|${target}`,
+        ...(rule.relationship_type
+          ? {
+              relationship_type: rule.relationship_type,
+              edge_key: `${source}|${rule.relationship_type}|${target}`,
+            }
+          : {}),
         evidence: { document: "expected", path: `/rules/${ruleIndex}` },
       });
     }

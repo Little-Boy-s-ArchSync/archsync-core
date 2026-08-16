@@ -290,10 +290,21 @@ describe("architecture conformance", () => {
     ];
     const result = analyzeConformance(expected, structuredClone(expected));
 
-    expect(result.findings).toEqual(expect.arrayContaining([
-      expect.objectContaining({ id: "EDGE-ANY", edge_key: "orphan|other|database" }),
+    const untypedEdge = result.findings.find((finding) => finding.id === "EDGE-ANY");
+    expect(untypedEdge).toEqual(expect.objectContaining({
+      id: "EDGE-ANY",
+      kind: "required-edge",
+      from: "orphan",
+      to: "database",
+    }));
+    expect(untypedEdge).not.toHaveProperty("relationship_type");
+    expect(untypedEdge).not.toHaveProperty("edge_key");
+    expect(result.findings).toContainEqual(
       expect.objectContaining({ id: "PATH-ANY", kind: "required-path" }),
-    ]));
+    );
+    expect(formatConformanceResult(result)).toContain(
+      "Relationship: orphan --any--> database",
+    );
   });
 
   it("formats plural violations and defensive finding fallbacks deterministically", () => {

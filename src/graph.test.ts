@@ -24,6 +24,33 @@ describe("architecture graph", () => {
     expect(graph.incoming.get("database")).toHaveLength(1);
   });
 
+  it("normalizes node and edge order independently of declaration order", () => {
+    const unordered: ArchitectureDocument = {
+      ...baseline,
+      components: {
+        worker: { type: "worker", layer: "application" },
+        database: baseline.components.database!,
+        api: baseline.components.api!,
+      },
+      relationships: [
+        { from: "worker", to: "database", type: "data" },
+        { from: "api", to: "database", type: "data" },
+      ],
+    };
+
+    const graph = buildGraph(unordered);
+
+    expect([...graph.nodes.keys()]).toEqual(["api", "database", "worker"]);
+    expect(graph.edges.map((edge) => edge.key)).toEqual([
+      "api|data|database",
+      "worker|data|database",
+    ]);
+    expect(graph.incoming.get("database")?.map((edge) => edge.key)).toEqual([
+      "api|data|database",
+      "worker|data|database",
+    ]);
+  });
+
   it("returns a deterministic graph diff", () => {
     const observed: ArchitectureDocument = {
       ...baseline,

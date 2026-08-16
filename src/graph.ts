@@ -26,16 +26,20 @@ export function edgeKey(relationship: ArchitectureRelationship): string {
 
 export function buildGraph(document: ArchitectureDocument): ArchitectureGraph {
   const nodes = new Map<string, GraphNode>(
-    Object.entries(document.components).map(([id, component]) => [
-      id,
-      { id, component },
-    ]),
+    Object.entries(document.components)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([id, component]) => [
+        id,
+        { id, component },
+      ]),
   );
 
-  const edges: GraphEdge[] = document.relationships.map((relationship) => ({
-    ...relationship,
-    key: edgeKey(relationship),
-  }));
+  const edges: GraphEdge[] = document.relationships
+    .map((relationship) => ({
+      ...relationship,
+      key: edgeKey(relationship),
+    }))
+    .sort((left, right) => left.key.localeCompare(right.key));
 
   const outgoing = new Map<string, GraphEdge[]>();
   const incoming = new Map<string, GraphEdge[]>();

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
@@ -40,6 +40,21 @@ try {
   assert.match(invalid.stderr, /relationships\[0\]\.to \(\/relationships\/0\/to\)/);
   assert.match(invalid.stderr, /Fix: Add 'missing-database' under components/);
   pass("invalid model exit code");
+
+  const missingInput = run(["validate", join(temporaryDirectory, "missing.architecture.yaml")]);
+  assert.equal(missingInput.status, 2);
+  assert.match(missingInput.stderr, /^RESULT: ERROR/m);
+  assert.match(missingInput.stderr, /Input path does not exist/);
+  assert.doesNotMatch(missingInput.stderr, /\n\s+at /);
+  pass("missing input is actionable");
+
+  const emptyDirectory = join(temporaryDirectory, "empty-models");
+  await mkdir(emptyDirectory);
+  const emptyValidation = run(["validate-dir", emptyDirectory]);
+  assert.equal(emptyValidation.status, 2);
+  assert.match(emptyValidation.stderr, /^RESULT: ERROR/m);
+  assert.match(emptyValidation.stderr, /No architecture YAML files/);
+  pass("empty fixture directory is rejected");
 
   const graph = run(["graph", fixture("order-platform.architecture.yaml")]);
   assert.equal(graph.status, 0, graph.stderr);

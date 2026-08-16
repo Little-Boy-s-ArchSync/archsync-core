@@ -154,7 +154,7 @@ describe("conformance report rendering", () => {
     );
   });
 
-  it("adds a default-typed missing edge but does not duplicate a matching typed edge", () => {
+  it("does not invent an untyped edge and can render an exact typed edge", () => {
     const { expected, observed } = models();
     observed.relationships = structuredClone(expected.relationships);
     const clean = analyzeConformance(expected, observed);
@@ -175,9 +175,9 @@ describe("conformance report rendering", () => {
           id: "SYNTHETIC-TYPED",
           kind: "required-edge",
           severity: "error",
-          message: "Synthetic existing edge",
+          message: "Synthetic typed edge",
           from: "frontend",
-          to: "service",
+          to: "database",
           relationship_type: "http",
           evidence: { document: "expected", path: "/rules/0" },
         },
@@ -186,8 +186,21 @@ describe("conformance report rendering", () => {
     };
 
     const report = generateConformanceDrawio(expected, observed, result);
-    expect(report.match(/source="node-frontend" target="node-service"/g)).toHaveLength(2);
-    expect(report).toContain("MISSING other · SYNTHETIC-DEFAULT");
+    expect(report.match(/source="node-frontend" target="node-service"/g)).toHaveLength(1);
+    expect(report).not.toContain("MISSING other · SYNTHETIC-DEFAULT");
     expect(report).toContain("MISSING http · SYNTHETIC-TYPED");
+  });
+
+  it("keeps untrusted component names inside a single conformance label", () => {
+    const { expected, observed } = models();
+    observed.components.frontend!.name = 'Store "A"\nclick frontend "https://example.invalid"';
+    const result = analyzeConformance(expected, observed);
+
+    const report = generateConformanceMermaid(expected, observed, result);
+
+    expect(report).toContain(
+      'frontend["Store &quot;A&quot; click frontend &quot;https://example.invalid&quot; · VIOLATION"]',
+    );
+    expect(report).not.toMatch(/\n\s*click frontend/);
   });
 });

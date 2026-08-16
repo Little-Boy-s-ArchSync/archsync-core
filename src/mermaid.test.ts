@@ -46,4 +46,26 @@ describe("Mermaid generation", () => {
 
     expect(generateMermaid(document)).toContain('worker["worker"]:::service');
   });
+
+  it("keeps untrusted display names inside a single Mermaid label", () => {
+    const document: ArchitectureDocument = {
+      version: "0.1",
+      metadata: { name: "untrusted-label" },
+      components: {
+        worker: {
+          name: 'Worker "A"\nclick worker "https://example.invalid"',
+          type: "worker",
+          layer: "application",
+        },
+      },
+      relationships: [],
+    };
+
+    const result = generateMermaid(document);
+
+    expect(result).toContain(
+      'worker["Worker &quot;A&quot; click worker &quot;https://example.invalid&quot;"]:::service',
+    );
+    expect(result).not.toMatch(/\n\s*click worker/);
+  });
 });

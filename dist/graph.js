@@ -13,14 +13,18 @@ export function edgeKey(relationship) {
     return `${relationship.from}|${relationship.type}|${relationship.to}`;
 }
 export function buildGraph(document) {
-    const nodes = new Map(Object.entries(document.components).map(([id, component]) => [
+    const nodes = new Map(Object.entries(document.components)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([id, component]) => [
         id,
         { id, component },
     ]));
-    const edges = document.relationships.map((relationship) => ({
+    const edges = document.relationships
+        .map((relationship) => ({
         ...relationship,
         key: edgeKey(relationship),
-    }));
+    }))
+        .sort((left, right) => left.key.localeCompare(right.key));
     const outgoing = new Map();
     const incoming = new Map();
     for (const id of nodes.keys()) {

@@ -18,7 +18,9 @@ function mermaidId(id: string): string {
 }
 
 function escapeLabel(label: string): string {
-  return label.replaceAll('"', "&quot;");
+  return label
+    .replace(/[\u0000-\u001f\u007f]+/g, " ")
+    .replaceAll('"', "&quot;");
 }
 
 export function generateMermaid(document: ArchitectureDocument): string {

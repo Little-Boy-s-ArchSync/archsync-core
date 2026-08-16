@@ -16,7 +16,9 @@ function mermaidId(id) {
     return id.replaceAll("-", "_");
 }
 function escapeMermaidLabel(label) {
-    return label.replaceAll('"', "&quot;");
+    return label
+        .replace(/[\u0000-\u001f\u007f]+/g, " ")
+        .replaceAll('"', "&quot;");
 }
 function hasWildcard(value) {
     return value.includes("*");
@@ -40,6 +42,7 @@ function exactMissingRelationship(finding) {
     if (finding.kind !== "required-edge" ||
         !finding.from ||
         !finding.to ||
+        !finding.relationship_type ||
         hasWildcard(finding.from) ||
         hasWildcard(finding.to)) {
         return undefined;
@@ -47,7 +50,7 @@ function exactMissingRelationship(finding) {
     return {
         from: finding.from,
         to: finding.to,
-        type: finding.relationship_type ?? "other",
+        type: finding.relationship_type,
     };
 }
 function buildConformanceView(expected, observed, result) {

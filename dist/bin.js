@@ -23,6 +23,27 @@ function formatInvalidArchitecture(filePath, issues, role) {
         "EXIT CODE: 1 (INVALID)",
     ].join("\n");
 }
+function formatRuntimeError(error) {
+    const details = error instanceof Error
+        ? error.message
+        : String(error);
+    const code = error && typeof error === "object" && "code" in error
+        ? String(error.code)
+        : undefined;
+    const path = error && typeof error === "object" && "path" in error
+        ? String(error.path)
+        : undefined;
+    const reason = code === "ENOENT" && path
+        ? `Input path does not exist: ${path}`
+        : details;
+    return [
+        "RESULT: ERROR",
+        `REASON: ${reason}`,
+        "",
+        "NEXT STEP: Check the input and output paths, permissions and file contents, then run the command again.",
+        "EXIT CODE: 2 (INPUT/IO)",
+    ].join("\n");
+}
 function usage() {
     console.error(`Usage:
   archsync validate <architecture.yaml>
@@ -82,6 +103,11 @@ async function main() {
         const files = (await readdir(directory))
             .filter((file) => [".yaml", ".yml"].includes(extname(file)))
             .sort();
+        if (files.length === 0) {
+            console.error(formatRuntimeError(new Error(`No architecture YAML files were found in ${directory}`)));
+            process.exitCode = 2;
+            return;
+        }
         let valid = true;
         for (const file of files) {
             const expectedInvalid = file.startsWith("invalid-");
@@ -214,5 +240,11 @@ async function main() {
     }
     usage();
 }
-await main();
+try {
+    await main();
+}
+catch (error) {
+    console.error(formatRuntimeError(error));
+    process.exitCode = 2;
+}
 //# sourceMappingURL=bin.js.map
