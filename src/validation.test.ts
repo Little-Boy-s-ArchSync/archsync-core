@@ -241,4 +241,49 @@ quality_goals:
       keyword: "schema",
     });
   });
+
+  it("formats exact escaped JSON Pointer paths for schema property errors", () => {
+    const root = formatSchemaIssue({
+      instancePath: "",
+      schemaPath: "#/type",
+      keyword: "type",
+      params: { type: "object" },
+      message: "must be object",
+    });
+    const required = formatSchemaIssue({
+      instancePath: "",
+      schemaPath: "#/required",
+      keyword: "required",
+      params: { missingProperty: "metadata" },
+      message: "must have required property 'metadata'",
+    });
+    const additional = formatSchemaIssue({
+      instancePath: "/metadata",
+      schemaPath: "#/properties/metadata/additionalProperties",
+      keyword: "additionalProperties",
+      params: { additionalProperty: "extra/field~name" },
+      message: "must NOT have additional properties",
+    });
+    const innerPropertyName = formatSchemaIssue({
+      instancePath: "/components",
+      schemaPath: "#/$defs/componentId/pattern",
+      keyword: "pattern",
+      params: { pattern: "component-id" },
+      propertyName: "Bad_Component_ID",
+      message: "must match pattern",
+    });
+    const outerPropertyName = formatSchemaIssue({
+      instancePath: "/components",
+      schemaPath: "#/properties/components/propertyNames",
+      keyword: "propertyNames",
+      params: { propertyName: "Another_Bad_ID" },
+      message: "property name must be valid",
+    });
+
+    expect(root.path).toBe("/");
+    expect(required.path).toBe("/metadata");
+    expect(additional.path).toBe("/metadata/extra~1field~0name");
+    expect(innerPropertyName.path).toBe("/components/Bad_Component_ID");
+    expect(outerPropertyName.path).toBe("/components/Another_Bad_ID");
+  });
 });

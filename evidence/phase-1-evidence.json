@@ -42,10 +42,10 @@
       },
       {
         "file": "src/validation.ts",
-        "sha256": "225f7a5940c52bfaab396ff7533209ff07ab46b1b2764304b2f9bb21d592bc68"
+        "sha256": "676611544e8fb29628d7f09c65ff3f427d4249f93051a0f984f905d559252892"
       }
     ],
-    "implementation_source_sha256": "1676e297cc4fee9bb4821175bced06a4f8570ea43b3dcf59198c78ec4440e092",
+    "implementation_source_sha256": "50b1bb4ec2cb4b450941a7d4cf11c6330e6987745a9551148ba0780e03da646e",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
@@ -73,14 +73,14 @@
       },
       {
         "file": "src/validation.test.ts",
-        "sha256": "d2a12babc30262d970a681f88f960d541ed55fdf0ed45aee430d054ad62cb8b4"
+        "sha256": "b27ddb4a8796f34d7d85501e844a4e9aa1173100efd248e1d6b7008150b3784b"
       },
       {
         "file": "src/validation.topology.test.ts",
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "9fd497cb8790ba806d875b8c00ed6a45b5dffce30350ab900ca43a1bc5f71857",
+    "unit_test_source_sha256": "beb4a63e18b80cf4dcdeb79e11896cb961a4d0e3e755310edbfe4a5e9604aab7",
     "fixture_tree": {
       "files": [
         {
@@ -216,12 +216,12 @@
             "message": "must match pattern \"^0\\.1(?:\\.[0-9]+)?$\""
           },
           {
-            "path": "/components",
+            "path": "/components/Bad_Component_ID",
             "keyword": "schema",
             "message": "must match pattern \"^[a-z][a-z0-9-]*$\""
           },
           {
-            "path": "/components",
+            "path": "/components/Bad_Component_ID",
             "keyword": "schema",
             "message": "property name must be valid"
           },
