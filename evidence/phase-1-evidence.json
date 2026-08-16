@@ -10,7 +10,7 @@
       },
       {
         "file": "src/bin.ts",
-        "sha256": "2d58c0b0ada9ec079879831a28315113d38a6c66496be46fa5e0b4535e855afa"
+        "sha256": "21bd7569643ae4a5c9d6a195b7c1571cc07c40047a32f92836777bc997570ea3"
       },
       {
         "file": "src/conformance-report.ts",
@@ -45,7 +45,7 @@
         "sha256": "46613bee7707b56ec7dac1e5cdd7142f5c824b5ba6849d217f878326ce80f453"
       }
     ],
-    "implementation_source_sha256": "82b6c4bbdfac1c5a0fc87ca76351dc638b26221e2d6b60813e92ccc569540952",
+    "implementation_source_sha256": "6fa418dd371cbfc57db1dda84b6641094a44fb4e883cd4f6a4312470efeac868",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
@@ -117,7 +117,7 @@
     "verification_source": [
       {
         "file": "scripts/cli-smoke.mjs",
-        "sha256": "7e2828f54ef4ff26427da1ca0cd3c666a75883c06a4af86a2f75a3df0bf8d83d"
+        "sha256": "3b8568efca971afa9d41e29d67bc85c56b29524657c8b806d090b4c7b94c4b77"
       },
       {
         "file": "scripts/phase1-evidence.mjs",
@@ -136,18 +136,18 @@
         "sha256": "1b485eeec7fd741e284a1439cde221ac1a4e17f89559b326a208fc9305b639f3"
       }
     ],
-    "verification_source_sha256": "552a82d780e6b5ae876da38d79a7a95af61359789424d6419fcea168d10b0448",
+    "verification_source_sha256": "c4b7b19f147dba52ee7d96f3aa6e65b677cb2b0a7f23bdcbca39006f92acfab4",
     "dependency_source": [
       {
         "file": "package.json",
-        "sha256": "c5977b47b4e3cea65bdc31145ab8609cc42f6569aa0e5751b21b40a9f1158186"
+        "sha256": "6dfa47ea31668c7aa731ae0fce20ccfe6e3e2651b916df741658fac61a8245f8"
       },
       {
         "file": "pnpm-lock.yaml",
         "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
       }
     ],
-    "dependency_source_sha256": "5d6cb42681ce64c4f794f8e36fd6bfb321fe9e64e41162591ab0921ab9684df7"
+    "dependency_source_sha256": "7e8628b0bf053b033d01fa89d4257ae0f9f44f2c641ba9cf986fc5153c880084"
   },
   "schema": {
     "file": "specs/architecture.schema.json",

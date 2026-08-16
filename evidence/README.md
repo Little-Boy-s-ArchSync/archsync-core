@@ -20,7 +20,7 @@ Any change to a bound implementation, input, verifier or dependency makes the co
 
 - at least ten schema/topology review scenarios;
 - 100% statement, branch, function and line coverage thresholds for all deterministic engine modules;
-- 15/15 built-CLI command-contract checks for entry-point behavior and exit codes;
+- 17/17 built-CLI command-contract checks for entry-point behavior and exit codes;
 - valid and intentionally invalid fixture behavior;
 - the built CLI exit-code and output contract;
 - deterministic Mermaid and editable draw.io generation.

@@ -56,6 +56,22 @@ try {
   assert.match(emptyValidation.stderr, /No architecture YAML files/);
   pass("empty fixture directory is rejected");
 
+  const directoryValidation = run(["validate-dir", fixture()]);
+  assert.equal(directoryValidation.status, 1);
+  assert.match(directoryValidation.stderr, /invalid-schema\.architecture\.yaml/);
+  assert.doesNotMatch(directoryValidation.stdout, /EXPECTED INVALID/);
+  pass("directory validation checks every model");
+
+  const fixtureValidation = run([
+    "validate-dir",
+    fixture(),
+    "--expect-invalid-prefix",
+  ]);
+  assert.equal(fixtureValidation.status, 0, fixtureValidation.stderr);
+  assert.match(fixtureValidation.stdout, /EXPECTED INVALID .*invalid-schema\.architecture\.yaml/);
+  assert.match(fixtureValidation.stdout, /EXPECTED INVALID .*invalid-unknown-component\.architecture\.yaml/);
+  pass("explicit fixture expectation mode");
+
   const graph = run(["graph", fixture("order-platform.architecture.yaml")]);
   assert.equal(graph.status, 0, graph.stderr);
   const graphJson = JSON.parse(graph.stdout);

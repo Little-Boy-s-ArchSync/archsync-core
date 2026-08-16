@@ -47,7 +47,7 @@ function formatRuntimeError(error) {
 function usage() {
     console.error(`Usage:
   archsync validate <architecture.yaml>
-  archsync validate-dir <directory>
+  archsync validate-dir <directory> [--expect-invalid-prefix]
   archsync graph <architecture.yaml>
   archsync diff <expected.yaml> <observed.yaml>
   archsync check <expected.yaml> <observed.yaml>
@@ -99,6 +99,9 @@ async function main() {
         return;
     }
     if (command === "validate-dir") {
+        const expectInvalidPrefix = output === "--expect-invalid-prefix";
+        if (output && !expectInvalidPrefix)
+            usage();
         const directory = resolve(input);
         const files = (await readdir(directory))
             .filter((file) => [".yaml", ".yml"].includes(extname(file)))
@@ -110,7 +113,7 @@ async function main() {
         }
         let valid = true;
         for (const file of files) {
-            const expectedInvalid = file.startsWith("invalid-");
+            const expectedInvalid = expectInvalidPrefix && file.startsWith("invalid-");
             const filePath = join(directory, file);
             if (expectedInvalid) {
                 const result = await loadArchitecture(filePath);
