@@ -1,3 +1,4 @@
+import { edgeKey } from "./graph.js";
 import type { ArchitectureDocument, ComponentType, Layer } from "./model.js";
 
 export type DiagramState = "violation" | "evolution" | "removed";
@@ -40,6 +41,7 @@ const layerOrder: readonly Layer[] = [
 
 function escapeXml(value: string): string {
   return value
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, " ")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -115,9 +117,9 @@ export function generateDrawio(
   }
 
   [...document.relationships]
-    .sort((a, b) => `${a.from}-${a.to}-${a.type}`.localeCompare(`${b.from}-${b.to}-${b.type}`))
+    .sort((a, b) => edgeKey(a).localeCompare(edgeKey(b)))
     .forEach((relationship, index) => {
-      const key = `${relationship.from}|${relationship.type}|${relationship.to}`;
+      const key = edgeKey(relationship);
       const state = options.edgeStates?.[key];
       const label = escapeXml(options.edgeLabels?.[key] ?? relationship.type);
       const stroke = state ? paletteByState[state].stroke : "#64748b";

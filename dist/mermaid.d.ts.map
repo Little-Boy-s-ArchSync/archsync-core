@@ -1,1 +1,1 @@
-{"version":3,"file":"mermaid.d.ts","sourceRoot":"","sources":["../src/mermaid.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,oBAAoB,EAAiB,MAAM,YAAY,CAAC;AAyBtE,wBAAgB,eAAe,CAAC,QAAQ,EAAE,oBAAoB,GAAG,MAAM,CA8BtE"}
+{"version":3,"file":"mermaid.d.ts","sourceRoot":"","sources":["../src/mermaid.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,oBAAoB,EAAiB,MAAM,YAAY,CAAC;AAyBtE,wBAAgB,eAAe,CAAC,QAAQ,EAAE,oBAAoB,GAAG,MAAM,CA8BtE"}

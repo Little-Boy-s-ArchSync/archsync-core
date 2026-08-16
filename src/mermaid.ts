@@ -1,3 +1,4 @@
+import { edgeKey } from "./graph.js";
 import type { ArchitectureDocument, ComponentType } from "./model.js";
 
 const classByType: Record<ComponentType, string> = {
@@ -35,7 +36,7 @@ export function generateMermaid(document: ArchitectureDocument): string {
   }
 
   for (const relationship of [...document.relationships].sort((a, b) =>
-    `${a.from}-${a.to}-${a.type}`.localeCompare(`${b.from}-${b.to}-${b.type}`),
+    edgeKey(a).localeCompare(edgeKey(b)),
   )) {
     lines.push(
       `  ${mermaidId(relationship.from)} -->|${relationship.type}| ${mermaidId(relationship.to)}`,

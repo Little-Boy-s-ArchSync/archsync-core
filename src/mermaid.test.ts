@@ -68,4 +68,25 @@ describe("Mermaid generation", () => {
     );
     expect(result).not.toMatch(/\n\s*click worker/);
   });
+
+  it("orders edges by their unambiguous graph key", () => {
+    const document: ArchitectureDocument = {
+      version: "0.1",
+      metadata: { name: "ambiguous-sort-keys" },
+      components: {
+        a: { type: "service", layer: "application" },
+        "a-b": { type: "service", layer: "application" },
+        "b-c": { type: "database", layer: "data" },
+        c: { type: "database", layer: "data" },
+      },
+      relationships: [
+        { from: "a-b", to: "c", type: "http" },
+        { from: "a", to: "b-c", type: "http" },
+      ],
+    };
+    const reordered = structuredClone(document);
+    reordered.relationships.reverse();
+
+    expect(generateMermaid(document)).toBe(generateMermaid(reordered));
+  });
 });

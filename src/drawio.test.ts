@@ -85,4 +85,47 @@ describe("draw.io generation", () => {
 
     expect(result).toContain('<mxPoint x="145" y="260"/>');
   });
+
+  it("orders edges by their unambiguous graph key", () => {
+    const document: ArchitectureDocument = {
+      version: "0.1",
+      metadata: { name: "ambiguous-sort-keys" },
+      components: {
+        a: { type: "service", layer: "application" },
+        "a-b": { type: "service", layer: "application" },
+        "b-c": { type: "database", layer: "data" },
+        c: { type: "database", layer: "data" },
+      },
+      relationships: [
+        { from: "a-b", to: "c", type: "http" },
+        { from: "a", to: "b-c", type: "http" },
+      ],
+    };
+    const reordered = structuredClone(document);
+    reordered.relationships.reverse();
+
+    expect(generateDrawio(document)).toBe(generateDrawio(reordered));
+  });
+
+  it("replaces characters that are forbidden by XML 1.0", () => {
+    const document: ArchitectureDocument = {
+      version: "0.1",
+      metadata: { name: "control\u0000character" },
+      components: {
+        service: {
+          name: "service\u0001name",
+          type: "service",
+          layer: "application",
+        },
+      },
+      relationships: [],
+    };
+
+    const result = generateDrawio(document, { title: "title\u000bvalue" });
+
+    expect(result).not.toMatch(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/);
+    expect(result).toContain("control character");
+    expect(result).toContain("service name");
+    expect(result).toContain("title value");
+  });
 });

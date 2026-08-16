@@ -22,7 +22,7 @@
       },
       {
         "file": "src/drawio.ts",
-        "sha256": "199de8bea6547d496686f57f304eed7cf8f7815fa331ac5fa4e68a315d1df86f"
+        "sha256": "ccdaa8c77cf73bb2940c149d98e79d048b52d71b4bb58d3dca39d1ba0ef80650"
       },
       {
         "file": "src/graph.ts",
@@ -34,7 +34,7 @@
       },
       {
         "file": "src/mermaid.ts",
-        "sha256": "54342789e298dd52fd164e3daadbe53f8a478e9122a56f3ff61789766626f084"
+        "sha256": "f07b45c30af0dc1512da538dacb1ec0d40bbe20b705637176479c7eb3a43873d"
       },
       {
         "file": "src/model.ts",
@@ -45,7 +45,7 @@
         "sha256": "46613bee7707b56ec7dac1e5cdd7142f5c824b5ba6849d217f878326ce80f453"
       }
     ],
-    "implementation_source_sha256": "ef7d2b04c8c9baa53471d7cda211c17808337a1d142731bbc3cc6d7ace609a51",
+    "implementation_source_sha256": "82b6c4bbdfac1c5a0fc87ca76351dc638b26221e2d6b60813e92ccc569540952",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
@@ -61,7 +61,7 @@
       },
       {
         "file": "src/drawio.test.ts",
-        "sha256": "7dcdf22166d93987342166c513ebbf439b3d087d35d5302b7a263f6afd3cd8df"
+        "sha256": "8f3535710f9bb863f9f9671d4bce3669b3227fa6b23889b77f809f297e0c854e"
       },
       {
         "file": "src/graph.test.ts",
@@ -69,7 +69,7 @@
       },
       {
         "file": "src/mermaid.test.ts",
-        "sha256": "84309dde3a6de490adedb10d46f789d666657adfdec858fd4e391d347172a033"
+        "sha256": "69e8f8730c0a39a4b4bf57763239f0df6e3e991dc4d5aaadcffb4cc568bb68eb"
       },
       {
         "file": "src/validation.test.ts",
@@ -80,7 +80,7 @@
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "e6035fee1c7633aecbfd58c50c3049b8f9b6f0d106023ac283ed68dadc5e4372",
+    "unit_test_source_sha256": "30b9684bf4d48c4fc9079d6428ef88a082e03dd2d7bdbcb84a3933a4c0950f1b",
     "fixture_tree": {
       "files": [
         {
@@ -274,8 +274,8 @@
     "removed_edges": []
   },
   "deterministic_views": {
-    "mermaid_sha256": "01bcb21921bc25fdc259b69bc5191947969567877d4dc76a74b47bdd6e94e93f",
-    "drawio_sha256": "414fb3f0bc3402797d89d963c994f1ff7f795489fcdbe5937f517b6350c35f4a"
+    "mermaid_sha256": "71395dff7ed4e6282a91e9a943808d36a56503d214d21c10e6c4ec5497d30881",
+    "drawio_sha256": "6c534ce6e83a248c482b8a9d06e802e926db52f9e10cf2d9dc0910409f0486ce"
   },
   "conformance_demo": {
     "expected": "test/fixtures/order-platform.architecture.yaml",
@@ -288,9 +288,9 @@
     "evolution_observed": "test/fixtures/order-platform.evolution.architecture.yaml",
     "evolution_classification": "evolution",
     "violation_report_mermaid_sha256": "ee93166e79d25a4ccfffe51c72e378c2574684bd44b2ca8168e2f0d1c02e7260",
-    "violation_report_drawio_sha256": "6cc635e878d9a9087daca69f532e8798003a3c8ca2729eb378315695d280171e",
+    "violation_report_drawio_sha256": "6d1656f518f4ed3c39bd94b52dc1ee816430e67a51568abcd6fdc0717dc972ba",
     "evolution_report_mermaid_sha256": "ea6f860eb77ddb8e5c2ed177f180735740b048f8fab27123b65ebe0acac36779",
-    "evolution_report_drawio_sha256": "93b9abbef07f69e66ca379ee37a9c1a5e4bcfd560c03b2e127a35c97ad6e6689"
+    "evolution_report_drawio_sha256": "ef0c7b914c321f62e196989a9ae77724de08db8a0c928def7055580f9dc48455"
   },
   "demo_artifacts": {
     "directory": "docs/demo",

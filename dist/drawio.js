@@ -1,3 +1,4 @@
+import { edgeKey } from "./graph.js";
 const paletteByType = {
     frontend: { fill: "#eaf2ff", stroke: "#2563eb" },
     gateway: { fill: "#eef2ff", stroke: "#4f46e5" },
@@ -26,6 +27,7 @@ const layerOrder = [
 ];
 function escapeXml(value) {
     return value
+        .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, " ")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
@@ -83,9 +85,9 @@ export function generateDrawio(document, options = {}) {
         lines.push(`        <mxCell id="node-${escapeXml(id)}" value="${value}" style="${style}" vertex="1" parent="1">`, `          <mxGeometry x="${position.x}" y="${position.y}" width="170" height="72" as="geometry"/>`, "        </mxCell>");
     }
     [...document.relationships]
-        .sort((a, b) => `${a.from}-${a.to}-${a.type}`.localeCompare(`${b.from}-${b.to}-${b.type}`))
+        .sort((a, b) => edgeKey(a).localeCompare(edgeKey(b)))
         .forEach((relationship, index) => {
-        const key = `${relationship.from}|${relationship.type}|${relationship.to}`;
+        const key = edgeKey(relationship);
         const state = options.edgeStates?.[key];
         const label = escapeXml(options.edgeLabels?.[key] ?? relationship.type);
         const stroke = state ? paletteByState[state].stroke : "#64748b";
