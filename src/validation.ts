@@ -138,6 +138,23 @@ export function validateArchitectureSemantics(
         keyword: "reference",
       });
     }
+    if (["<", "<=", ">=", ">"].includes(goal.operator) && typeof goal.target !== "number") {
+      issues.push({
+        path: `/quality_goals/${index}/target`,
+        message: `Operator '${goal.operator}' requires a numeric target`,
+        keyword: "semantic",
+      });
+    }
+    if (
+      ["contains", "not_contains"].includes(goal.operator) &&
+      typeof goal.target !== "string"
+    ) {
+      issues.push({
+        path: `/quality_goals/${index}/target`,
+        message: `Operator '${goal.operator}' requires a string target`,
+        keyword: "semantic",
+      });
+    }
   });
 
   return issues;
@@ -147,11 +164,12 @@ export async function parseArchitecture(
   source: string,
 ): Promise<ValidationResult<ArchitectureDocument>> {
   const yaml = parseDocument(source, { prettyErrors: true, uniqueKeys: true });
+  const yamlIssues = [...yaml.errors, ...yaml.warnings];
 
-  if (yaml.errors.length > 0) {
+  if (yamlIssues.length > 0) {
     return {
       valid: false,
-      issues: yaml.errors.map((error) => ({
+      issues: yamlIssues.map((error) => ({
         path: "/",
         message: error.message,
         keyword: "schema",

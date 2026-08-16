@@ -147,6 +147,73 @@ relationships: []
     );
   });
 
+  it("rejects unresolved YAML tags instead of silently discarding the warning", async () => {
+    const result = await parseArchitecture(`
+version: "0.1"
+metadata:
+  name: !custom tagged-model
+components:
+  service:
+    type: service
+    layer: application
+relationships: []
+`);
+
+    expect(result.valid).toBe(false);
+    expect(result.value).toBeUndefined();
+    expect(result.issues).toContainEqual(expect.objectContaining({
+      path: "/",
+      keyword: "schema",
+      message: expect.stringContaining("Unresolved tag: !custom"),
+    }));
+  });
+
+  it("rejects quality-goal targets that are incompatible with their operators", async () => {
+    const result = await parseArchitecture(`
+version: "0.1"
+metadata:
+  name: invalid-quality-goals
+components:
+  service:
+    type: service
+    layer: application
+relationships: []
+quality_goals:
+  - id: PERF-001
+    attribute: performance
+    metric: latency
+    operator: "<="
+    target: fast
+    priority: high
+  - id: SEC-001
+    attribute: security
+    metric: protocols
+    operator: contains
+    target: 3
+    priority: high
+  - id: SEC-002
+    attribute: security
+    metric: protocols
+    operator: contains
+    target: tls
+    priority: medium
+`);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        path: "/quality_goals/0/target",
+        keyword: "semantic",
+        message: "Operator '<=' requires a numeric target",
+      }),
+      expect.objectContaining({
+        path: "/quality_goals/1/target",
+        keyword: "semantic",
+        message: "Operator 'contains' requires a string target",
+      }),
+    ]));
+  });
+
   it("formats actionable fixes for common schema failures", () => {
     const formatted = formatValidationIssues([
       { path: "/", message: "must have required property 'metadata'", keyword: "schema" },

@@ -101,15 +101,31 @@ export function validateArchitectureSemantics(value) {
                 keyword: "reference",
             });
         }
+        if (["<", "<=", ">=", ">"].includes(goal.operator) && typeof goal.target !== "number") {
+            issues.push({
+                path: `/quality_goals/${index}/target`,
+                message: `Operator '${goal.operator}' requires a numeric target`,
+                keyword: "semantic",
+            });
+        }
+        if (["contains", "not_contains"].includes(goal.operator) &&
+            typeof goal.target !== "string") {
+            issues.push({
+                path: `/quality_goals/${index}/target`,
+                message: `Operator '${goal.operator}' requires a string target`,
+                keyword: "semantic",
+            });
+        }
     });
     return issues;
 }
 export async function parseArchitecture(source) {
     const yaml = parseDocument(source, { prettyErrors: true, uniqueKeys: true });
-    if (yaml.errors.length > 0) {
+    const yamlIssues = [...yaml.errors, ...yaml.warnings];
+    if (yamlIssues.length > 0) {
         return {
             valid: false,
-            issues: yaml.errors.map((error) => ({
+            issues: yamlIssues.map((error) => ({
                 path: "/",
                 message: error.message,
                 keyword: "schema",
