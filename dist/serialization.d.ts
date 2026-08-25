@@ -1,73 +1,66 @@
-import type { ConformanceResult } from "./conformance.js";
+import type { ConformanceClassification, ConformanceFinding, ConformanceResult, ConformanceSummary } from "./conformance.js";
 import type { ArchitectureContractVersion } from "./versions.js";
-import type { ArchitectureGraph, GraphDiff } from "./model.js";
-export declare function serializeGraph(modelVersion: ArchitectureContractVersion, graph: ArchitectureGraph): {
-    schema_version: "1.0.0";
+import { CLI_JSON_CONTRACT_VERSION, CONFORMANCE_CONTRACT_VERSION, EVIDENCE_CONTRACT_VERSION, FINDING_CONTRACT_VERSION, GRAPH_CONTRACT_VERSION } from "./versions.js";
+import type { ArchitectureComponent, ArchitectureGraph, GraphDiff, RelationshipType } from "./model.js";
+export interface SerializedGraphEdge {
+    key: string;
+    from: string;
+    to: string;
+    type: RelationshipType;
+}
+export interface SerializedChangedNode {
+    id: string;
+    expected: ArchitectureComponent;
+    observed: ArchitectureComponent;
+}
+export interface SerializedGraph {
+    schema_version: typeof CLI_JSON_CONTRACT_VERSION;
     kind: "archsync.graph";
     contracts: {
-        architecture_model: "0.1.1" | "0.1.0" | "0.1";
-        graph: "1.0.0";
+        architecture_model: ArchitectureContractVersion;
+        graph: typeof GRAPH_CONTRACT_VERSION;
     };
     nodes: string[];
-    edges: {
-        key: string;
-        from: string;
-        to: string;
-        type: "http" | "async" | "data" | "dependency" | "event" | "deployment" | "other";
-    }[];
-};
-export declare function serializeGraphDiff(expectedModelVersion: ArchitectureContractVersion, observedModelVersion: ArchitectureContractVersion, diff: GraphDiff): {
-    schema_version: "1.0.0";
+    edges: SerializedGraphEdge[];
+}
+export interface SerializedGraphDiff {
+    schema_version: typeof CLI_JSON_CONTRACT_VERSION;
     kind: "archsync.graph-diff";
     contracts: {
-        expected_architecture_model: "0.1.1" | "0.1.0" | "0.1";
-        observed_architecture_model: "0.1.1" | "0.1.0" | "0.1";
-        graph: "1.0.0";
+        expected_architecture_model: ArchitectureContractVersion;
+        observed_architecture_model: ArchitectureContractVersion;
+        graph: typeof GRAPH_CONTRACT_VERSION;
     };
     addedNodes: string[];
     removedNodes: string[];
-    changedNodes: {
-        id: string;
-        expected: import("./model.js").ArchitectureComponent;
-        observed: import("./model.js").ArchitectureComponent;
-    }[];
-    addedEdges: {
-        key: string;
-        from: string;
-        to: string;
-        type: "http" | "async" | "data" | "dependency" | "event" | "deployment" | "other";
-    }[];
-    removedEdges: {
-        key: string;
-        from: string;
-        to: string;
-        type: "http" | "async" | "data" | "dependency" | "event" | "deployment" | "other";
-    }[];
-};
-export declare function serializeConformanceResult(expectedModelVersion: ArchitectureContractVersion, observedModelVersion: ArchitectureContractVersion, result: ConformanceResult): {
-    schema_version: "1.0.0";
+    changedNodes: SerializedChangedNode[];
+    addedEdges: SerializedGraphEdge[];
+    removedEdges: SerializedGraphEdge[];
+}
+export interface SerializedConformanceDiff {
+    addedNodes: string[];
+    removedNodes: string[];
+    changedNodes: SerializedChangedNode[];
+    addedEdges: string[];
+    removedEdges: string[];
+}
+export interface SerializedConformanceResult {
+    schema_version: typeof CLI_JSON_CONTRACT_VERSION;
     kind: "archsync.conformance";
     contracts: {
-        expected_architecture_model: "0.1.1" | "0.1.0" | "0.1";
-        observed_architecture_model: "0.1.1" | "0.1.0" | "0.1";
-        conformance: "1.0.0";
-        graph: "1.0.0";
-        finding: "1.0.0";
-        evidence: "1.0.0";
+        expected_architecture_model: ArchitectureContractVersion;
+        observed_architecture_model: ArchitectureContractVersion;
+        conformance: typeof CONFORMANCE_CONTRACT_VERSION;
+        graph: typeof GRAPH_CONTRACT_VERSION;
+        finding: typeof FINDING_CONTRACT_VERSION;
+        evidence: typeof EVIDENCE_CONTRACT_VERSION;
     };
-    classification: import("./conformance.js").ConformanceClassification;
-    summary: import("./conformance.js").ConformanceSummary;
-    findings: import("./conformance.js").ConformanceFinding[];
-    diff: {
-        addedNodes: string[];
-        removedNodes: string[];
-        changedNodes: {
-            id: string;
-            expected: import("./model.js").ArchitectureComponent;
-            observed: import("./model.js").ArchitectureComponent;
-        }[];
-        addedEdges: string[];
-        removedEdges: string[];
-    };
-};
+    classification: ConformanceClassification;
+    summary: ConformanceSummary;
+    findings: ConformanceFinding[];
+    diff: SerializedConformanceDiff;
+}
+export declare function serializeGraph(modelVersion: ArchitectureContractVersion, graph: ArchitectureGraph): SerializedGraph;
+export declare function serializeGraphDiff(expectedModelVersion: ArchitectureContractVersion, observedModelVersion: ArchitectureContractVersion, diff: GraphDiff): SerializedGraphDiff;
+export declare function serializeConformanceResult(expectedModelVersion: ArchitectureContractVersion, observedModelVersion: ArchitectureContractVersion, result: ConformanceResult): SerializedConformanceResult;
 //# sourceMappingURL=serialization.d.ts.map

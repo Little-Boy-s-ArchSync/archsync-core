@@ -42,7 +42,7 @@
       },
       {
         "file": "src/serialization.ts",
-        "sha256": "2024fa92f666ccb6401722434b5be7c724ce230e3b6b288e077c5ed0b683f8ca"
+        "sha256": "2cfe2cfe5b1de1f4eef362851f97cc7df55b12223f0e70456e38a0b3e9b27f3b"
       },
       {
         "file": "src/validation.ts",
@@ -53,7 +53,7 @@
         "sha256": "333da015a29e027df205f7dfca4cc1ed3f41332f4aa349c2415ec732750115f4"
       }
     ],
-    "implementation_source_sha256": "c704c5f6c6edd9366e13bf7d53f6de867b69d5a66f2c11b9088dde3827a5c9ab",
+    "implementation_source_sha256": "495bf77b1a270ba84e9e47c75618f51a489be0e68b31b6261fc6e96a4cc149a1",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
