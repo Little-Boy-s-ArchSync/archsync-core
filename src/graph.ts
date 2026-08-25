@@ -7,6 +7,7 @@ import type {
   GraphEdge,
   GraphNode,
 } from "./model.js";
+import { GRAPH_CONTRACT_VERSION } from "./versions.js";
 
 function componentFingerprint(component: ArchitectureComponent): string {
   return JSON.stringify({
@@ -54,7 +55,13 @@ export function buildGraph(document: ArchitectureDocument): ArchitectureGraph {
     incoming.get(edge.to)?.push(edge);
   }
 
-  return { nodes, edges, outgoing, incoming };
+  return {
+    schema_version: GRAPH_CONTRACT_VERSION,
+    nodes,
+    edges,
+    outgoing,
+    incoming,
+  };
 }
 
 export function diffGraphs(
@@ -65,6 +72,7 @@ export function diffGraphs(
   const observedEdges = new Map(observed.edges.map((edge) => [edge.key, edge]));
 
   return {
+    schema_version: GRAPH_CONTRACT_VERSION,
     addedNodes: [...observed.nodes.values()].filter(
       (node) => !expected.nodes.has(node.id),
     ),

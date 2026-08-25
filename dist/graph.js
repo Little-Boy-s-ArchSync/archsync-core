@@ -1,3 +1,4 @@
+import { GRAPH_CONTRACT_VERSION } from "./versions.js";
 function componentFingerprint(component) {
     return JSON.stringify({
         name: component.name ?? null,
@@ -35,12 +36,19 @@ export function buildGraph(document) {
         outgoing.get(edge.from)?.push(edge);
         incoming.get(edge.to)?.push(edge);
     }
-    return { nodes, edges, outgoing, incoming };
+    return {
+        schema_version: GRAPH_CONTRACT_VERSION,
+        nodes,
+        edges,
+        outgoing,
+        incoming,
+    };
 }
 export function diffGraphs(expected, observed) {
     const expectedEdges = new Map(expected.edges.map((edge) => [edge.key, edge]));
     const observedEdges = new Map(observed.edges.map((edge) => [edge.key, edge]));
     return {
+        schema_version: GRAPH_CONTRACT_VERSION,
         addedNodes: [...observed.nodes.values()].filter((node) => !expected.nodes.has(node.id)),
         removedNodes: [...expected.nodes.values()].filter((node) => !observed.nodes.has(node.id)),
         changedNodes: [...observed.nodes.values()]

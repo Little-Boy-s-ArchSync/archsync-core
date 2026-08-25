@@ -1,0 +1,7 @@
+diff --git a/src/app.ts b/src/app.ts
+index 3367afd..7cb95d1 100644
+--- a/src/app.ts
++++ b/src/app.ts
+@@ -1 +1,2 @@
+ export const service = "api";
++export const directDatabaseAccess = true;

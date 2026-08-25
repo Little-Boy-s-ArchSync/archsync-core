@@ -1,4 +1,12 @@
 import { buildGraph, diffGraphs, edgeKey } from "./graph.js";
+import { CONFORMANCE_CONTRACT_VERSION, EVIDENCE_CONTRACT_VERSION, FINDING_CONTRACT_VERSION, } from "./versions.js";
+function conformanceEvidence(document, path) {
+    return {
+        schema_version: EVIDENCE_CONTRACT_VERSION,
+        document,
+        path,
+    };
+}
 function selectorExpression(selector) {
     const escaped = selector
         .split("*")
@@ -31,6 +39,7 @@ function denyFindings(expected, observed) {
         for (const relationship of matching) {
             const key = edgeKey(relationship);
             findings.push({
+                schema_version: FINDING_CONTRACT_VERSION,
                 id: rule.id,
                 kind: "deny-rule",
                 severity: rule.severity,
@@ -39,10 +48,7 @@ function denyFindings(expected, observed) {
                 to: relationship.to,
                 relationship_type: relationship.type,
                 edge_key: key,
-                evidence: {
-                    document: "observed",
-                    path: `/relationships/${relationshipIndex(observed, key)}`,
-                },
+                evidence: conformanceEvidence("observed", `/relationships/${relationshipIndex(observed, key)}`),
             });
         }
     }
@@ -61,6 +67,7 @@ function allowFindings(expected, observed) {
         for (const relationship of disallowed) {
             const key = edgeKey(relationship);
             findings.push({
+                schema_version: FINDING_CONTRACT_VERSION,
                 id: rule.id,
                 kind: "allow-rule",
                 severity: rule.severity,
@@ -69,10 +76,7 @@ function allowFindings(expected, observed) {
                 to: relationship.to,
                 relationship_type: relationship.type,
                 edge_key: key,
-                evidence: {
-                    document: "observed",
-                    path: `/relationships/${relationshipIndex(observed, key)}`,
-                },
+                evidence: conformanceEvidence("observed", `/relationships/${relationshipIndex(observed, key)}`),
             });
         }
     }
@@ -95,6 +99,7 @@ function requiredFindings(expected, observed, observedGraph) {
                 ? `'${source}|${rule.relationship_type}|${target}'`
                 : `from '${source}' to '${target}' (any relationship type)`;
             findings.push({
+                schema_version: FINDING_CONTRACT_VERSION,
                 id: rule.id,
                 kind: "required-edge",
                 severity: rule.severity,
@@ -107,7 +112,7 @@ function requiredFindings(expected, observed, observedGraph) {
                         edge_key: `${source}|${rule.relationship_type}|${target}`,
                     }
                     : {}),
-                evidence: { document: "expected", path: `/rules/${ruleIndex}` },
+                evidence: conformanceEvidence("expected", `/rules/${ruleIndex}`),
             });
         }
     }
@@ -141,6 +146,7 @@ function requiredPathFindings(expected, observedGraph) {
             if (hasRequiredPath(observedGraph, source, rule.to, rule.relationship_type))
                 continue;
             findings.push({
+                schema_version: FINDING_CONTRACT_VERSION,
                 id: rule.id,
                 kind: "required-path",
                 severity: rule.severity,
@@ -148,7 +154,7 @@ function requiredPathFindings(expected, observedGraph) {
                 from: source,
                 to: rule.to,
                 ...(rule.relationship_type ? { relationship_type: rule.relationship_type } : {}),
-                evidence: { document: "expected", path: `/rules/${ruleIndex}` },
+                evidence: conformanceEvidence("expected", `/rules/${ruleIndex}`),
             });
         }
     }
@@ -160,39 +166,43 @@ function evolutionFindings(expected, observed, diff) {
     const nextId = () => `EVOLUTION-${String(sequence++).padStart(3, "0")}`;
     for (const node of diff.addedNodes) {
         findings.push({
+            schema_version: FINDING_CONTRACT_VERSION,
             id: nextId(),
             kind: "architecture-evolution",
             severity: "warning",
             message: `Component '${node.id}' was added to the observed architecture`,
             component: node.id,
             change: "added",
-            evidence: { document: "observed", path: `/components/${node.id}` },
+            evidence: conformanceEvidence("observed", `/components/${node.id}`),
         });
     }
     for (const node of diff.removedNodes) {
         findings.push({
+            schema_version: FINDING_CONTRACT_VERSION,
             id: nextId(),
             kind: "architecture-evolution",
             severity: "warning",
             message: `Component '${node.id}' is missing from the observed architecture`,
             component: node.id,
             change: "removed",
-            evidence: { document: "expected", path: `/components/${node.id}` },
+            evidence: conformanceEvidence("expected", `/components/${node.id}`),
         });
     }
     for (const node of diff.changedNodes) {
         findings.push({
+            schema_version: FINDING_CONTRACT_VERSION,
             id: nextId(),
             kind: "architecture-evolution",
             severity: "warning",
             message: `Component '${node.id}' changed architecture metadata`,
             component: node.id,
             change: "changed",
-            evidence: { document: "observed", path: `/components/${node.id}` },
+            evidence: conformanceEvidence("observed", `/components/${node.id}`),
         });
     }
     for (const edge of diff.addedEdges) {
         findings.push({
+            schema_version: FINDING_CONTRACT_VERSION,
             id: nextId(),
             kind: "architecture-evolution",
             severity: "warning",
@@ -202,14 +212,12 @@ function evolutionFindings(expected, observed, diff) {
             relationship_type: edge.type,
             edge_key: edge.key,
             change: "added",
-            evidence: {
-                document: "observed",
-                path: `/relationships/${relationshipIndex(observed, edge.key)}`,
-            },
+            evidence: conformanceEvidence("observed", `/relationships/${relationshipIndex(observed, edge.key)}`),
         });
     }
     for (const edge of diff.removedEdges) {
         findings.push({
+            schema_version: FINDING_CONTRACT_VERSION,
             id: nextId(),
             kind: "architecture-evolution",
             severity: "warning",
@@ -219,10 +227,7 @@ function evolutionFindings(expected, observed, diff) {
             relationship_type: edge.type,
             edge_key: edge.key,
             change: "removed",
-            evidence: {
-                document: "expected",
-                path: `/relationships/${relationshipIndex(expected, edge.key)}`,
-            },
+            evidence: conformanceEvidence("expected", `/relationships/${relationshipIndex(expected, edge.key)}`),
         });
     }
     return findings;
@@ -244,6 +249,7 @@ export function analyzeConformance(expected, observed) {
             ? "evolution"
             : "no-impact";
     return {
+        schema_version: CONFORMANCE_CONTRACT_VERSION,
         classification,
         findings: [...violations, ...evolutions],
         diff,

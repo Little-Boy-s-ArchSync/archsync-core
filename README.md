@@ -6,7 +6,8 @@ This repository contains the deterministic foundation completed in **Phase 1: Ar
 
 ## Phase 1 deliverables
 
-- Architecture-as-code schema v0.1.
+- Architecture-as-code schema v0.1.1 with a tested v0.1.0 compatibility reader.
+- Independently versioned graph, finding, evidence, conformance and CLI JSON contracts.
 - YAML schema and semantic validation.
 - Graph builder and graph diff.
 - Deterministic `deny`, `allow`, direct `require` and multi-hop `require-path` conformance checks with no-impact, violation and evolution classification.
@@ -57,7 +58,11 @@ node dist/bin.js drawio test/fixtures/order-platform.architecture.yaml output.dr
 pnpm phase1:verify
 ```
 
-`phase1:verify` enforces 100% statement, branch, function and line coverage across every deterministic engine module, validates fixtures, builds the tracked distribution, runs all 17 built-CLI contract checks and verifies [`evidence/phase-1-evidence.json`](evidence/phase-1-evidence.json). Entry-point wiring and type-only declarations are checked by typecheck/build and the built-binary smoke suite rather than being hidden inside the engine percentage. CI runs the same gate on Ubuntu, Windows and macOS and uploads coverage/evidence artifacts.
+`phase1:verify` enforces 100% statement, branch, function and line coverage across every deterministic engine module, validates fixtures, builds the tracked distribution, replays the current and previous contract fixtures, runs all 18 built-CLI contract checks and verifies [`evidence/phase-1-evidence.json`](evidence/phase-1-evidence.json). Entry-point wiring and type-only declarations are checked by typecheck/build and the built-binary smoke suite rather than being hidden inside the engine percentage. CI runs the same gate on Ubuntu, Windows and macOS and uploads coverage/evidence artifacts.
+
+Contract support and migration rules are recorded in the [compatibility
+matrix](docs/contract-compatibility.md), [ADR-0003](docs/adr/0003-version-core-contracts.md)
+and the [0.1.0 to 0.1.1 migration note](docs/migrations/core-contracts-0.1.0-to-0.1.1.md).
 
 See the [architecture conformance demo](docs/demo/README.md) for violation and evolution screenshots. `check` returns exit code `0` for no-impact, `1` for violation and `3` for evolution requiring approval. These Core commands compare declared models; Guardian adds source-code reconstruction in Phase 2 and Git-diff/PR gating in Phase 3.
 
@@ -67,7 +72,7 @@ For the complete Vietnamese presentation script covering the Architecture Model,
 
 ```text
 src/            model, validation, graph, benchmark and diagram tooling
-specs/          JSON Schema v0.1
+specs/          JSON Schema v0.1.1
 test/fixtures/  valid and invalid model fixtures
 docs/adr/       architecture decision records
 evidence/       deterministic Phase 1 evidence manifest

@@ -1,4 +1,4 @@
-version: "0.1"
+version: "0.1.1"
 metadata:
   name: order-platform
   description: Reference model used by the Phase 1 benchmark lab.
@@ -103,4 +103,3 @@ quality_goals:
     target: 150
     unit: USD
     priority: medium
-

@@ -5,6 +5,14 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
+import {
+  ARCHITECTURE_CONTRACT_CURRENT_VERSION,
+  CLI_JSON_CONTRACT_VERSION,
+  EVIDENCE_CONTRACT_VERSION,
+  FINDING_CONTRACT_VERSION,
+  GRAPH_CONTRACT_VERSION,
+} from "../dist/index.js";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(root, "dist", "bin.js");
 const fixture = (...parts) => join(root, "test", "fixtures", ...parts);
@@ -41,6 +49,18 @@ try {
   assert.match(invalid.stderr, /Fix: Add 'missing-database' under components/);
   pass("invalid model exit code");
 
+  const unsupportedVersion = run([
+    "validate",
+    fixture("invalid-unsupported-version.architecture.yaml"),
+  ]);
+  assert.equal(unsupportedVersion.status, 1);
+  assert.match(
+    unsupportedVersion.stderr,
+    /Unsupported architecture contract version '1\.0\.0'/,
+  );
+  assert.match(unsupportedVersion.stderr, /migrate from 0\.1\.0/);
+  pass("unsupported contract version is actionable");
+
   const missingInput = run(["validate", join(temporaryDirectory, "missing.architecture.yaml")]);
   assert.equal(missingInput.status, 2);
   assert.match(missingInput.stderr, /^RESULT: ERROR/m);
@@ -75,6 +95,13 @@ try {
   const graph = run(["graph", fixture("order-platform.architecture.yaml")]);
   assert.equal(graph.status, 0, graph.stderr);
   const graphJson = JSON.parse(graph.stdout);
+  assert.equal(graphJson.schema_version, CLI_JSON_CONTRACT_VERSION);
+  assert.equal(graphJson.kind, "archsync.graph");
+  assert.equal(
+    graphJson.contracts.architecture_model,
+    ARCHITECTURE_CONTRACT_CURRENT_VERSION,
+  );
+  assert.equal(graphJson.contracts.graph, GRAPH_CONTRACT_VERSION);
   assert.equal(graphJson.nodes.length, 5);
   assert.equal(graphJson.edges.length, 5);
   pass("graph JSON");
@@ -86,6 +113,9 @@ try {
   ]);
   assert.equal(diff.status, 0, diff.stderr);
   const diffJson = JSON.parse(diff.stdout);
+  assert.equal(diffJson.schema_version, CLI_JSON_CONTRACT_VERSION);
+  assert.equal(diffJson.kind, "archsync.graph-diff");
+  assert.equal(diffJson.contracts.graph, GRAPH_CONTRACT_VERSION);
   assert.deepEqual(diffJson.addedNodes, ["redis"]);
   assert.deepEqual(diffJson.addedEdges.map((edge) => edge.key), ["api|data|redis"]);
   pass("graph diff JSON");
@@ -120,10 +150,20 @@ try {
   ]);
   assert.equal(violationJson.status, 1);
   const violationResult = JSON.parse(violationJson.stdout);
+  assert.equal(violationResult.schema_version, CLI_JSON_CONTRACT_VERSION);
+  assert.equal(violationResult.kind, "archsync.conformance");
+  assert.equal(violationResult.contracts.finding, FINDING_CONTRACT_VERSION);
+  assert.equal(violationResult.contracts.evidence, EVIDENCE_CONTRACT_VERSION);
   assert.equal(violationResult.classification, "violation");
   assert.deepEqual(
     violationResult.findings.filter((finding) => finding.kind !== "architecture-evolution").map((finding) => finding.id),
     ["ARCH-001", "ARCH-004"],
+  );
+  assert.ok(
+    violationResult.findings.every(
+      (finding) => finding.schema_version === FINDING_CONTRACT_VERSION &&
+        finding.evidence.schema_version === EVIDENCE_CONTRACT_VERSION,
+    ),
   );
   pass("machine-readable conformance JSON");
 

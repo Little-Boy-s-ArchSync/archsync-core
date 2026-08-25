@@ -1,3 +1,8 @@
+import type {
+  ArchitectureContractVersion,
+  GRAPH_CONTRACT_VERSION,
+} from "./versions.js";
+
 export const componentTypes = [
   "frontend",
   "gateway",
@@ -97,7 +102,7 @@ export interface QualityGoal {
 }
 
 export interface ArchitectureDocument {
-  version: string;
+  version: ArchitectureContractVersion;
   metadata: ArchitectureMetadata;
   components: Record<string, ArchitectureComponent>;
   relationships: ArchitectureRelationship[];
@@ -115,6 +120,7 @@ export interface GraphEdge extends ArchitectureRelationship {
 }
 
 export interface ArchitectureGraph {
+  schema_version: typeof GRAPH_CONTRACT_VERSION;
   nodes: ReadonlyMap<string, GraphNode>;
   edges: readonly GraphEdge[];
   outgoing: ReadonlyMap<string, readonly GraphEdge[]>;
@@ -122,6 +128,7 @@ export interface ArchitectureGraph {
 }
 
 export interface GraphDiff {
+  schema_version: typeof GRAPH_CONTRACT_VERSION;
   addedNodes: GraphNode[];
   removedNodes: GraphNode[];
   changedNodes: GraphNodeChange[];
@@ -138,7 +145,7 @@ export interface GraphNodeChange {
 export interface ValidationIssue {
   path: string;
   message: string;
-  keyword: "schema" | "reference" | "duplicate" | "semantic";
+  keyword: "schema" | "version" | "reference" | "duplicate" | "semantic";
 }
 
 export interface ValidationResult<T> {

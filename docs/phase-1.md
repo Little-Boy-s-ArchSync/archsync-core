@@ -8,7 +8,7 @@ Turn architecture into a machine-readable contract and create ground truth for t
 
 ## In scope
 
-- Architecture schema v0.1.
+- Architecture schema v0.1.1 plus the supported v0.1.0 reader/replay path.
 - YAML parser and schema/semantic validation.
 - Graph domain model and graph diff.
 - Deterministic conformance evaluation for schema-valid observed model fixtures.
@@ -33,15 +33,16 @@ Turn architecture into a machine-readable contract and create ground truth for t
 5. Mermaid output can be generated deterministically from any valid model.
 6. `pnpm phase1:verify` passes from a clean checkout of `archsync-core`.
 7. At least ten topology-review scenarios and the built CLI contract are enforced automatically.
-8. Statement, branch, function and line coverage remain exactly 100% for every deterministic engine module; built CLI behavior is additionally protected by 17/17 command-contract checks.
+8. Statement, branch, function and line coverage remain exactly 100% for every deterministic engine module; built CLI behavior is additionally protected by 18/18 command-contract checks.
 9. A schema-valid observed model can be classified as no-impact, violation or evolution with actionable rule evidence.
 10. Violation and evolution reports can be generated as deterministic Mermaid and editable draw.io views.
+11. Current and previous Architecture Model fixtures replay the same benchmark semantics, and unsupported versions fail with a migration-oriented error.
 
 ## Completion evidence
 
 | Requirement | Owner | Authoritative artifact or check |
 | --- | --- | --- |
-| Schema v0.1 for components, relationships, rules and goals | Core engineer | [`specs/architecture.schema.json`](../specs/architecture.schema.json) |
+| Schema v0.1.1 for components, relationships, rules and goals, with v0.1.0 compatibility | Core engineer | [`specs/architecture.schema.json`](../specs/architecture.schema.json) and [`docs/contract-compatibility.md`](contract-compatibility.md) |
 | Three example `architecture.yaml` models | Core engineer | Core fixtures plus [`archsync-examples/models`](https://github.com/Little-Boy-s-ArchSync/archsync-examples/tree/main/models) |
 | Graph domain model, graph diff and semantic validation | Core engineer | [`src/graph.ts`](../src/graph.ts), [`src/validation.ts`](../src/validation.ts) and their tests |
 | One-stack, five-component benchmark | Research engineer | [`archsync-benchmark/order-platform`](https://github.com/Little-Boy-s-ArchSync/archsync-benchmark/tree/main/order-platform) |

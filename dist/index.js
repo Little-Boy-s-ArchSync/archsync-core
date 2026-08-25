@@ -5,5 +5,7 @@ export * from "./drawio.js";
 export * from "./graph.js";
 export * from "./mermaid.js";
 export * from "./model.js";
+export * from "./serialization.js";
 export * from "./validation.js";
+export * from "./versions.js";
 //# sourceMappingURL=index.js.map

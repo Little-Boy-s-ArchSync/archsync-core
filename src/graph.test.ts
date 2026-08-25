@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildGraph, diffGraphs } from "./graph.js";
 import type { ArchitectureDocument } from "./model.js";
+import { GRAPH_CONTRACT_VERSION } from "./versions.js";
 
 const baseline: ArchitectureDocument = {
   version: "0.1",
@@ -19,6 +20,7 @@ describe("architecture graph", () => {
   it("builds incoming and outgoing indexes", () => {
     const graph = buildGraph(baseline);
 
+    expect(graph.schema_version).toBe(GRAPH_CONTRACT_VERSION);
     expect(graph.nodes.size).toBe(2);
     expect(graph.outgoing.get("api")).toHaveLength(1);
     expect(graph.incoming.get("database")).toHaveLength(1);
@@ -66,6 +68,7 @@ describe("architecture graph", () => {
 
     const diff = diffGraphs(buildGraph(baseline), buildGraph(observed));
 
+    expect(diff.schema_version).toBe(GRAPH_CONTRACT_VERSION);
     expect(diff.addedNodes.map((node) => node.id)).toEqual(["redis"]);
     expect(diff.addedEdges.map((edge) => edge.key)).toEqual([
       "api|data|redis",

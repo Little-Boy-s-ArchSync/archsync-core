@@ -6,6 +6,11 @@ import {
   type ConformanceResult,
 } from "./conformance.js";
 import type { ArchitectureDocument } from "./model.js";
+import {
+  CONFORMANCE_CONTRACT_VERSION,
+  EVIDENCE_CONTRACT_VERSION,
+  FINDING_CONTRACT_VERSION,
+} from "./versions.js";
 
 function expectedModel(): ArchitectureDocument {
   return {
@@ -35,6 +40,7 @@ describe("architecture conformance", () => {
     const result = analyzeConformance(expected, structuredClone(expected));
 
     expect(result.classification).toBe("no-impact");
+    expect(result.schema_version).toBe(CONFORMANCE_CONTRACT_VERSION);
     expect(result.findings).toEqual([]);
   });
 
@@ -48,10 +54,15 @@ describe("architecture conformance", () => {
     expect(result.classification).toBe("violation");
     expect(result.findings).toContainEqual(expect.objectContaining({
       id: "ARCH-001",
+      schema_version: FINDING_CONTRACT_VERSION,
       kind: "deny-rule",
       severity: "critical",
       edge_key: "frontend|data|database",
-      evidence: { document: "observed", path: "/relationships/3" },
+      evidence: {
+        schema_version: EVIDENCE_CONTRACT_VERSION,
+        document: "observed",
+        path: "/relationships/3",
+      },
     }));
   });
 
@@ -105,7 +116,11 @@ describe("architecture conformance", () => {
       expect.objectContaining({
         kind: "allow-rule",
         edge_key: "frontend|http|service",
-        evidence: { document: "observed", path: "/relationships/3" },
+        evidence: {
+          schema_version: EVIDENCE_CONTRACT_VERSION,
+          document: "observed",
+          path: "/relationships/3",
+        },
       }),
     ]);
     expect(formatConformanceResult(result)).toContain(
@@ -161,7 +176,11 @@ describe("architecture conformance", () => {
       kind: "required-path",
       from: "frontend",
       to: "database",
-      evidence: { document: "expected", path: "/rules/0" },
+      evidence: {
+        schema_version: EVIDENCE_CONTRACT_VERSION,
+        document: "expected",
+        path: "/rules/0",
+      },
     }));
     expect(formatConformanceResult(failing)).toContain(
       "Required architecture path is missing",
@@ -220,12 +239,20 @@ describe("architecture conformance", () => {
     expect(result.findings).toContainEqual(expect.objectContaining({
       component: "database",
       change: "removed",
-      evidence: { document: "expected", path: "/components/database" },
+      evidence: {
+        schema_version: EVIDENCE_CONTRACT_VERSION,
+        document: "expected",
+        path: "/components/database",
+      },
     }));
     expect(result.findings).toContainEqual(expect.objectContaining({
       edge_key: "service|data|database",
       change: "removed",
-      evidence: { document: "expected", path: "/relationships/2" },
+      evidence: {
+        schema_version: EVIDENCE_CONTRACT_VERSION,
+        document: "expected",
+        path: "/relationships/2",
+      },
     }));
     expect(formatConformanceResult(result)).toContain("REMOVED component: database");
   });
@@ -314,27 +341,42 @@ describe("architecture conformance", () => {
       classification: "violation",
       findings: [
         {
+          schema_version: FINDING_CONTRACT_VERSION,
           id: "CUSTOM-001",
           kind: "unsupported" as "deny-rule",
           severity: "error",
           message: "Custom violation message",
-          evidence: { document: "observed", path: "/custom/path" },
+          evidence: {
+            schema_version: EVIDENCE_CONTRACT_VERSION,
+            document: "observed",
+            path: "/custom/path",
+          },
         },
         {
+          schema_version: FINDING_CONTRACT_VERSION,
           id: "CUSTOM-002",
           kind: "unsupported" as "deny-rule",
           severity: "warning",
           message: "Second custom violation",
           from: "frontend",
           to: "service",
-          evidence: { document: "observed", path: "/custom/second" },
+          evidence: {
+            schema_version: EVIDENCE_CONTRACT_VERSION,
+            document: "observed",
+            path: "/custom/second",
+          },
         },
         {
+          schema_version: FINDING_CONTRACT_VERSION,
           id: "EVOLUTION-CUSTOM",
           kind: "architecture-evolution",
           severity: "warning",
           message: "Topology changed without structured fields",
-          evidence: { document: "observed", path: "/custom/evolution" },
+          evidence: {
+            schema_version: EVIDENCE_CONTRACT_VERSION,
+            document: "observed",
+            path: "/custom/evolution",
+          },
         },
       ],
       summary: { ...base.summary, violations: 2, evolutions: 1 },

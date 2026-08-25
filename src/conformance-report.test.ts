@@ -9,6 +9,10 @@ import {
   generateConformanceMermaid,
 } from "./conformance-report.js";
 import type { ArchitectureDocument } from "./model.js";
+import {
+  EVIDENCE_CONTRACT_VERSION,
+  FINDING_CONTRACT_VERSION,
+} from "./versions.js";
 
 function models(): { expected: ArchitectureDocument; observed: ArchitectureDocument } {
   const expected: ArchitectureDocument = {
@@ -116,11 +120,16 @@ describe("conformance report rendering", () => {
       ...clean,
       classification: "violation",
       findings: [{
+        schema_version: FINDING_CONTRACT_VERSION,
         id: "SYNTHETIC-001",
         kind: "required-edge",
         severity: "error",
         message: "Synthetic missing relationship",
-        evidence: { document: "expected", path: "/rules/0" },
+        evidence: {
+          schema_version: EVIDENCE_CONTRACT_VERSION,
+          document: "expected",
+          path: "/rules/0",
+        },
       }],
       summary: { ...clean.summary, violations: 1 },
     };
@@ -137,6 +146,7 @@ describe("conformance report rendering", () => {
       ...clean,
       classification: "violation",
       findings: [{
+        schema_version: FINDING_CONTRACT_VERSION,
         id: "SYNTHETIC-LABEL",
         kind: "deny-rule",
         severity: "error",
@@ -144,7 +154,11 @@ describe("conformance report rendering", () => {
         from: "frontend",
         to: "service",
         edge_key: "frontend|http|service",
-        evidence: { document: "observed", path: "/relationships/0" },
+        evidence: {
+          schema_version: EVIDENCE_CONTRACT_VERSION,
+          document: "observed",
+          path: "/relationships/0",
+        },
       }],
       summary: { ...clean.summary, violations: 1 },
     };
@@ -163,15 +177,21 @@ describe("conformance report rendering", () => {
       classification: "violation",
       findings: [
         {
+          schema_version: FINDING_CONTRACT_VERSION,
           id: "SYNTHETIC-DEFAULT",
           kind: "required-edge",
           severity: "error",
           message: "Synthetic default edge",
           from: "frontend",
           to: "service",
-          evidence: { document: "expected", path: "/rules/0" },
+          evidence: {
+            schema_version: EVIDENCE_CONTRACT_VERSION,
+            document: "expected",
+            path: "/rules/0",
+          },
         },
         {
+          schema_version: FINDING_CONTRACT_VERSION,
           id: "SYNTHETIC-TYPED",
           kind: "required-edge",
           severity: "error",
@@ -179,7 +199,11 @@ describe("conformance report rendering", () => {
           from: "frontend",
           to: "database",
           relationship_type: "http",
-          evidence: { document: "expected", path: "/rules/0" },
+          evidence: {
+            schema_version: EVIDENCE_CONTRACT_VERSION,
+            document: "expected",
+            path: "/rules/0",
+          },
         },
       ],
       summary: { ...clean.summary, violations: 2 },

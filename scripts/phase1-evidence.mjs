@@ -5,6 +5,14 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
+  ARCHITECTURE_CONTRACT_CURRENT_VERSION,
+  ARCHITECTURE_CONTRACT_LEGACY_VERSION,
+  ARCHITECTURE_CONTRACT_PREVIOUS_VERSION,
+  CLI_JSON_CONTRACT_VERSION,
+  CONFORMANCE_CONTRACT_VERSION,
+  EVIDENCE_CONTRACT_VERSION,
+  FINDING_CONTRACT_VERSION,
+  GRAPH_CONTRACT_VERSION,
   buildGraph,
   diffGraphs,
   analyzeConformance,
@@ -90,6 +98,7 @@ const unitTestSource = await hashFiles(
 const fixtureTree = await treeSha256(fixturesDirectory);
 const verificationSource = await hashFiles([
   join(root, "scripts", "cli-smoke.mjs"),
+  join(root, "scripts", "contract-compatibility.mjs"),
   join(root, "scripts", "phase1-evidence.mjs"),
   join(root, "tsconfig.json"),
   join(root, "tsconfig.test.json"),
@@ -198,6 +207,22 @@ const evidence = {
     sha256: sha256(benchmarkSchemaSource),
     required_sections: benchmarkSchema.required,
   },
+  contract_compatibility: {
+    architecture: {
+      current: ARCHITECTURE_CONTRACT_CURRENT_VERSION,
+      previous: ARCHITECTURE_CONTRACT_PREVIOUS_VERSION,
+      legacy_alias: ARCHITECTURE_CONTRACT_LEGACY_VERSION,
+    },
+    graph: GRAPH_CONTRACT_VERSION,
+    finding: FINDING_CONTRACT_VERSION,
+    evidence: EVIDENCE_CONTRACT_VERSION,
+    conformance: CONFORMANCE_CONTRACT_VERSION,
+    cli_json: CLI_JSON_CONTRACT_VERSION,
+    replay_fixtures: [
+      "test/fixtures/compatibility/ground-truth-current.json",
+      "test/fixtures/compatibility/ground-truth-previous.json",
+    ],
+  },
   fixtures: {
     valid: validFixtures,
     expected_invalid: expectedInvalidFixtures,
@@ -258,6 +283,7 @@ const evidence = {
     cli_smoke_checks: [
       "valid model exits 0",
       "invalid model exits 1 with actionable path",
+      "unsupported contract version exits 1 with migration guidance",
       "graph emits parseable JSON",
       "graph diff emits expected delta",
       "clean conformance exits 0",

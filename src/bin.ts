@@ -7,7 +7,6 @@ import { validateBenchmark } from "./benchmark.js";
 import {
   analyzeConformance,
   formatConformanceResult,
-  type ConformanceResult,
 } from "./conformance.js";
 import {
   generateConformanceDrawio,
@@ -16,6 +15,11 @@ import {
 import { generateDrawio } from "./drawio.js";
 import { buildGraph, diffGraphs } from "./graph.js";
 import { generateMermaid } from "./mermaid.js";
+import {
+  serializeConformanceResult,
+  serializeGraph,
+  serializeGraphDiff,
+} from "./serialization.js";
 import {
   formatValidationIssues,
   loadArchitecture,
@@ -96,25 +100,6 @@ async function validateFile(filePath: string): Promise<boolean> {
   return true;
 }
 
-function serializeConformance(result: ConformanceResult): object {
-  return {
-    classification: result.classification,
-    summary: result.summary,
-    findings: result.findings,
-    diff: {
-      addedNodes: result.diff.addedNodes.map(({ id }) => id),
-      removedNodes: result.diff.removedNodes.map(({ id }) => id),
-      changedNodes: result.diff.changedNodes.map(({ id, expected, observed }) => ({
-        id,
-        expected: expected.component,
-        observed: observed.component,
-      })),
-      addedEdges: result.diff.addedEdges.map(({ key }) => key),
-      removedEdges: result.diff.removedEdges.map(({ key }) => key),
-    },
-  };
-}
-
 async function main(): Promise<void> {
   const [, , command, input, output, reportOutput] = process.argv;
   if (!command || !input) usage();
@@ -180,17 +165,11 @@ async function main(): Promise<void> {
 
     if (command === "diff") {
       const diff = diffGraphs(buildGraph(expected.value), buildGraph(observed.value));
-      console.log(JSON.stringify({
-        addedNodes: diff.addedNodes.map(({ id }) => id),
-        removedNodes: diff.removedNodes.map(({ id }) => id),
-        changedNodes: diff.changedNodes.map(({ id, expected: before, observed: after }) => ({
-          id,
-          expected: before.component,
-          observed: after.component,
-        })),
-        addedEdges: diff.addedEdges.map(({ key, from, to, type }) => ({ key, from, to, type })),
-        removedEdges: diff.removedEdges.map(({ key, from, to, type }) => ({ key, from, to, type })),
-      }, null, 2));
+      console.log(JSON.stringify(
+        serializeGraphDiff(expected.value.version, observed.value.version, diff),
+        null,
+        2,
+      ));
       return;
     }
 
@@ -216,7 +195,15 @@ async function main(): Promise<void> {
     }
 
     if (command === "check-json") {
-      console.log(JSON.stringify(serializeConformance(result), null, 2));
+      console.log(JSON.stringify(
+        serializeConformanceResult(
+          expected.value.version,
+          observed.value.version,
+          result,
+        ),
+        null,
+        2,
+      ));
     } else {
       console.log(formatConformanceResult(result));
     }
@@ -239,10 +226,7 @@ async function main(): Promise<void> {
 
     if (command === "graph") {
       const graph = buildGraph(result.value);
-      console.log(JSON.stringify({
-        nodes: [...graph.nodes.keys()],
-        edges: graph.edges.map(({ key, from, to, type }) => ({ key, from, to, type })),
-      }, null, 2));
+      console.log(JSON.stringify(serializeGraph(result.value.version, graph), null, 2));
       return;
     }
 

@@ -1,4 +1,4 @@
-version: "0.1"
+version: "0.1.1"
 metadata:
   name: order-platform-evolution
   description: Schema-valid observed model that adds Redis without violating a deterministic rule.

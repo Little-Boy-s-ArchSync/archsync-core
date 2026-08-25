@@ -1,6 +1,11 @@
-# ArchSync Architecture Model v0.1
+# ArchSync Architecture Model v0.1.1
 
 `architecture.schema.json` is the machine-readable architecture contract for Phase 1. `benchmark-ground-truth.schema.json` validates the runtime shape of benchmark metadata, cases, graph deltas, expected findings and source-evidence records before semantic and engine-backed checks run.
+
+The reader accepts current `0.1.1`, previous `0.1.0`, and the deprecated `0.1`
+spelling. It rejects every other string version with an actionable `/version`
+error. See the [compatibility matrix](../docs/contract-compatibility.md) and
+[migration note](../docs/migrations/core-contracts-0.1.0-to-0.1.1.md).
 
 ## Model sections
 

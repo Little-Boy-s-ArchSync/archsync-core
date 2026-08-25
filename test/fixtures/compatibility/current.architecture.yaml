@@ -1,0 +1,19 @@
+version: "0.1.1"
+metadata:
+  name: contract-compatibility
+components:
+  api:
+    type: service
+    layer: application
+  database:
+    type: database
+    layer: data
+relationships: []
+rules:
+  - id: ARCH-001
+    type: deny
+    from: api
+    to: database
+    relationship_type: data
+    severity: error
+    rationale: Services must not bypass the approved data-access boundary.

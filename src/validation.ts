@@ -12,6 +12,11 @@ import type {
   ValidationIssue,
   ValidationResult,
 } from "./model.js";
+import {
+  ARCHITECTURE_CONTRACT_CURRENT_VERSION,
+  ARCHITECTURE_CONTRACT_PREVIOUS_VERSION,
+  unsupportedArchitectureContractVersionMessage,
+} from "./versions.js";
 
 const schemaUrl = new URL("../specs/architecture.schema.json", import.meta.url);
 let validatorPromise: Promise<ValidateFunction<ArchitectureDocument>> | undefined;
@@ -187,6 +192,18 @@ export async function parseArchitecture(
   }
 
   const value = yaml.toJS() as unknown;
+  const version = (value as { version?: unknown } | null)?.version;
+  const unsupportedVersion = unsupportedArchitectureContractVersionMessage(version);
+  if (unsupportedVersion) {
+    return {
+      valid: false,
+      issues: [{
+        path: "/version",
+        message: unsupportedVersion,
+        keyword: "version",
+      }],
+    };
+  }
   const validate = await getValidator();
 
   if (!validate(value)) {
@@ -236,6 +253,9 @@ function formatValidationPath(path: string): string {
 }
 
 function validationFix(issue: ValidationIssue): string {
+  if (issue.keyword === "version") {
+    return `Use architecture contract ${ARCHITECTURE_CONTRACT_CURRENT_VERSION}, migrate from ${ARCHITECTURE_CONTRACT_PREVIOUS_VERSION}, or follow docs/migrations/core-contracts-0.1.0-to-0.1.1.md.`;
+  }
   const unknownComponent = issue.message.match(/Unknown component '([^']+)'/);
   if (unknownComponent) {
     return `Add '${unknownComponent[1]}' under components, or change this reference to an existing component.`;
