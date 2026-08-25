@@ -38,7 +38,7 @@
       },
       {
         "file": "src/model.ts",
-        "sha256": "0a8e34c8d4c0fb8799c9c17e18d42f5126a23ca96ced538fb67cbaefd0fe5bdb"
+        "sha256": "839e8fedef98ef6934e6a0647230f1261fb978831fa01137b88b450af63f2f6a"
       },
       {
         "file": "src/serialization.ts",
@@ -46,14 +46,14 @@
       },
       {
         "file": "src/validation.ts",
-        "sha256": "64aa3a4a46a4959b55f065f63c70552df4c880379705b2489c54046f0169a3c5"
+        "sha256": "42c2b55d6befa27adebd9b0b842b8c3fa4e20fe47a91cb64cd3b3ca6a0254fa3"
       },
       {
         "file": "src/versions.ts",
         "sha256": "333da015a29e027df205f7dfca4cc1ed3f41332f4aa349c2415ec732750115f4"
       }
     ],
-    "implementation_source_sha256": "495bf77b1a270ba84e9e47c75618f51a489be0e68b31b6261fc6e96a4cc149a1",
+    "implementation_source_sha256": "1c68664906cfbcef3fd245072959b30bb05a554ad9d09d37be88337288e2a521",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
@@ -85,14 +85,14 @@
       },
       {
         "file": "src/validation.test.ts",
-        "sha256": "131a2bfe35760c39146ae8b78f18d22ef7237cbe2ccc53f46f27e86edc8b60ff"
+        "sha256": "d9604e277a534de36c524459f12b3e3ca54fb42223deff3efa2f487559ec81f2"
       },
       {
         "file": "src/validation.topology.test.ts",
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "fd634f0c6ae73f584c283c1f0994428c1a151a9fa016177d02c1612a2e072a60",
+    "unit_test_source_sha256": "52941d6a2f64974e27b35d9cfc8f985a0242a45a388d2fc6a9050e564452dfc3",
     "fixture_tree": {
       "files": [
         {
@@ -197,7 +197,7 @@
     "file": "specs/architecture.schema.json",
     "id": "https://archsync.dev/schemas/architecture-v0.1.1.json",
     "title": "ArchSync Architecture Model",
-    "sha256": "03efb964eaf2d2e984e0e70464e1a4894a12a2e18a099c0860806b03435fc87b",
+    "sha256": "552054b2a4951c14d1af4a43c79a1d44974dd925d1a502177aa2a85f85ebbc16",
     "required_sections": [
       "version",
       "metadata",

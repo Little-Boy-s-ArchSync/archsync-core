@@ -81,7 +81,7 @@ export interface ArchitectureRule {
   rationale?: string;
 }
 
-export interface QualityGoal {
+export interface LegacyQualityGoal {
   id: string;
   attribute:
     | "performance"
@@ -100,6 +100,41 @@ export interface QualityGoal {
   priority: Priority;
   description?: string;
 }
+
+export type QualityGoalAttributeV02 =
+  | "latency"
+  | "availability"
+  | "security"
+  | "cost"
+  | "complexity";
+
+export type QualityGoalMetricV02 =
+  | "p95_latency"
+  | "availability_ratio"
+  | "security_violation_count"
+  | "estimated_cost"
+  | "component_count";
+
+export interface QualityGoalWindowV02 {
+  value: number;
+  unit: "minute" | "hour" | "day";
+}
+
+export interface QualityGoalV02 {
+  contract_version: "0.2";
+  id: string;
+  attribute: QualityGoalAttributeV02;
+  scope: string;
+  metric: QualityGoalMetricV02;
+  operator: "<" | "<=" | ">=" | ">";
+  target: number;
+  unit: "ms" | "ratio" | "count" | "usd";
+  window: QualityGoalWindowV02;
+  priority: Priority;
+  description?: string;
+}
+
+export type QualityGoal = LegacyQualityGoal | QualityGoalV02;
 
 export interface ArchitectureDocument {
   version: ArchitectureContractVersion;

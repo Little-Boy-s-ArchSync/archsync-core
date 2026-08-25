@@ -1,6 +1,6 @@
 # ArchSync Core
 
-`@archsync/core` provides the machine-readable architecture contract, validation, graph/conformance primitives and deterministic Mermaid/draw.io reporting for ArchSync.
+`@archsync/core` provides the machine-readable architecture contract, validation, graph/conformance primitives and deterministic Mermaid/draw.io reporting for ArchSync. A proposed, backward-compatible Phase 6 quality-goal v0.2 contract is included for technical review; it is not an approved goal set or an experimental result.
 
 This repository contains the deterministic foundation completed in **Phase 1: Architecture Model and Benchmark Lab**. It deliberately excludes Guardian orchestration, LLM, MCP, IaC and runtime features.
 
