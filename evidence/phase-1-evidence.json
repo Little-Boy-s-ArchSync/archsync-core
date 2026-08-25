@@ -38,14 +38,14 @@
       },
       {
         "file": "src/model.ts",
-        "sha256": "5a138fee8651157a8728ab61d40c34a5369252423aeeae4872e49989586bf9c6"
+        "sha256": "e6133db4f156e4285b2bba7569a9ff636613ee5f98231dc42e33d36693d5a6eb"
       },
       {
         "file": "src/validation.ts",
-        "sha256": "676611544e8fb29628d7f09c65ff3f427d4249f93051a0f984f905d559252892"
+        "sha256": "f360b6febcda794e182ca389f4e108b841209c9dda80226213945c4c46d30537"
       }
     ],
-    "implementation_source_sha256": "50b1bb4ec2cb4b450941a7d4cf11c6330e6987745a9551148ba0780e03da646e",
+    "implementation_source_sha256": "fcd3fa8a65ab005db05b4c7140b9b6439cd57ceb9865a8b7b900503c33d81d5a",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
@@ -73,14 +73,14 @@
       },
       {
         "file": "src/validation.test.ts",
-        "sha256": "b27ddb4a8796f34d7d85501e844a4e9aa1173100efd248e1d6b7008150b3784b"
+        "sha256": "e0f1bfd7c0a75e9307888567c8d4ae9f4ae3c7691a106b09607eeb9f5e336fc7"
       },
       {
         "file": "src/validation.topology.test.ts",
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "beb4a63e18b80cf4dcdeb79e11896cb961a4d0e3e755310edbfe4a5e9604aab7",
+    "unit_test_source_sha256": "e6aefc23444c98c6786f3eafd486ea984e789814518a12fe5c8e697b4725777f",
     "fixture_tree": {
       "files": [
         {
@@ -153,7 +153,7 @@
     "file": "specs/architecture.schema.json",
     "id": "https://archsync.dev/schemas/architecture-v0.1.json",
     "title": "ArchSync Architecture Model",
-    "sha256": "d93a3179d02b11a8efe0b18be4096a244182e2b3928d6f2c5919aa3670a0402c",
+    "sha256": "dda1afaef3bfaf2739d440c4f59658b011d7c168d9be756723511634d3a199b4",
     "required_sections": [
       "version",
       "metadata",

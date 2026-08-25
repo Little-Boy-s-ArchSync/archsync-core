@@ -1,6 +1,6 @@
 # ArchSync Architecture Model v0.1
 
-`architecture.schema.json` is the machine-readable architecture contract for Phase 1. `benchmark-ground-truth.schema.json` validates the runtime shape of benchmark metadata, cases, graph deltas, expected findings and source-evidence records before semantic and engine-backed checks run.
+`architecture.schema.json` is the machine-readable architecture contract for Phase 1. `benchmark-ground-truth.schema.json` validates the runtime shape of benchmark metadata, cases, graph deltas, expected findings and source-evidence records before semantic and engine-backed checks run. `quality-goal.schema.json` is the opt-in proposed v0.2 goal contract for the Phase 6 runtime-awareness foundation.
 
 ## Model sections
 
@@ -8,7 +8,7 @@
 - `components`: stable component identifiers and properties.
 - `relationships`: intended directed edges.
 - `rules`: deterministic `deny`, `allow`, direct `require` or multi-hop `require-path` constraints.
-- `quality_goals`: measurable targets used later by the Evolution Engine.
+- `quality_goals`: legacy targets or explicitly versioned v0.2 latency, availability, security, cost and complexity targets. See [`docs/quality-goals-v0.2.md`](../docs/quality-goals-v0.2.md); the proposed schema does not imply stakeholder approval.
 
 Schema validation is followed by semantic validation. Semantic checks currently cover unknown references, duplicate ids/edges and self relationships.
 

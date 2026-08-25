@@ -47,7 +47,12 @@
     },
     "quality_goals": {
       "type": "array",
-      "items": { "$ref": "#/$defs/qualityGoal" },
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/qualityGoalV01" },
+          { "$ref": "https://archsync.dev/schemas/quality-goal-v0.2.json" }
+        ]
+      },
       "default": []
     }
   },
@@ -116,7 +121,7 @@
         "rationale": { "type": "string", "minLength": 1 }
       }
     },
-    "qualityGoal": {
+    "qualityGoalV01": {
       "type": "object",
       "additionalProperties": false,
       "required": ["id", "attribute", "metric", "operator", "target", "priority"],

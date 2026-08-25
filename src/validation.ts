@@ -9,12 +9,15 @@ import { parseDocument } from "yaml";
 
 import type {
   ArchitectureDocument,
+  QualityGoalV02,
   ValidationIssue,
   ValidationResult,
 } from "./model.js";
 
 const schemaUrl = new URL("../specs/architecture.schema.json", import.meta.url);
+const qualityGoalSchemaUrl = new URL("../specs/quality-goal.schema.json", import.meta.url);
 let validatorPromise: Promise<ValidateFunction<ArchitectureDocument>> | undefined;
+let qualityGoalValidatorPromise: Promise<ValidateFunction<QualityGoalV02>> | undefined;
 
 export function formatSchemaIssue(error: ErrorObject): ValidationIssue {
   const property = "missingProperty" in error.params
@@ -40,11 +43,39 @@ export function formatSchemaIssue(error: ErrorObject): ValidationIssue {
 async function getValidator(): Promise<ValidateFunction<ArchitectureDocument>> {
   validatorPromise ??= (async () => {
     const schema = JSON.parse(await readFile(fileURLToPath(schemaUrl), "utf8")) as object;
+    const qualityGoalSchema = JSON.parse(
+      await readFile(fileURLToPath(qualityGoalSchemaUrl), "utf8"),
+    ) as object;
     const ajv = new Ajv2020({ allErrors: true, strict: true });
+    ajv.addSchema(qualityGoalSchema);
     return ajv.compile<ArchitectureDocument>(schema);
   })();
 
   return validatorPromise;
+}
+
+async function getQualityGoalValidator(): Promise<ValidateFunction<QualityGoalV02>> {
+  qualityGoalValidatorPromise ??= (async () => {
+    const schema = JSON.parse(
+      await readFile(fileURLToPath(qualityGoalSchemaUrl), "utf8"),
+    ) as object;
+    return new Ajv2020({ allErrors: true, strict: true }).compile<QualityGoalV02>(schema);
+  })();
+
+  return qualityGoalValidatorPromise;
+}
+
+export async function validateQualityGoal(
+  value: unknown,
+): Promise<ValidationResult<QualityGoalV02>> {
+  const validate = await getQualityGoalValidator();
+  if (!validate(value)) {
+    return {
+      valid: false,
+      issues: validate.errors!.map(formatSchemaIssue),
+    };
+  }
+  return { valid: true, value, issues: [] };
 }
 
 function isExactSelector(selector: string): boolean {
