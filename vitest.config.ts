@@ -11,7 +11,9 @@ export default defineConfig({
         "src/drawio.ts",
         "src/graph.ts",
         "src/mermaid.ts",
+        "src/serialization.ts",
         "src/validation.ts",
+        "src/versions.ts",
       ],
       reporter: ["text", "json-summary", "html"],
       thresholds: {

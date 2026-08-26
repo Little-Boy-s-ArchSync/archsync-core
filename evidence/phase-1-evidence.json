@@ -10,7 +10,7 @@
       },
       {
         "file": "src/bin.ts",
-        "sha256": "21bd7569643ae4a5c9d6a195b7c1571cc07c40047a32f92836777bc997570ea3"
+        "sha256": "93a280d56c94541a37094c3a37aeabcb5c8e380e2280bef3027d55325345a8b1"
       },
       {
         "file": "src/conformance-report.ts",
@@ -18,7 +18,7 @@
       },
       {
         "file": "src/conformance.ts",
-        "sha256": "89b46937a5e961d2da96884b0f03e9697f624f2f435a0abbc9e59b359cf99a54"
+        "sha256": "ceb73388f6d4c2d9b0626fb55db1a66de64a584b61e37a70eaf8dec334ade0c1"
       },
       {
         "file": "src/drawio.ts",
@@ -26,11 +26,11 @@
       },
       {
         "file": "src/graph.ts",
-        "sha256": "ef90327c7e0a4b92768c2364df535f1096cd9b13005278c488121d8cc5c91946"
+        "sha256": "49242b58792cef986fea26cdd5de6e8ad25352812a7a1cb4aaaf03f117b96422"
       },
       {
         "file": "src/index.ts",
-        "sha256": "361ce71c69dc3d101d1f0c31de5b5e33ba8fdb04341b08260451a6d23109b4e3"
+        "sha256": "ac911886fdfcdf096a94980b191515a78c0334ac2dd2121a6690be197d81860d"
       },
       {
         "file": "src/mermaid.ts",
@@ -38,14 +38,22 @@
       },
       {
         "file": "src/model.ts",
-        "sha256": "5a138fee8651157a8728ab61d40c34a5369252423aeeae4872e49989586bf9c6"
+        "sha256": "0a8e34c8d4c0fb8799c9c17e18d42f5126a23ca96ced538fb67cbaefd0fe5bdb"
+      },
+      {
+        "file": "src/serialization.ts",
+        "sha256": "2cfe2cfe5b1de1f4eef362851f97cc7df55b12223f0e70456e38a0b3e9b27f3b"
       },
       {
         "file": "src/validation.ts",
-        "sha256": "676611544e8fb29628d7f09c65ff3f427d4249f93051a0f984f905d559252892"
+        "sha256": "64aa3a4a46a4959b55f065f63c70552df4c880379705b2489c54046f0169a3c5"
+      },
+      {
+        "file": "src/versions.ts",
+        "sha256": "333da015a29e027df205f7dfca4cc1ed3f41332f4aa349c2415ec732750115f4"
       }
     ],
-    "implementation_source_sha256": "50b1bb4ec2cb4b450941a7d4cf11c6330e6987745a9551148ba0780e03da646e",
+    "implementation_source_sha256": "495bf77b1a270ba84e9e47c75618f51a489be0e68b31b6261fc6e96a4cc149a1",
     "unit_test_source": [
       {
         "file": "src/benchmark.test.ts",
@@ -53,11 +61,11 @@
       },
       {
         "file": "src/conformance-report.test.ts",
-        "sha256": "47a247eeaa48c4e699a8271dfd836dc7f3cf3f3b3fb7240f6b5288f727719bf7"
+        "sha256": "0bbce25a2bf7197d84cdae21e0149d02edf475b1416bd6a307d120b3571beb59"
       },
       {
         "file": "src/conformance.test.ts",
-        "sha256": "02dfa66c9d3601daa194571397bbbd3fb757e82f11d6b1d6d6b02e02907505ae"
+        "sha256": "662460352cb3d6168f545fe1d251c5ceb2d802e12b72deb3883b4b8421ae5c44"
       },
       {
         "file": "src/drawio.test.ts",
@@ -65,63 +73,99 @@
       },
       {
         "file": "src/graph.test.ts",
-        "sha256": "e4cf6710f04f04d3dd70a324a55dd4337a8c191c35548c45c7aecd2f246c94d6"
+        "sha256": "95c8026f3ee007db757ef2b29b9de72f197778af010542e9836b0190fcb547ca"
       },
       {
         "file": "src/mermaid.test.ts",
         "sha256": "69e8f8730c0a39a4b4bf57763239f0df6e3e991dc4d5aaadcffb4cc568bb68eb"
       },
       {
+        "file": "src/serialization.test.ts",
+        "sha256": "cddd9aed9977d3a0e6ebec6c2dfcf0f7e978366f194875b8dbb2e3f129f1d550"
+      },
+      {
         "file": "src/validation.test.ts",
-        "sha256": "b27ddb4a8796f34d7d85501e844a4e9aa1173100efd248e1d6b7008150b3784b"
+        "sha256": "131a2bfe35760c39146ae8b78f18d22ef7237cbe2ccc53f46f27e86edc8b60ff"
       },
       {
         "file": "src/validation.topology.test.ts",
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "beb4a63e18b80cf4dcdeb79e11896cb961a4d0e3e755310edbfe4a5e9604aab7",
+    "unit_test_source_sha256": "fd634f0c6ae73f584c283c1f0994428c1a151a9fa016177d02c1612a2e072a60",
     "fixture_tree": {
       "files": [
         {
+          "file": "test/fixtures/compatibility/case-01.patch",
+          "sha256": "48393df39bc5a1b476208c25aadc06bd9a5bdd095e0f86a0f028727bce9d1af5"
+        },
+        {
+          "file": "test/fixtures/compatibility/current.architecture.yaml",
+          "sha256": "d490c60a5e1d31998651240e60a9098dc37eb3a2657bf05593fc9e1c7b2066f7"
+        },
+        {
+          "file": "test/fixtures/compatibility/ground-truth-current.json",
+          "sha256": "8da0d389aa405e3f4a893dba8b270402ce5b72e09db0638c47c9c43804e4bfbe"
+        },
+        {
+          "file": "test/fixtures/compatibility/ground-truth-previous.json",
+          "sha256": "ea12aa435e9e40659c860da1c10527f74403b0045cfccaca915d01c309f65324"
+        },
+        {
+          "file": "test/fixtures/compatibility/previous.architecture.yaml",
+          "sha256": "4800e2db0a581cbd0c2b1f320ea18f10313ebe793bca77aee93970a7968708f5"
+        },
+        {
+          "file": "test/fixtures/compatibility/repository/src/app.ts",
+          "sha256": "f2ec5965c2ce5899d09836a5451e8b25b81c0e1abadc4c12e24ecd2c92691d6a"
+        },
+        {
           "file": "test/fixtures/invalid-schema.architecture.yaml",
-          "sha256": "18f66dc911cae28965272c67e1ea9067bfa1f8899894eb023e3ec28047d97c86"
+          "sha256": "40e76ca5770bbbf79028a92e208255af40afb28c4210e6ed7f024c5955142061"
         },
         {
           "file": "test/fixtures/invalid-unknown-component.architecture.yaml",
-          "sha256": "3bea60f332aafbdf5d19490284e39cf29da8ae86f31e372a660a13a877047d06"
+          "sha256": "3bfae75a6210afb09e3d914992bb2d9b648c2124ea1a1cb68e600de839a2e4e4"
+        },
+        {
+          "file": "test/fixtures/invalid-unsupported-version.architecture.yaml",
+          "sha256": "57ba57a13eeead51d7bd0964e24c47b2c4f8aaece220d0dff5836bd8080a18ae"
         },
         {
           "file": "test/fixtures/minimal-evolution.architecture.yaml",
-          "sha256": "a9b41d5df33a1334b08470db050e26a4ea8ccf97ae61e407c4703fbc0f5a99a9"
+          "sha256": "042e0a899b9f132b4281c8f40a498e94f7dd810a7cb2bd27ade245f3133f30f1"
         },
         {
           "file": "test/fixtures/minimal.architecture.yaml",
-          "sha256": "15619c737a351d67b3aafa4cf19a4979732f1aad0e85e2a1f9d38cc66cb5bacb"
+          "sha256": "431e4c4110d6541139585f32ce8ac978668be2a8de0c792349c48c82d57e5712"
         },
         {
           "file": "test/fixtures/order-platform.architecture.yaml",
-          "sha256": "967b0498af330f392ea67d1d0e7b5054c293fb591a9c41ed5da15e2b3bd85e72"
+          "sha256": "9503ce17f971a5bc7ba760eb088e928e017238877edc2867f4f303d42093f9b4"
         },
         {
           "file": "test/fixtures/order-platform.evolution.architecture.yaml",
-          "sha256": "20f4f1898bc715cd3eeee54e2cf198723fa73e2865161bcf54bcb18ac2b20765"
+          "sha256": "ff05a29b1edc715e2fa171c454ca5e776a4209bae38ae22fd616b14bd21c58ad"
         },
         {
           "file": "test/fixtures/order-platform.violation.architecture.yaml",
-          "sha256": "9b05d32bac86a754e48e6df60457c6b78db9aba33be96bdddac7de06d5ba6472"
+          "sha256": "1c357bf2f68e5690e2bee0ebbb53515ca56cab89c76bb7a1372f90c8eb6f0292"
         }
       ],
-      "sha256": "9a3387bfed8324bed0a744b2efe3ebb5bd206bcb8f04080d091bf355200d3b08"
+      "sha256": "d03a51b4120fff9c07ea2cb8b17ed007b4c88cbe5c7671839747e4e8d5c88c3a"
     },
     "verification_source": [
       {
         "file": "scripts/cli-smoke.mjs",
-        "sha256": "3b8568efca971afa9d41e29d67bc85c56b29524657c8b806d090b4c7b94c4b77"
+        "sha256": "817256965e3570277fc6cf7962c2456320c68f8b6d8b8f597685e8fd5075a092"
+      },
+      {
+        "file": "scripts/contract-compatibility.mjs",
+        "sha256": "83d8e7a877a26983376f07661f7d83ae055453220b0654d9f4a9ca665598a9c1"
       },
       {
         "file": "scripts/phase1-evidence.mjs",
-        "sha256": "68faff3c8fe90757411d6f52261699277309833d1881f1391e41002c413fcffc"
+        "sha256": "503adf0476f1bc1e665ed2f3f908ca40c8b926e7f924dfb06c199109ac223e98"
       },
       {
         "file": "tsconfig.json",
@@ -133,27 +177,27 @@
       },
       {
         "file": "vitest.config.ts",
-        "sha256": "1b485eeec7fd741e284a1439cde221ac1a4e17f89559b326a208fc9305b639f3"
+        "sha256": "66e9fdae2147c27393aa38cd4969f8f5aa2138b2a9eeb1311475d45c85c3960e"
       }
     ],
-    "verification_source_sha256": "ece41b2a6bf484d12afe65e217222514d61e409c2797f98f82d0bc79c25d3383",
+    "verification_source_sha256": "a5b5eb6516ef859fcfdc0f2028dc15228c7159957f0039cbda58e57ecbb89bf7",
     "dependency_source": [
       {
         "file": "package.json",
-        "sha256": "cea8fe916d18dd3b03318a059f44e09d4cee7e01c4bc8d67f2cc7c5f309a6e3c"
+        "sha256": "2616d9d2daa76c965ae4283855d3ff4d7be9a9ed2210c0bf04ca468de81d8a27"
       },
       {
         "file": "pnpm-lock.yaml",
         "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
       }
     ],
-    "dependency_source_sha256": "8f88b7982cbd4cc116b297331f7368b3e620c59348f33877d98c81bfd0aa5b74"
+    "dependency_source_sha256": "284c3fead11fb0b8937f49ba64c59f99dac25926999f4171063097bb60009198"
   },
   "schema": {
     "file": "specs/architecture.schema.json",
-    "id": "https://archsync.dev/schemas/architecture-v0.1.json",
+    "id": "https://archsync.dev/schemas/architecture-v0.1.1.json",
     "title": "ArchSync Architecture Model",
-    "sha256": "d93a3179d02b11a8efe0b18be4096a244182e2b3928d6f2c5919aa3670a0402c",
+    "sha256": "03efb964eaf2d2e984e0e70464e1a4894a12a2e18a099c0860806b03435fc87b",
     "required_sections": [
       "version",
       "metadata",
@@ -176,6 +220,22 @@
       "version",
       "benchmark",
       "cases"
+    ]
+  },
+  "contract_compatibility": {
+    "architecture": {
+      "current": "0.1.1",
+      "previous": "0.1.0",
+      "legacy_alias": "0.1"
+    },
+    "graph": "1.0.0",
+    "finding": "1.0.0",
+    "evidence": "1.0.0",
+    "conformance": "1.0.0",
+    "cli_json": "1.0.0",
+    "replay_fixtures": [
+      "test/fixtures/compatibility/ground-truth-current.json",
+      "test/fixtures/compatibility/ground-truth-previous.json"
     ]
   },
   "fixtures": {
@@ -211,11 +271,6 @@
         "file": "test/fixtures/invalid-schema.architecture.yaml",
         "issues": [
           {
-            "path": "/version",
-            "keyword": "schema",
-            "message": "must match pattern \"^0\\.1(?:\\.[0-9]+)?$\""
-          },
-          {
             "path": "/components/Bad_Component_ID",
             "keyword": "schema",
             "message": "must match pattern \"^[a-z][a-z0-9-]*$\""
@@ -249,6 +304,16 @@
             "path": "/relationships/0/to",
             "keyword": "reference",
             "message": "Unknown component 'missing-database'"
+          }
+        ]
+      },
+      {
+        "file": "test/fixtures/invalid-unsupported-version.architecture.yaml",
+        "issues": [
+          {
+            "path": "/version",
+            "keyword": "version",
+            "message": "Unsupported architecture contract version '1.0.0'. Supported versions: 0.1.1, 0.1.0, 0.1."
           }
         ]
       }
@@ -337,6 +402,7 @@
     "cli_smoke_checks": [
       "valid model exits 0",
       "invalid model exits 1 with actionable path",
+      "unsupported contract version exits 1 with migration guidance",
       "graph emits parseable JSON",
       "graph diff emits expected delta",
       "clean conformance exits 0",

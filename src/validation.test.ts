@@ -7,6 +7,10 @@ import {
   formatValidationIssues,
   parseArchitecture,
 } from "./validation.js";
+import {
+  ARCHITECTURE_CONTRACT_CURRENT_VERSION,
+  ARCHITECTURE_CONTRACT_PREVIOUS_VERSION,
+} from "./versions.js";
 
 const examplesDirectory = new URL("../test/fixtures/", import.meta.url);
 
@@ -22,6 +26,58 @@ describe("architecture validation", () => {
 
     expect(result.valid).toBe(true);
     expect(Object.keys(result.value?.components ?? {})).toHaveLength(2);
+  });
+
+  it("loads both current and previous compatibility fixtures", async () => {
+    const current = await parseArchitecture(
+      await readExample("compatibility/current.architecture.yaml"),
+    );
+    const previous = await parseArchitecture(
+      await readExample("compatibility/previous.architecture.yaml"),
+    );
+
+    expect(current.valid).toBe(true);
+    expect(current.value?.version).toBe(ARCHITECTURE_CONTRACT_CURRENT_VERSION);
+    expect(previous.valid).toBe(true);
+    expect(previous.value?.version).toBe(ARCHITECTURE_CONTRACT_PREVIOUS_VERSION);
+  });
+
+  it("rejects unsupported versions with an actionable migration error", async () => {
+    const result = await parseArchitecture(
+      await readExample("invalid-unsupported-version.architecture.yaml"),
+    );
+
+    expect(result).toMatchObject({
+      valid: false,
+      issues: [{
+        path: "/version",
+        keyword: "version",
+        message: expect.stringContaining("Unsupported architecture contract version '1.0.0'"),
+      }],
+    });
+    expect(formatValidationIssues(result.issues)).toContain(
+      `Fix: Use architecture contract ${ARCHITECTURE_CONTRACT_CURRENT_VERSION}, migrate from ${ARCHITECTURE_CONTRACT_PREVIOUS_VERSION}`,
+    );
+  });
+
+  it("leaves non-string versions to the JSON schema type check", async () => {
+    const result = await parseArchitecture(`
+version: 1
+metadata:
+  name: numeric-version
+components:
+  service:
+    type: service
+    layer: application
+relationships: []
+`);
+
+    expect(result.valid).toBe(false);
+    expect(result.issues).toContainEqual(expect.objectContaining({
+      path: "/version",
+      keyword: "schema",
+      message: "must be string",
+    }));
   });
 
   it("accepts rules and quality goals", async () => {

@@ -1,4 +1,4 @@
-version: "0.1"
+version: "0.1.1"
 metadata:
   name: invalid-unknown-component
 components:
@@ -9,4 +9,3 @@ relationships:
   - from: api
     to: missing-database
     type: data
-

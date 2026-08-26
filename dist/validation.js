@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { Ajv2020, } from "ajv/dist/2020.js";
 import { parseDocument } from "yaml";
+import { ARCHITECTURE_CONTRACT_CURRENT_VERSION, ARCHITECTURE_CONTRACT_PREVIOUS_VERSION, unsupportedArchitectureContractVersionMessage, } from "./versions.js";
 const schemaUrl = new URL("../specs/architecture.schema.json", import.meta.url);
 let validatorPromise;
 export function formatSchemaIssue(error) {
@@ -140,6 +141,18 @@ export async function parseArchitecture(source) {
         };
     }
     const value = yaml.toJS();
+    const version = value?.version;
+    const unsupportedVersion = unsupportedArchitectureContractVersionMessage(version);
+    if (unsupportedVersion) {
+        return {
+            valid: false,
+            issues: [{
+                    path: "/version",
+                    message: unsupportedVersion,
+                    keyword: "version",
+                }],
+        };
+    }
     const validate = await getValidator();
     if (!validate(value)) {
         return {
@@ -176,6 +189,9 @@ function formatValidationPath(path) {
     return `${readable} (${path})`;
 }
 function validationFix(issue) {
+    if (issue.keyword === "version") {
+        return `Use architecture contract ${ARCHITECTURE_CONTRACT_CURRENT_VERSION}, migrate from ${ARCHITECTURE_CONTRACT_PREVIOUS_VERSION}, or follow docs/migrations/core-contracts-0.1.0-to-0.1.1.md.`;
+    }
     const unknownComponent = issue.message.match(/Unknown component '([^']+)'/);
     if (unknownComponent) {
         return `Add '${unknownComponent[1]}' under components, or change this reference to an existing component.`;

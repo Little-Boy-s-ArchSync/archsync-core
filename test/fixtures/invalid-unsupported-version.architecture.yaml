@@ -1,0 +1,8 @@
+version: "1.0.0"
+metadata:
+  name: unsupported-version
+components:
+  service:
+    type: service
+    layer: application
+relationships: []

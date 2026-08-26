@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://archsync.dev/schemas/architecture-v0.1.json",
+  "$id": "https://archsync.dev/schemas/architecture-v0.1.1.json",
   "title": "ArchSync Architecture Model",
   "description": "Machine-readable contract for the intended software architecture.",
   "type": "object",
@@ -9,7 +9,8 @@
   "properties": {
     "version": {
       "type": "string",
-      "pattern": "^0\\.1(?:\\.[0-9]+)?$"
+      "description": "ArchSync architecture contract version. 0.1 is the deprecated spelling of 0.1.0.",
+      "enum": ["0.1", "0.1.0", "0.1.1"]
     },
     "metadata": {
       "type": "object",

@@ -1,0 +1,58 @@
+{
+  "version": "0.1",
+  "benchmark": {
+    "id": "core-contract-current",
+    "architecture": "current.architecture.yaml",
+    "repository": "repository",
+    "stack": "TypeScript/Node.js",
+    "expected_distribution": {
+      "no-impact": 0,
+      "violation": 1,
+      "evolution": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "compatibility-01",
+      "title": "Reject a direct data-boundary bypass",
+      "owner": "Core compatibility gate",
+      "category": "violation",
+      "risk": "high",
+      "description": "Replay one stable rule violation on the current architecture contract.",
+      "patch": "case-01.patch",
+      "changed_files": ["src/app.ts"],
+      "delta": {
+        "relationships_added": [
+          {
+            "from": "api",
+            "to": "database",
+            "type": "data"
+          }
+        ]
+      },
+      "acceptance_criteria": [
+        "The engine returns the ARCH-001 violation with stable graph and evidence contracts."
+      ],
+      "expected": {
+        "classification": "violation",
+        "findings": [
+          {
+            "id": "ARCH-001",
+            "kind": "deny-rule",
+            "severity": "error",
+            "from": "api",
+            "to": "database"
+          }
+        ],
+        "evidence": [
+          {
+            "file": "src/app.ts",
+            "line": 1,
+            "kind": "source-location"
+          }
+        ],
+        "approval_required": false
+      }
+    }
+  ]
+}

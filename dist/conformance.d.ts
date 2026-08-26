@@ -1,10 +1,13 @@
 import type { ArchitectureDocument, GraphDiff, RelationshipType, Severity } from "./model.js";
+import { CONFORMANCE_CONTRACT_VERSION, EVIDENCE_CONTRACT_VERSION, FINDING_CONTRACT_VERSION } from "./versions.js";
 export type ConformanceClassification = "no-impact" | "violation" | "evolution";
 export interface ConformanceEvidence {
+    schema_version: typeof EVIDENCE_CONTRACT_VERSION;
     document: "expected" | "observed";
     path: string;
 }
 export interface ConformanceFinding {
+    schema_version: typeof FINDING_CONTRACT_VERSION;
     id: string;
     kind: "deny-rule" | "allow-rule" | "required-edge" | "required-path" | "architecture-evolution";
     severity: Severity;
@@ -27,6 +30,7 @@ export interface ConformanceSummary {
     removed_edges: number;
 }
 export interface ConformanceResult {
+    schema_version: typeof CONFORMANCE_CONTRACT_VERSION;
     classification: ConformanceClassification;
     findings: ConformanceFinding[];
     diff: GraphDiff;

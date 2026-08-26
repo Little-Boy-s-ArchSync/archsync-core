@@ -1,3 +1,4 @@
+import type { ArchitectureContractVersion, GRAPH_CONTRACT_VERSION } from "./versions.js";
 export declare const componentTypes: readonly ["frontend", "gateway", "service", "worker", "database", "cache", "queue", "external", "library", "other"];
 export type ComponentType = (typeof componentTypes)[number];
 export declare const layers: readonly ["experience", "edge", "application", "domain", "data", "integration", "external"];
@@ -50,7 +51,7 @@ export interface QualityGoal {
     description?: string;
 }
 export interface ArchitectureDocument {
-    version: string;
+    version: ArchitectureContractVersion;
     metadata: ArchitectureMetadata;
     components: Record<string, ArchitectureComponent>;
     relationships: ArchitectureRelationship[];
@@ -65,12 +66,14 @@ export interface GraphEdge extends ArchitectureRelationship {
     key: string;
 }
 export interface ArchitectureGraph {
+    schema_version: typeof GRAPH_CONTRACT_VERSION;
     nodes: ReadonlyMap<string, GraphNode>;
     edges: readonly GraphEdge[];
     outgoing: ReadonlyMap<string, readonly GraphEdge[]>;
     incoming: ReadonlyMap<string, readonly GraphEdge[]>;
 }
 export interface GraphDiff {
+    schema_version: typeof GRAPH_CONTRACT_VERSION;
     addedNodes: GraphNode[];
     removedNodes: GraphNode[];
     changedNodes: GraphNodeChange[];
@@ -85,7 +88,7 @@ export interface GraphNodeChange {
 export interface ValidationIssue {
     path: string;
     message: string;
-    keyword: "schema" | "reference" | "duplicate" | "semantic";
+    keyword: "schema" | "version" | "reference" | "duplicate" | "semantic";
 }
 export interface ValidationResult<T> {
     valid: boolean;

@@ -1,4 +1,4 @@
-version: "1.0"
+version: "0.1.1"
 metadata:
   name: invalid-schema
 components:
@@ -6,4 +6,3 @@ components:
     type: unknown-type
     layer: nowhere
 relationships: not-an-array
-
