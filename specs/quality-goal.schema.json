@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archsync.dev/schemas/quality-goal-v0.2.json",
+  "title": "ArchSync Quality Goal v0.2",
+  "description": "A typed, independently measurable quality target. This contract does not imply that a goal has been approved or experimentally validated.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "id",
+    "attribute",
+    "scope",
+    "metric",
+    "operator",
+    "target",
+    "unit",
+    "window",
+    "priority"
+  ],
+  "properties": {
+    "contract_version": { "const": "0.2" },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9-]*$"
+    },
+    "attribute": {
+      "enum": ["latency", "availability", "security", "cost", "complexity"]
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^(?:\\*|[a-z*][a-z0-9*-]*)$"
+    },
+    "metric": {
+      "enum": [
+        "p95_latency",
+        "availability_ratio",
+        "security_violation_count",
+        "estimated_cost",
+        "component_count"
+      ]
+    },
+    "operator": { "enum": ["<", "<=", ">=", ">"] },
+    "target": { "type": "number" },
+    "unit": { "enum": ["ms", "ratio", "count", "usd"] },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit"],
+      "properties": {
+        "value": { "type": "integer", "minimum": 1 },
+        "unit": { "enum": ["minute", "hour", "day"] }
+      }
+    },
+    "priority": { "enum": ["low", "medium", "high", "critical"] },
+    "description": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "attribute": { "const": "latency" } }, "required": ["attribute"] },
+      "then": {
+        "properties": {
+          "metric": { "const": "p95_latency" },
+          "operator": { "enum": ["<", "<="] },
+          "target": { "type": "number", "minimum": 0 },
+          "unit": { "const": "ms" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "attribute": { "const": "availability" } }, "required": ["attribute"] },
+      "then": {
+        "properties": {
+          "metric": { "const": "availability_ratio" },
+          "operator": { "enum": [">", ">="] },
+          "target": { "type": "number", "minimum": 0, "maximum": 1 },
+          "unit": { "const": "ratio" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "attribute": { "const": "security" } }, "required": ["attribute"] },
+      "then": {
+        "properties": {
+          "metric": { "const": "security_violation_count" },
+          "operator": { "enum": ["<", "<="] },
+          "target": { "type": "integer", "minimum": 0 },
+          "unit": { "const": "count" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "attribute": { "const": "cost" } }, "required": ["attribute"] },
+      "then": {
+        "properties": {
+          "metric": { "const": "estimated_cost" },
+          "operator": { "enum": ["<", "<="] },
+          "target": { "type": "number", "minimum": 0 },
+          "unit": { "const": "usd" }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "attribute": { "const": "complexity" } }, "required": ["attribute"] },
+      "then": {
+        "properties": {
+          "metric": { "const": "component_count" },
+          "operator": { "enum": ["<", "<="] },
+          "target": { "type": "integer", "minimum": 0 },
+          "unit": { "const": "count" }
+        }
+      }
+    }
+  ]
+}
