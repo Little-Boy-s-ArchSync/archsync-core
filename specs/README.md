@@ -7,6 +7,11 @@ spelling. It rejects every other string version with an actionable `/version`
 error. See the [compatibility matrix](../docs/contract-compatibility.md) and
 [migration note](../docs/migrations/core-contracts-0.1.0-to-0.1.1.md).
 
+The reader accepts current `0.1.1`, previous `0.1.0`, and the deprecated `0.1`
+spelling. It rejects every other string version with an actionable `/version`
+error. See the [compatibility matrix](../docs/contract-compatibility.md) and
+[migration note](../docs/migrations/core-contracts-0.1.0-to-0.1.1.md).
+
 ## Model sections
 
 - `metadata`: model identity and ownership.
