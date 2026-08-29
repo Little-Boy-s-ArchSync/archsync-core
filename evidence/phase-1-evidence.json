@@ -156,6 +156,18 @@
     },
     "verification_source": [
       {
+        "file": ".github/workflows/ci.yml",
+        "sha256": "e3b2cdaf6a4a835f82ce80a8799d7fbee9a99896960cba840f165645a6e0a3f5"
+      },
+      {
+        "file": "scripts/architecture-change-policy.mjs",
+        "sha256": "6b57bbe56da2eaf624f4b8830fcf63bc76f7435aad2e0d05cf6f4760af73b38f"
+      },
+      {
+        "file": "scripts/architecture-change-policy.node-tests.mjs",
+        "sha256": "c263ab94e29a43a1be5e1b35dd918bb9e496b882321bb710c662eeddfae1840c"
+      },
+      {
         "file": "scripts/cli-smoke.mjs",
         "sha256": "817256965e3570277fc6cf7962c2456320c68f8b6d8b8f597685e8fd5075a092"
       },
@@ -165,7 +177,7 @@
       },
       {
         "file": "scripts/phase1-evidence.mjs",
-        "sha256": "503adf0476f1bc1e665ed2f3f908ca40c8b926e7f924dfb06c199109ac223e98"
+        "sha256": "68cb12df58009b68fd7a8b0f8cb450c993bb2d7b99553ad619de1c3d620fd2a9"
       },
       {
         "file": "tsconfig.json",
@@ -180,18 +192,18 @@
         "sha256": "66e9fdae2147c27393aa38cd4969f8f5aa2138b2a9eeb1311475d45c85c3960e"
       }
     ],
-    "verification_source_sha256": "a5b5eb6516ef859fcfdc0f2028dc15228c7159957f0039cbda58e57ecbb89bf7",
+    "verification_source_sha256": "6579f5cd99bd9c26e505a44ca9d5f6f0b8e39183dae82b6923a89ab5339be771",
     "dependency_source": [
       {
         "file": "package.json",
-        "sha256": "2616d9d2daa76c965ae4283855d3ff4d7be9a9ed2210c0bf04ca468de81d8a27"
+        "sha256": "96e7c54dc123228886f5b52165434a13ae33c94c1dfdb0ea0be370820023795f"
       },
       {
         "file": "pnpm-lock.yaml",
         "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
       }
     ],
-    "dependency_source_sha256": "284c3fead11fb0b8937f49ba64c59f99dac25926999f4171063097bb60009198"
+    "dependency_source_sha256": "e9eb2b8602714815957c06efe8f0251ad57f809cc386c2e8a22703fcec387037"
   },
   "schema": {
     "file": "specs/architecture.schema.json",
@@ -221,6 +233,33 @@
       "benchmark",
       "cases"
     ]
+  },
+  "governance_policy": {
+    "task": "GOV-103",
+    "revision": "GOV-103-r1",
+    "status": "proposed-pending-human",
+    "file": "docs/adr/0004-architecture-change-policy-proposed.md",
+    "sha256": "a65edb493b488abc09c1ba74d956c7299b8d16033044fe12abde3948bf827a69",
+    "acceptance_record_schema": {
+      "file": "specs/gov103-acceptance-record.schema.json",
+      "id": "https://archsync.dev/schemas/gov103-acceptance-record-v1.json",
+      "sha256": "5cae193ec255f9a5ec36dee4ee6411d51c7d998bf699b1384a6ab1c7ea399c1e"
+    },
+    "approval_evidence_schema": {
+      "file": "specs/gov103-approval-evidence.schema.json",
+      "id": "https://archsync.dev/schemas/gov103-approval-evidence-v1.json",
+      "sha256": "c0784c192d2721b5f96c060c91cbde37c58419da574d9b97a891987e0a9bc7b8"
+    },
+    "acceptance_record_procedure": {
+      "file": "docs/adr/acceptance-records/README.md",
+      "sha256": "4f80cbe1ed00c2d4921f4650059b3e27d1565033dde90205da8b51d04a619a59"
+    },
+    "approval_evidence_procedure": {
+      "file": "docs/adr/acceptance-evidence/README.md",
+      "sha256": "c3115d874ed72fe35eff202538913298203d131f66d815a7e0ae0f9128bc7522"
+    },
+    "approval_evidence_files": [],
+    "acceptance_record_files": []
   },
   "contract_compatibility": {
     "architecture": {

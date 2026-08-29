@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archsync.dev/schemas/gov103-approval-evidence-v1.json",
+  "title": "ArchSync GOV-103 Human Approval Evidence",
+  "description": "Immutable human approval and non-author review evidence for exact GOV-103 policy bytes. It is committed before the separate closure record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "policy_revision",
+    "policy_commit",
+    "policy_sha256",
+    "policy_authors",
+    "actor_type",
+    "accepted_by",
+    "accountable_role",
+    "decision",
+    "accepted_at_utc",
+    "acceptance_authorization_reference",
+    "non_author_review"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_id": {
+      "const": "GOV-103"
+    },
+    "policy_revision": {
+      "const": "GOV-103-r1"
+    },
+    "policy_commit": {
+      "$ref": "#/$defs/gitCommit"
+    },
+    "policy_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "policy_authors": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/namedValue"
+      }
+    },
+    "actor_type": {
+      "const": "human"
+    },
+    "accepted_by": {
+      "const": "Hiếu"
+    },
+    "accountable_role": {
+      "const": "Repository Lead"
+    },
+    "decision": {
+      "const": "approved"
+    },
+    "accepted_at_utc": {
+      "$ref": "#/$defs/utcSecond"
+    },
+    "acceptance_authorization_reference": {
+      "$ref": "#/$defs/reference"
+    },
+    "non_author_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actor_type",
+        "reviewed_by",
+        "reviewer_role",
+        "decision",
+        "reviewed_at_utc",
+        "policy_sha256",
+        "authorization_reference"
+      ],
+      "properties": {
+        "actor_type": {
+          "const": "human"
+        },
+        "reviewed_by": {
+          "$ref": "#/$defs/namedValue"
+        },
+        "reviewer_role": {
+          "$ref": "#/$defs/namedValue"
+        },
+        "decision": {
+          "const": "approved"
+        },
+        "reviewed_at_utc": {
+          "$ref": "#/$defs/utcSecond"
+        },
+        "policy_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "authorization_reference": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "utcSecond": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "namedValue": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^\\S(?:.*\\S)?$"
+    },
+    "reference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2048,
+      "pattern": "^\\S(?:.*\\S)?$"
+    }
+  }
+}

@@ -80,3 +80,5 @@ scripts/        CLI smoke and evidence verification
 ```
 
 The user-facing models live in `archsync-examples`; the independently verified 20-case end-to-end dataset and 40-signal detector corpus live in `archsync-benchmark`. See [Phase 1](docs/phase-1.md), [ADR-0001](docs/adr/0001-architecture-model-is-source-of-truth.md) and [ADR-0002](docs/adr/0002-expanded-evaluation-foundation.md).
+
+[ADR-0004](docs/adr/0004-architecture-change-policy-proposed.md) contains the proposed GOV-103 risk/approval matrix and fail-closed baseline-update policy. It remains **Proposed**: no human approval evidence or append-only acceptance record is present. `pnpm governance:verify` validates the prepared contract without converting that absence into acceptance.
