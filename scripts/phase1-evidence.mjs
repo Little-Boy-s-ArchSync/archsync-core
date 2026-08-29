@@ -82,6 +82,28 @@ const schema = JSON.parse(schemaSource);
 const benchmarkSchemaPath = join(root, "specs", "benchmark-ground-truth.schema.json");
 const benchmarkSchemaSource = await readFile(benchmarkSchemaPath, "utf8");
 const benchmarkSchema = JSON.parse(benchmarkSchemaSource);
+const governancePolicyPath = join(root, "docs", "adr", "0004-architecture-change-policy-proposed.md");
+const governancePolicySource = await readFile(governancePolicyPath, "utf8");
+const governanceRecordProcedurePath = join(root, "docs", "adr", "acceptance-records", "README.md");
+const governanceRecordProcedureSource = await readFile(governanceRecordProcedurePath, "utf8");
+const governanceEvidenceProcedurePath = join(root, "docs", "adr", "acceptance-evidence", "README.md");
+const governanceEvidenceProcedureSource = await readFile(governanceEvidenceProcedurePath, "utf8");
+const governanceRecordSchemaPath = join(root, "specs", "gov103-acceptance-record.schema.json");
+const governanceRecordSchemaSource = await readFile(governanceRecordSchemaPath, "utf8");
+const governanceRecordSchema = JSON.parse(governanceRecordSchemaSource);
+const governanceEvidenceSchemaPath = join(root, "specs", "gov103-approval-evidence.schema.json");
+const governanceEvidenceSchemaSource = await readFile(governanceEvidenceSchemaPath, "utf8");
+const governanceEvidenceSchema = JSON.parse(governanceEvidenceSchemaSource);
+const governanceAcceptanceRecordNames = (await readdir(join(root, "docs", "adr", "acceptance-records")))
+  .filter((name) => name.endsWith(".json"))
+  .sort();
+const governanceApprovalEvidenceNames = (await readdir(join(root, "docs", "adr", "acceptance-evidence")))
+  .filter((name) => name.endsWith(".json"))
+  .sort();
+const governanceAcceptanceRecords = await hashFiles(governanceAcceptanceRecordNames
+  .map((name) => join(root, "docs", "adr", "acceptance-records", name)));
+const governanceApprovalEvidence = await hashFiles(governanceApprovalEvidenceNames
+  .map((name) => join(root, "docs", "adr", "acceptance-evidence", name)));
 const sourceDirectory = join(root, "src");
 const sourceNames = (await readdir(sourceDirectory))
   .filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts"))
@@ -97,7 +119,10 @@ const unitTestSource = await hashFiles(
 );
 const fixtureTree = await treeSha256(fixturesDirectory);
 const verificationSource = await hashFiles([
+  join(root, ".github", "workflows", "ci.yml"),
   join(root, "scripts", "cli-smoke.mjs"),
+  join(root, "scripts", "architecture-change-policy.mjs"),
+  join(root, "scripts", "architecture-change-policy.node-tests.mjs"),
   join(root, "scripts", "contract-compatibility.mjs"),
   join(root, "scripts", "phase1-evidence.mjs"),
   join(root, "tsconfig.json"),
@@ -206,6 +231,37 @@ const evidence = {
     title: benchmarkSchema.title,
     sha256: sha256(benchmarkSchemaSource),
     required_sections: benchmarkSchema.required,
+  },
+  governance_policy: {
+    task: "GOV-103",
+    revision: "GOV-103-r1",
+    status: governanceAcceptanceRecordNames.length === 0
+      ? (governanceApprovalEvidenceNames.length === 0
+          ? "proposed-pending-human"
+          : "proposed-pending-closure")
+      : "closure-record-present-authenticity-review-required",
+    file: relativePath(governancePolicyPath),
+    sha256: sha256(governancePolicySource),
+    acceptance_record_schema: {
+      file: relativePath(governanceRecordSchemaPath),
+      id: governanceRecordSchema.$id,
+      sha256: sha256(governanceRecordSchemaSource),
+    },
+    approval_evidence_schema: {
+      file: relativePath(governanceEvidenceSchemaPath),
+      id: governanceEvidenceSchema.$id,
+      sha256: sha256(governanceEvidenceSchemaSource),
+    },
+    acceptance_record_procedure: {
+      file: relativePath(governanceRecordProcedurePath),
+      sha256: sha256(governanceRecordProcedureSource),
+    },
+    approval_evidence_procedure: {
+      file: relativePath(governanceEvidenceProcedurePath),
+      sha256: sha256(governanceEvidenceProcedureSource),
+    },
+    approval_evidence_files: governanceApprovalEvidence,
+    acceptance_record_files: governanceAcceptanceRecords,
   },
   contract_compatibility: {
     architecture: {
