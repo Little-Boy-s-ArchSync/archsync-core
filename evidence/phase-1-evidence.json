@@ -200,10 +200,10 @@
       },
       {
         "file": "pnpm-lock.yaml",
-        "sha256": "3d7c8ce009bca724d74a70432591953c9fa9e39a1b39241571ab9a0abf48f910"
+        "sha256": "9f24372d2f62691c0b608520234f05e5315636afff3c7d1bb4f7a35456847974"
       }
     ],
-    "dependency_source_sha256": "e9eb2b8602714815957c06efe8f0251ad57f809cc386c2e8a22703fcec387037"
+    "dependency_source_sha256": "e66bd1690c5309235fccd985983a23fcad51c2f9a9739e3e577b7eed881e822d"
   },
   "schema": {
     "file": "specs/architecture.schema.json",
