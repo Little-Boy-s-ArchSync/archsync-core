@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://archsync.dev/schemas/gov103-acceptance-record-v1.json",
+  "title": "ArchSync GOV-103 Acceptance Record",
+  "description": "Append-only closure manifest binding a human GOV-103 approval to exact policy bytes and earlier immutable approval evidence. A valid manifest does not itself prove that the referenced human decision occurred.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "policy_revision",
+    "policy_commit",
+    "policy_sha256",
+    "actor_type",
+    "accepted_by",
+    "accountable_role",
+    "decision",
+    "accepted_at_utc",
+    "evidence_commit",
+    "evidence_url",
+    "acceptance_record_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "policy_id": {
+      "const": "GOV-103"
+    },
+    "policy_revision": {
+      "const": "GOV-103-r1"
+    },
+    "policy_commit": {
+      "$ref": "#/$defs/gitCommit"
+    },
+    "policy_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "actor_type": {
+      "const": "human"
+    },
+    "accepted_by": {
+      "const": "Hiếu"
+    },
+    "accountable_role": {
+      "const": "Repository Lead"
+    },
+    "decision": {
+      "const": "approved"
+    },
+    "accepted_at_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "evidence_commit": {
+      "$ref": "#/$defs/gitCommit"
+    },
+    "evidence_url": {
+      "type": "string",
+      "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/blob/[0-9a-f]{40}/[^?#\\s]+(?:#L[0-9]+(?:-L[0-9]+)?)?$"
+    },
+    "acceptance_record_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "gitCommit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
