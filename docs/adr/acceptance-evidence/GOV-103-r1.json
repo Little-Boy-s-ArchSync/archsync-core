@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "policy_id": "GOV-103",
+  "policy_revision": "GOV-103-r1",
+  "policy_commit": "ff7b47f7bf17f3d820941522b13032445e612773",
+  "policy_sha256": "a65edb493b488abc09c1ba74d956c7299b8d16033044fe12abde3948bf827a69",
+  "policy_authors": [
+    "Trần Minh Hoàng (Git author: Andy Tran / an1dee3301)"
+  ],
+  "actor_type": "human",
+  "accepted_by": "Hiếu",
+  "accountable_role": "Repository Lead",
+  "decision": "approved",
+  "accepted_at_utc": "2026-09-11T09:53:36Z",
+  "acceptance_authorization_reference": "https://github.com/Little-Boy-s-ArchSync/archsync/issues/52#issuecomment-5632714522",
+  "non_author_review": {
+    "actor_type": "human",
+    "reviewed_by": "Lê Văn Kiệt",
+    "reviewer_role": "Software Engineer / Non-author Reviewer",
+    "decision": "approved",
+    "reviewed_at_utc": "2026-09-11T07:14:19Z",
+    "policy_sha256": "a65edb493b488abc09c1ba74d956c7299b8d16033044fe12abde3948bf827a69",
+    "authorization_reference": "https://github.com/Little-Boy-s-ArchSync/archsync/issues/52#issuecomment-5630858361"
+  }
+}
