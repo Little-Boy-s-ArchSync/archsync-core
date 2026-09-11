@@ -237,7 +237,7 @@
   "governance_policy": {
     "task": "GOV-103",
     "revision": "GOV-103-r1",
-    "status": "proposed-pending-closure",
+    "status": "closure-record-present-authenticity-review-required",
     "file": "docs/adr/0004-architecture-change-policy-proposed.md",
     "sha256": "a65edb493b488abc09c1ba74d956c7299b8d16033044fe12abde3948bf827a69",
     "acceptance_record_schema": {
@@ -264,7 +264,12 @@
         "sha256": "a4e17b08031b58b26d2f11fb5297e89e6a6c9418003f0c7ee797622f8017dd1c"
       }
     ],
-    "acceptance_record_files": []
+    "acceptance_record_files": [
+      {
+        "file": "docs/adr/acceptance-records/20260911-GOV-103-r1-a65edb493b48.json",
+        "sha256": "3a5a933e7022859228f9bf3f1c3634883560a127dddcd7e89534dfb03cad495b"
+      }
+    ]
   },
   "contract_compatibility": {
     "architecture": {
