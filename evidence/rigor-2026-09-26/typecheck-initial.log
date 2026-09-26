@@ -1,0 +1,4 @@
+$ tsc -b --pretty false && tsc -p tsconfig.test.json --noEmit --pretty false
+src/conformance-exhaustive.test.ts(49,59): error TS2345: Argument of type '"other" | "data" | "http" | "async" | "dependency" | "event" | "deployment" | undefined' is not assignable to parameter of type '"data" | "http" | undefined'.
+  Type '"other"' is not assignable to type '"data" | "http" | undefined'.
+[ELIFECYCLE] Command failed with exit code 2.

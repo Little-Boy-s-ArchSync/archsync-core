@@ -60,10 +60,6 @@
         "sha256": "11deeb9a098c7c68ca7ee19968fec8619d35c15049a9768eb318bff6f3f49474"
       },
       {
-        "file": "src/conformance-exhaustive.test.ts",
-        "sha256": "cd407e101bcd3d535862e601546129e22091183a1ce42ce9231183178854fadf"
-      },
-      {
         "file": "src/conformance-report.test.ts",
         "sha256": "0bbce25a2bf7197d84cdae21e0149d02edf475b1416bd6a307d120b3571beb59"
       },
@@ -96,7 +92,7 @@
         "sha256": "06f31fc622742482447ec0732bda9665a1b23caf701e25d31099e52ac8daffce"
       }
     ],
-    "unit_test_source_sha256": "e9aae30ebb0815368629e87899f2a3454b911615cee39883a40abf6c16fdb044",
+    "unit_test_source_sha256": "52941d6a2f64974e27b35d9cfc8f985a0242a45a388d2fc6a9050e564452dfc3",
     "fixture_tree": {
       "files": [
         {
