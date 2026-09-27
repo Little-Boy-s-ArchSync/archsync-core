@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "scope": "eight targeted semantic mutants; synthetic finite model checking, not field accuracy",
+  "environment": {
+    "node": "v22.16.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "source_sha256": "ceb73388f6d4c2d9b0626fb55db1a66de64a584b61e37a70eaf8dec334ade0c1",
+  "test_sha256": "d782e06d34d513602f816752bc3ae5f64603704a6bdc434f0ec40965b42788af",
+  "runs": [
+    {
+      "id": "baseline",
+      "replacement": null,
+      "source_sha256": "ceb73388f6d4c2d9b0626fb55db1a66de64a584b61e37a70eaf8dec334ade0c1",
+      "exit_code": 0,
+      "signal": null,
+      "status": "passed",
+      "tests": 3,
+      "failed_tests": 0
+    },
+    {
+      "id": "deny-disabled",
+      "replacement": {
+        "before": "if (rule.type !== \"deny\") continue;",
+        "after": "if (rule.type === \"deny\") continue;"
+      },
+      "source_sha256": "e8fcd5786f5b7c0786eba95ba126c37a1f71204619eb2d3b1ff3dc690c36df8b",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    },
+    {
+      "id": "allow-inverted",
+      "replacement": {
+        "before": "!matchesSelector(rule.to, relationship.to)",
+        "after": "matchesSelector(rule.to, relationship.to)"
+      },
+      "source_sha256": "8031e4a7bbefbe90378d67f2af7fcab8d37d7bcd23a1fdd6b38298d5872e31d4",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    },
+    {
+      "id": "require-satisfied-is-error",
+      "replacement": {
+        "before": "if (matching) continue;",
+        "after": "if (!matching) continue;"
+      },
+      "source_sha256": "b3f0fda86e9b6e0888e928cfbf6062159f19d27d926cf4d282d36fda948af2b8",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    },
+    {
+      "id": "path-ignores-edge-type",
+      "replacement": {
+        "before": "if (relationshipType && edge.type !== relationshipType) continue;",
+        "after": "if (false) continue;"
+      },
+      "source_sha256": "10b2106b4f8191b916ee4eccf91256ee3e0dc39493d390003465a4bbe1135f71",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    },
+    {
+      "id": "path-is-direct-only",
+      "replacement": {
+        "before": "queue.push(edge.to);",
+        "after": "/* injected fault: do not traverse */"
+      },
+      "source_sha256": "c33d7ff92e6ac2ceda9934d19e78cea964fc96595f769267c3eac2d6b80b334a",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    },
+    {
+      "id": "path-misses-direct-target",
+      "replacement": {
+        "before": "if (matchesSelector(targetSelector, edge.to)) return true;",
+        "after": "if (false) return true;"
+      },
+      "source_sha256": "bb900c294b6565fd293e5f4d2444e50003665a5ce043895378dc426c10ecbc75",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    },
+    {
+      "id": "violation-demoted",
+      "replacement": {
+        "before": "? \"violation\"",
+        "after": "? \"no-impact\""
+      },
+      "source_sha256": "20a6f74c67c36d25b1fd4ea64ae7d516036aad55bbf00f86c5ea5212dab7b041",
+      "exit_code": 0,
+      "signal": null,
+      "status": "passed",
+      "tests": 3,
+      "failed_tests": 0
+    },
+    {
+      "id": "evolution-demoted",
+      "replacement": {
+        "before": "? \"evolution\"",
+        "after": "? \"no-impact\""
+      },
+      "source_sha256": "d6aa6a0bfaa5dbda2e863035b0b588972ea1c03923b17f357114fd18740c1f8e",
+      "exit_code": 1,
+      "signal": null,
+      "status": "assertion-failure",
+      "tests": 3,
+      "failed_tests": 1
+    }
+  ],
+  "killed": 7,
+  "survived": 1,
+  "execution_errors": 0
+}

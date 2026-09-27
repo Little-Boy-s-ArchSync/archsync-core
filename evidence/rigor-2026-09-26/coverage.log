@@ -1,0 +1,39 @@
+$ vitest run --coverage
+
+ RUN  v3.2.7 /Users/andytran/Coding/Little Boy's/acsidan/archsync-core
+      Coverage enabled with v8
+
+ ✓ src/mermaid.test.ts (4 tests) 10ms
+ ✓ src/graph.test.ts (4 tests) 10ms
+ ✓ src/drawio.test.ts (5 tests) 10ms
+ ✓ src/serialization.test.ts (4 tests) 11ms
+ ✓ src/conformance.test.ts (16 tests) 17ms
+ ✓ src/conformance-report.test.ts (9 tests) 13ms
+ ✓ src/validation.test.ts (17 tests) 113ms
+ ✓ src/validation.topology.test.ts (13 tests) 4ms
+ ✓ src/benchmark.test.ts (51 tests) 387ms
+ ✓ src/conformance-exhaustive.test.ts (3 tests) 4322ms
+   ✓ finite conformance model checking > matches a matrix oracle for all 4096 typed three-node graphs and 192 rules  3522ms
+   ✓ finite conformance model checking > preserves semantic outcomes under ordering and bijective component renaming  452ms
+   ✓ finite conformance model checking > classifies every edge addition/removal and verifies inverse graph deltas  347ms
+
+ Test Files  10 passed (10)
+      Tests  126 passed (126)
+   Start at  12:49:32
+   Duration  4.89s (transform 480ms, setup 0ms, collect 1.36s, tests 4.90s, environment 3ms, prepare 1.39s)
+
+ % Coverage report from v8
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |     100 |      100 |     100 |     100 |                   
+ benchmark.ts      |     100 |      100 |     100 |     100 |                   
+ ...ance-report.ts |     100 |      100 |     100 |     100 |                   
+ conformance.ts    |     100 |      100 |     100 |     100 |                   
+ drawio.ts         |     100 |      100 |     100 |     100 |                   
+ graph.ts          |     100 |      100 |     100 |     100 |                   
+ mermaid.ts        |     100 |      100 |     100 |     100 |                   
+ serialization.ts  |     100 |      100 |     100 |     100 |                   
+ validation.ts     |     100 |      100 |     100 |     100 |                   
+ versions.ts       |     100 |      100 |     100 |     100 |                   
+-------------------|---------|----------|---------|---------|-------------------
